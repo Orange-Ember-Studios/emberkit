@@ -1,0 +1,33 @@
+{
+  "name": "@emberkit/core",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Lightweight TypeScript-first JSX framework core",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc --build",
+    "dev": "tsc --build --watch",
+    "lint": "eslint src --ext .ts,.tsx",
+    "format": "prettier --write \"src/**/*.{ts,tsx}\"",
+    "test": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "vite": "^6.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^22.0.0",
+    "eslint": "^10.0.0",
+    "eslint-plugin-perfectionist": "^5.9.0",
+    "typescript-eslint": "^8.59.3",
+    "vitest": "^3.0.0"
+  }
+}
