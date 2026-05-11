@@ -1,6 +1,6 @@
 import type { RouteComponent } from '@emberkit/core';
 import { navigate } from '@emberkit/core';
-import { IconZap, IconPackage, IconTarget, IconType, IconArrowRight, IconCode } from './icons';
+import { IconZap, IconPackage, IconTarget, IconType, IconArrowRight, IconCode } from '@emberkit/icons';
 
 const HomePage: RouteComponent = () => {
   return (

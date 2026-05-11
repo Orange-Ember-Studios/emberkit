@@ -1,6 +1,6 @@
 import type { RouteComponent } from '@emberkit/core';
 import { navigate } from '@emberkit/core';
-import { IconChevronRight } from './icons';
+import { IconChevronRight } from '@emberkit/icons';
 
 const docs = [
   {

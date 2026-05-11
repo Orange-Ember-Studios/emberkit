@@ -1,22 +1,20 @@
-import type { JSXElement } from '@emberkit/core';
-
 export interface IconProps {
   size?: number;
   className?: string;
   color?: string;
 }
 
-type IconComponent = (props: IconProps) => JSXElement;
+type IconComponent<P = IconProps> = (props: P) => unknown;
 
 interface IconDefinition {
   viewBox: string;
   fill?: string;
   stroke?: boolean;
-  children: unknown[];
+  children: unknown;
 }
 
 function createSvgIcon(def: IconDefinition): IconComponent {
-  return (props) => ({
+  return (props: IconProps) => ({
     type: 'svg',
     props: {
       viewBox: def.viewBox,
@@ -30,7 +28,7 @@ function createSvgIcon(def: IconDefinition): IconComponent {
       className: props.className,
       children: def.children,
     },
-  } as unknown as JSXElement);
+  });
 }
 
 export const IconMenu = createSvgIcon({
@@ -80,6 +78,11 @@ export const IconChevronRight = createSvgIcon({
   children: { type: 'path', props: { d: 'M9 18l6-6-6-6' } },
 });
 
+export const IconChevronLeft = createSvgIcon({
+  viewBox: '0 0 24 24',
+  children: { type: 'path', props: { d: 'M15 18l-6-6 6-6' } },
+});
+
 export const IconArrowRight = createSvgIcon({
   viewBox: '0 0 24 24',
   children: { type: 'path', props: { d: 'M5 12h14M12 5l7 7-7 7' } },
@@ -98,6 +101,14 @@ export const IconArrowDown = createSvgIcon({
 export const IconPlay = createSvgIcon({
   viewBox: '0 0 24 24',
   children: { type: 'path', props: { d: 'M5 3l14 9-14 9V3z' } },
+});
+
+export const IconPause = createSvgIcon({
+  viewBox: '0 0 24 24',
+  children: [
+    { type: 'rect', props: { x: 6, y: 4, width: 4, height: 16 } },
+    { type: 'rect', props: { x: 14, y: 4, width: 4, height: 16 } },
+  ],
 });
 
 export const IconCode = createSvgIcon({
@@ -357,6 +368,68 @@ export const IconCalendar = createSvgIcon({
   ],
 });
 
+export const IconClock = createSvgIcon({
+  viewBox: '0 0 24 24',
+  children: [
+    { type: 'circle', props: { cx: 12, cy: 12, r: 10 } },
+    { type: 'polyline', props: { points: '12 6 12 12 16 14' } },
+  ],
+});
+
+export const IconMapPin = createSvgIcon({
+  viewBox: '0 0 24 24',
+  children: [
+    { type: 'path', props: { d: 'M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z' } },
+    { type: 'circle', props: { cx: 12, cy: 10, r: 3 } },
+  ],
+});
+
+export const IconLink = createSvgIcon({
+  viewBox: '0 0 24 24',
+  children: [
+    { type: 'path', props: { d: 'M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71' } },
+    { type: 'path', props: { d: 'M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71' } },
+  ],
+});
+
+export const IconRefresh = createSvgIcon({
+  viewBox: '0 0 24 24',
+  children: [
+    { type: 'polyline', props: { points: '23 4 23 10 17 10' } },
+    { type: 'path', props: { d: 'M20.49 15a9 9 0 1 1-2.12-9.36L23 10' } },
+  ],
+});
+
+export const IconShield = createSvgIcon({
+  viewBox: '0 0 24 24',
+  children: { type: 'path', props: { d: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z' } },
+});
+
+export const IconCloud = createSvgIcon({
+  viewBox: '0 0 24 24',
+  children: [
+    { type: 'path', props: { d: 'M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z' } },
+  ],
+});
+
+export const IconDownload = createSvgIcon({
+  viewBox: '0 0 24 24',
+  children: [
+    { type: 'path', props: { d: 'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4' } },
+    { type: 'polyline', props: { points: '7 10 12 15 17 10' } },
+    { type: 'line', props: { x1: 12, y1: 15, x2: 12, y2: 3 } },
+  ],
+});
+
+export const IconUpload = createSvgIcon({
+  viewBox: '0 0 24 24',
+  children: [
+    { type: 'path', props: { d: 'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4' } },
+    { type: 'polyline', props: { points: '17 8 12 3 7 8' } },
+    { type: 'line', props: { x1: 12, y1: 3, x2: 12, y2: 15 } },
+  ],
+});
+
 export default {
   Menu: IconMenu,
   X: IconX,
@@ -364,10 +437,12 @@ export default {
   Github: IconGithub,
   ChevronDown: IconChevronDown,
   ChevronRight: IconChevronRight,
+  ChevronLeft: IconChevronLeft,
   ArrowRight: IconArrowRight,
   ArrowUp: IconArrowUp,
   ArrowDown: IconArrowDown,
   Play: IconPlay,
+  Pause: IconPause,
   Code: IconCode,
   Book: IconBook,
   Zap: IconZap,
@@ -400,4 +475,12 @@ export default {
   Lock: IconLock,
   Mail: IconMail,
   Calendar: IconCalendar,
+  Clock: IconClock,
+  MapPin: IconMapPin,
+  Link: IconLink,
+  Refresh: IconRefresh,
+  Shield: IconShield,
+  Cloud: IconCloud,
+  Download: IconDownload,
+  Upload: IconUpload,
 };

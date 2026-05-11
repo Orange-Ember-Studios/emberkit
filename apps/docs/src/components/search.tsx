@@ -1,5 +1,5 @@
 import type { RouteComponent } from '@emberkit/core';
-import { IconSearch } from './icons';
+import { IconSearch } from '@emberkit/icons';
 
 const SearchButton: RouteComponent = () => {
   return (

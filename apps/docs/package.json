@@ -9,6 +9,7 @@
     "preview": "emberkit preview"
   },
   "dependencies": {
-    "@emberkit/core": "workspace:*"
+    "@emberkit/core": "workspace:*",
+    "@emberkit/icons": "workspace:*"
   }
 }

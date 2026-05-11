@@ -1,0 +1,10 @@
+{
+  "extends": "@emberkit/tsconfig/base.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "jsx": "react-jsx",
+    "jsxImportSource": "@emberkit/core"
+  },
+  "include": ["src/**/*"]
+}

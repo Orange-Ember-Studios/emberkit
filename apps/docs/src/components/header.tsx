@@ -1,6 +1,6 @@
 import type { RouteComponent } from '@emberkit/core';
 import { navigate } from '@emberkit/core';
-import { IconMenu, IconGithub } from './icons';
+import { IconMenu, IconGithub } from '@emberkit/icons';
 
 const Header: RouteComponent = () => {
   return (
