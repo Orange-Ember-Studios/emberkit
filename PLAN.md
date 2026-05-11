@@ -20,7 +20,7 @@
 
 - [x] **2.1** — Loader/data loading API (`RouteParams`, `LoaderResult`)
 - [x] **2.2** — SSR renderer
-- [ ] **2.3** — Error & loading boundaries (`_error.tsx`, `_loading.tsx`)
+- [x] **2.3** — Error & loading boundaries (`_error.tsx`, `_loading.tsx`)
 
 ### Phase 3: Interactivity (v0.3.0)
 
@@ -49,3 +49,6 @@
 | 1.4 JSX compiler | 2026-05-11 |
 | 1.5 Core runtime | 2026-05-11 |
 | 1.6 File-based routing | 2026-05-11 |
+| 2.1 Loader API | 2026-05-11 |
+| 2.2 SSR renderer | 2026-05-11 |
+| 2.3 Boundaries | 2026-05-11 |
