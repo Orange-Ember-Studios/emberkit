@@ -1,0 +1,27 @@
+{
+  "name": "@emberkit/cli",
+  "version": "0.1.0",
+  "type": "module",
+  "bin": {
+    "emberkit": "./bin/emberkit.js"
+  },
+  "main": "./dist/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "commander": "^11.1.0",
+    "inquirer": "^9.2.0"
+  },
+  "devDependencies": {
+    "@types/inquirer": "^9.0.3"
+  }
+}

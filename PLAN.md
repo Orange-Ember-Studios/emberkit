@@ -31,9 +31,9 @@
 
 ### Phase 4: Ecosystem (v0.4.0+)
 
-- [ ] **4.1** — Scaffolding CLI (`emberkit` CLI)
-- [ ] **4.2** — Dev server with HMR
-- [ ] **4.3** — Plugin system
+- [x] **4.1** — Scaffolding CLI (`emberkit` CLI)
+- [x] **4.2** — Dev server with HMR
+- [x] **4.3** — Plugin system
 - [ ] **4.4** — Edge runtime adapter
 - [ ] **4.5** — Image optimization plugin
 
@@ -56,3 +56,6 @@
 | 3.2 Context API | 2026-05-11 |
 | 3.3 Hydration | 2026-05-11 |
 | 3.4 Navigation | 2026-05-11 |
+| 4.1 CLI scaffold | 2026-05-11 |
+| 4.2 Dev server + HMR | 2026-05-11 |
+| 4.3 Plugin system | 2026-05-11 |

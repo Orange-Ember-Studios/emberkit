@@ -10,7 +10,8 @@
     "test": "pnpm -r test",
     "typecheck": "pnpm -r typecheck",
     "build": "pnpm -r build",
-    "dev": "pnpm -r --parallel dev"
+    "dev": "pnpm -r --parallel dev",
+    "build:cli": "pnpm --filter @emberkit/cli build"
   },
   "devDependencies": {
     "eslint": "^10.0.0",
