@@ -24,10 +24,10 @@
 
 ### Phase 3: Interactivity (v0.3.0)
 
-- [ ] **3.1** — Signal primitives (`signal`, `effect`, `computed`)
-- [ ] **3.2** — Context API (`createContext`)
-- [ ] **3.3** — Selective hydration
-- [ ] **3.4** — Navigation primitives (`navigate`, `redirect`, `preload`)
+- [x] **3.1** — Signal primitives (`signal`, `effect`, `computed`)
+- [x] **3.2** — Context API (`createContext`)
+- [x] **3.3** — Selective hydration
+- [x] **3.4** — Navigation primitives (`navigate`, `redirect`, `preload`)
 
 ### Phase 4: Ecosystem (v0.4.0+)
 
@@ -52,3 +52,7 @@
 | 2.1 Loader API | 2026-05-11 |
 | 2.2 SSR renderer | 2026-05-11 |
 | 2.3 Boundaries | 2026-05-11 |
+| 3.1 Signals | 2026-05-11 |
+| 3.2 Context API | 2026-05-11 |
+| 3.3 Hydration | 2026-05-11 |
+| 3.4 Navigation | 2026-05-11 |
