@@ -1,0 +1,14 @@
+{
+  "name": "@emberkit/docs",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "emberkit dev",
+    "build": "emberkit build",
+    "preview": "emberkit preview"
+  },
+  "dependencies": {
+    "@emberkit/core": "workspace:*"
+  }
+}

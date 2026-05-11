@@ -1,0 +1,76 @@
+import type { RouteComponent } from '@emberkit/core';
+import { renderMarkdown } from '@emberkit/core';
+
+const content = `# Introduction
+
+EmberKit is a **minimalist, TypeScript-first JSX framework** built for three principles:
+
+## Speed
+Sub-50ms server-side rendering with streaming support. Optimized for fast Time-to-First-Byte (TTFB).
+
+## Weight
+Under 10KB runtime, fully tree-shakeable. Pay only for what you use. No heavy dependencies.
+
+## Zero JS by Default
+Only interactive elements receive hydration. Static content stays static HTML, reducing bundle size dramatically.
+
+## Why EmberKit?
+
+Most frameworks ship 40-100KB of JavaScript by default, even for simple static pages. EmberKit takes a different approach:
+
+- **Selective Hydration**: Only components with event handlers get client-side JavaScript
+- **File-Based Routing**: No configuration needed, conventions over config
+- **View Transitions API**: Native page transitions without JavaScript
+- **Edge Ready**: Deploy to Cloudflare Workers, Deno Deploy, or any Node environment
+
+## Core Philosophy
+
+\`\`\`typescript
+// Your code
+function Button({ children }) {
+  return <button className="btn">{children}</button>;
+}
+
+// Result: Pure HTML, no JavaScript hydration needed
+// <button class="btn">Click me</button>
+\`\`\`
+
+Only when you add interactivity:
+
+\`\`\`typescript
+function Counter() {
+  const [count, setCount] = createSignal(0);
+
+  return (
+    // This button gets hydrated, the rest stays static
+    <button onClick={() => setCount(c => c + 1)}>
+      Count: {count()}
+    </button>
+  );
+}
+\`\`\`
+
+## Quick Comparison
+
+| Feature | EmberKit | React | Next.js |
+|---------|----------|-------|---------|
+| Runtime Size | ~8KB | ~45KB | ~95KB |
+| Zero-JS Pages | Native | Manual | Manual |
+| File Routing | Native | External | Built-in |
+| TypeScript | First-class | Supported | Supported |
+
+## Next Steps
+
+- [Installation](/docs/installation) - Set up your first project
+- [Quick Start](/docs/quick-start) - Build your first page
+- [Core Concepts](/docs/components) - Learn the fundamentals`;
+
+const IntroductionPage: RouteComponent = () => {
+  const html = renderMarkdown(content);
+
+  return (
+    <div className="doc-content" dangerouslySetInnerHTML={{ __html: html }} />
+  );
+};
+
+export default IntroductionPage;
