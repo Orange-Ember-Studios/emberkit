@@ -13,7 +13,7 @@
 - [x] **1.2** — EmberKit package scaffold: tsconfig, eslint, prettier
 - [x] **1.3** — Vite plugin (`emberkit:vite-plugin`)
 - [x] **1.4** — JSX-to-template-literal compiler
-- [ ] **1.5** — Core runtime: `createElement`, `render`, `hydrate`
+- [x] **1.5** — Core runtime: `createElement`, `render`, `hydrate`
 - [ ] **1.6** — File-based routing engine
 
 ### Phase 2: Data & SSR (v0.2.0)
@@ -44,6 +44,10 @@
 | Task | Date |
 |------|------|
 | 1.1 Monorepo setup | 2026-05-11 |
+| 1.2 Package scaffold | 2026-05-11 |
+| 1.3 Vite plugin | 2026-05-11 |
+| 1.4 JSX compiler | 2026-05-11 |
+| 1.5 Core runtime | 2026-05-11 |
 | 1.2 Package scaffold | 2026-05-11 |
 | 1.3 Vite plugin | 2026-05-11 |
 | 1.4 JSX compiler | 2026-05-11 |
