@@ -19,7 +19,7 @@
 ### Phase 2: Data & SSR (v0.2.0)
 
 - [x] **2.1** — Loader/data loading API (`RouteParams`, `LoaderResult`)
-- [ ] **2.2** — SSR renderer
+- [x] **2.2** — SSR renderer
 - [ ] **2.3** — Error & loading boundaries (`_error.tsx`, `_loading.tsx`)
 
 ### Phase 3: Interactivity (v0.3.0)

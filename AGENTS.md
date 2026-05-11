@@ -68,8 +68,10 @@ These decisions are unresolved and will affect how agents should work:
 
 - **Package manager:** pnpm — always use `pnpm`, never npm/yarn
 - **Testing:** TDD with strict Red-Green-Refactor cycle. Write failing test first, then make it pass, then refactor.
-- **Linting & Formatting:** ESLint + Prettier. Run lint and format before committing.
+- **Linting & Formatting:** ESLint + Prettier. Run lint and format before committing. **Never use eslint-disable comments** — fix the underlying issue instead.
 - **JS/TS conventions:** Follow best practices — camelCase for variables/functions, PascalCase for components/types, kebab-case for file names (except components, which use PascalCase). Use `const` by default, explicit return types on exported functions.
+- **Imports:** Use path aliases (e.g. `@emberkit/runtime`, `@emberkit/router`) instead of relative paths where possible.
+- **Error handling:** Use sentinel errors — create named error classes that extend Error for specific failure modes (e.g. `NotFoundError`, `ValidationError`). Never return raw strings as errors.
 
 ## Verification
 
