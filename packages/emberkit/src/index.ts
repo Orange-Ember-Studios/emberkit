@@ -13,6 +13,11 @@ export type { HydrationConfig, HydrationManifest, HydrationStrategy } from './hy
 export { DevServer, createDevServer } from './dev-server/index.js';
 export type { Plugin, PluginContext, ResolvedConfig } from './plugin/index.js';
 export { HMRConnection, createHMRContext, subscribeToHMR } from './hmr/index.js';
+export { SSGBuilder, generateStaticPages, isStaticRoute, createSSGManifest } from './ssg/index.js';
+export { FormValidator, createFormValidator, createFormState, setFieldValue, setFieldError } from './forms/index.js';
+export { createAction, createMutation, handleAction, useMutation } from './forms/mutations.js';
+export { MetaGenerator, createMetaGenerator, generateMeta, generateBreadcrumbs } from './meta/index.js';
+export { DataCache, createCache, getCached, setCache, prefetch, staleWhileRevalidate } from './cache/index.js';
 
 export function defineConfig(config: Record<string, unknown>): Record<string, unknown> {
   return config;

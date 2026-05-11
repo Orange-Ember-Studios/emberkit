@@ -34,8 +34,16 @@
 - [x] **4.1** — Scaffolding CLI (`emberkit` CLI)
 - [x] **4.2** — Dev server with HMR
 - [x] **4.3** — Plugin system
-- [ ] **4.4** — Edge runtime adapter
-- [ ] **4.5** — Image optimization plugin
+- [x] **4.4** — Edge runtime adapter
+- [x] **4.5** — Image optimization plugin
+
+### Phase 5: Data & Forms (v0.5.0)
+
+- [x] **5.1** — Static generation / SSG
+- [x] **5.2** — Forms & validation
+- [x] **5.3** — Data mutations (POST/PUT/DELETE)
+- [x] **5.4** — Meta tags & SEO
+- [x] **5.5** — Prefetch & cache control
 
 ---
 
@@ -59,3 +67,10 @@
 | 4.1 CLI scaffold | 2026-05-11 |
 | 4.2 Dev server + HMR | 2026-05-11 |
 | 4.3 Plugin system | 2026-05-11 |
+| 4.4 Edge runtime | 2026-05-11 |
+| 4.5 Image optimization | 2026-05-11 |
+| 5.1 SSG | 2026-05-11 |
+| 5.2 Forms + validation | 2026-05-11 |
+| 5.3 Mutations | 2026-05-11 |
+| 5.4 Meta + SEO | 2026-05-11 |
+| 5.5 Cache + prefetch | 2026-05-11 |
