@@ -10,6 +10,7 @@ export default tseslint.config(
       perfectionist,
     },
     rules: {
+      '@typescript-eslint/no-namespace': 'off',
       'perfectionist/sort-classes': [
         'error',
         {

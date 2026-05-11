@@ -5,7 +5,6 @@ import {
   compileTextContent,
   assembleTemplate,
 } from '../compiler.js';
-import type { CompiledTemplate } from '../types.js';
 
 describe('compileToTemplate', () => {
   it('should compile a simple div with text children', () => {
