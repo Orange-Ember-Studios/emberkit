@@ -31,7 +31,7 @@ const HomePage: RouteComponent = () => {
 
         <div className="flex flex-col gap-4 sm:flex-row">
           <button
-            className="min-w-[200px] rounded-full bg-gradient-to-r from-orange-500 to-orange-700 px-8 py-4 font-semibold text-white shadow-lg transition-all duration-300 hover:scale-[1.03] hover:from-orange-400 hover:to-orange-500 hover:shadow-[0_0_30px_rgba(249,115,22,0.4)]"
+            className="inline-flex min-w-[200px] items-center justify-center gap-2 rounded-full bg-gradient-to-r from-orange-500 to-orange-700 px-8 py-4 font-semibold text-white shadow-lg transition-all duration-300 hover:scale-[1.03] hover:from-orange-400 hover:to-orange-500 hover:shadow-[0_0_30px_rgba(249,115,22,0.4)]"
             onClick={() => navigate('/docs/introduction')}
           >
             Get Started

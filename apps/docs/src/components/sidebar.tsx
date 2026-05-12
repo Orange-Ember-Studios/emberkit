@@ -1,5 +1,4 @@
 import type { RouteComponent } from '@emberkit/core';
-import { navigate } from '@emberkit/core';
 import { IconChevronRight } from '@emberkit/icons';
 
 const docs = [
@@ -51,10 +50,6 @@ const Sidebar: RouteComponent = () => {
                 <a
                   href={item.path}
                   className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-400 no-underline transition-all hover:bg-white/5 hover:text-white [&_svg]:shrink-0 [&_svg]:text-gray-600"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    navigate(item.path);
-                  }}
                 >
                   <IconChevronRight size={16} />
                   {item.title}

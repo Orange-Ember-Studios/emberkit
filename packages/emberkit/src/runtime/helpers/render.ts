@@ -4,6 +4,18 @@ const SELF_CLOSING_TAGS = new Set([
   'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'source', 'track', 'wbr',
 ]);
 
+let handlerCounter = 0;
+const handlerRegistry = new Map<string, (e: Event) => void>();
+
+export function getHandler(id: string): ((e: Event) => void) | undefined {
+  return handlerRegistry.get(id);
+}
+
+export function clearHandlers(): void {
+  handlerRegistry.clear();
+  handlerCounter = 0;
+}
+
 export function renderElementToHTML(element: JSXElement): string {
   if (!element) return '';
   
@@ -46,9 +58,8 @@ export function renderElementToHTML(element: JSXElement): string {
 
   // Handle dangerouslySetInnerHTML
   let innerHtml = childHtml;
-  for (const [key, value] of Object.entries(props)) {
-    if (key.toLowerCase().replace(/_/g, '') === 'dangerouslysetinnerhtml' ||
-        (typeof value === 'object' && value !== null && '__html' in (value as Record<string, unknown>))) {
+  for (const [, value] of Object.entries(props)) {
+    if (typeof value === 'object' && value !== null && '__html' in (value as Record<string, unknown>)) {
       innerHtml = String((value as { __html: unknown }).__html);
       break;
     }
@@ -74,11 +85,20 @@ export function renderElementToHTML(element: JSXElement): string {
     })
     .join('');
 
-  if (SELF_CLOSING_TAGS.has(currentType as string)) {
-    return `<${currentType}${attributes}/>`;
+  // Register onClick handler as data attribute
+  const onClick = props.onClick as ((e: Event) => void) | undefined;
+  let onclickAttr = '';
+  if (typeof onClick === 'function') {
+    const id = `ekh${++handlerCounter}`;
+    handlerRegistry.set(id, onClick);
+    onclickAttr = ` data-ekclick="${id}"`;
   }
 
-  return `<${currentType}${attributes}>${innerHtml}</${currentType}>`;
+  if (SELF_CLOSING_TAGS.has(currentType as string)) {
+    return `<${currentType}${attributes}${onclickAttr}/>`;
+  }
+
+  return `<${currentType}${attributes}${onclickAttr}>${innerHtml}</${currentType}>`;
 }
 
 export function renderToString(element: JSXElement | string | null | number): string {

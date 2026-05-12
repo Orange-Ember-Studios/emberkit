@@ -1,5 +1,5 @@
 import type { JSXElementProps, JSXNode, DOMElement, JSXElement } from './types.js';
-import { renderToString } from './helpers/render.js';
+import { renderToString, getHandler, clearHandlers } from './helpers/render.js';
 
 export function createElement(
   type: string | ((props: JSXElementProps) => JSXNode),
@@ -19,11 +19,26 @@ export function createElement(
   };
 }
 
+function attachEventHandlers(container: Element): void {
+  const elements = container.querySelectorAll('[data-ekclick]');
+  elements.forEach((el) => {
+    const id = el.getAttribute('data-ekclick');
+    if (id) {
+      const handler = getHandler(id);
+      if (handler) {
+        el.addEventListener('click', handler);
+        el.removeAttribute('data-ekclick');
+      }
+    }
+  });
+}
+
 function renderToTarget(
   layout: (props: Record<string, unknown>) => JSXNode,
   target: Element,
   routeComponent?: (props: Record<string, unknown>) => JSXNode,
 ): void {
+  clearHandlers();
   const jsxElement: JSXElement = {
     type: layout,
     props: routeComponent ? { children: [createElement(routeComponent, {})] } : {},
@@ -31,6 +46,7 @@ function renderToTarget(
 
   const html = renderToString(jsxElement);
   target.innerHTML = html;
+  attachEventHandlers(target);
 }
 
 export function render(
@@ -97,6 +113,17 @@ export function render(
   }
 
   renderCurrentRoute();
+
+  // Global link interceptor for SPA navigation
+  document.addEventListener('click', (e) => {
+    const link = (e.target as HTMLElement).closest('a');
+    if (!link) return;
+    const href = link.getAttribute('href');
+    if (!href || href.startsWith('http') || href.startsWith('#') || link.target === '_blank') return;
+    e.preventDefault();
+    history.pushState(null, '', href);
+    renderCurrentRoute();
+  });
 
   window.addEventListener('popstate', () => {
     renderCurrentRoute();

@@ -1,5 +1,4 @@
 import type { RouteComponent } from '@emberkit/core';
-import { navigate } from '@emberkit/core';
 import { IconMenu, IconGithub } from '@emberkit/icons';
 
 const Header: RouteComponent = () => {
@@ -12,7 +11,6 @@ const Header: RouteComponent = () => {
         <a
           href="/"
           className="flex items-center gap-2 text-xl font-bold text-white no-underline"
-          onClick={(e) => { e.preventDefault(); navigate('/'); }}
         >
           <span className="text-2xl">🔥</span>
           <span className="bg-gradient-to-r from-orange-400 to-orange-500 bg-clip-text text-transparent">EmberKit</span>
