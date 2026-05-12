@@ -1,6 +1,6 @@
 {
   "name": "@emberkit/edge",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "description": "Edge runtime adapter for EmberKit",
   "license": "Apache-2.0",
@@ -10,10 +10,18 @@
     "directory": "packages/edge"
   },
   "homepage": "https://emberkit.dev",
-  "keywords": ["emberkit", "edge", "cloudflare", "deno", "serverless"],
+  "keywords": [
+    "emberkit",
+    "edge",
+    "cloudflare",
+    "deno",
+    "serverless"
+  ],
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "exports": {
     ".": {
       "import": "./dist/index.js",

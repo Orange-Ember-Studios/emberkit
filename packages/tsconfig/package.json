@@ -1,6 +1,6 @@
 {
   "name": "@emberkit/tsconfig",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "description": "Shared TypeScript configuration for EmberKit projects",
   "license": "Apache-2.0",
@@ -10,9 +10,16 @@
     "directory": "packages/tsconfig"
   },
   "homepage": "https://emberkit.dev",
-  "keywords": ["emberkit", "tsconfig", "typescript", "config"],
+  "keywords": [
+    "emberkit",
+    "tsconfig",
+    "typescript",
+    "config"
+  ],
   "main": "base.json",
-  "files": ["base.json"],
+  "files": [
+    "base.json"
+  ],
   "exports": {
     ".": "./base.json",
     "./base.json": "./base.json"

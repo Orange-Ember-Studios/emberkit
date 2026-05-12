@@ -1,6 +1,6 @@
 {
   "name": "@emberkit/core",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "description": "Lightweight TypeScript-first JSX framework core",
   "license": "Apache-2.0",
@@ -10,11 +10,20 @@
     "directory": "packages/emberkit"
   },
   "homepage": "https://emberkit.dev",
-  "keywords": ["emberkit", "framework", "jsx", "typescript", "ssr", "signals"],
+  "keywords": [
+    "emberkit",
+    "framework",
+    "jsx",
+    "typescript",
+    "ssr",
+    "signals"
+  ],
   "sideEffects": false,
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "exports": {
     ".": {
       "import": "./dist/index.js",
