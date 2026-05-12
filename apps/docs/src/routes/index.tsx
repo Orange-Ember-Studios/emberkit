@@ -1,8 +1,10 @@
 import type { RouteComponent } from '@emberkit/core';
-import { navigate } from '@emberkit/core';
-import { IconZap, IconPackage, IconTarget, IconType, IconArrowRight, IconCode } from '@emberkit/icons';
+import { IconZap, IconPackage, IconTarget, IconType, IconArrowRight } from '@emberkit/icons';
+import { useNavigate } from '../hooks/useNavigate';
 
 const HomePage: RouteComponent = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="relative min-h-screen bg-[#0b0f19] text-gray-100 overflow-hidden">
 

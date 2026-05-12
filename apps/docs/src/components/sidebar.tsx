@@ -1,5 +1,6 @@
 import type { RouteComponent } from '@emberkit/core';
 import { IconChevronRight } from '@emberkit/icons';
+import { useNavigate } from '../hooks/useNavigate';
 
 const docs = [
   {
@@ -39,6 +40,8 @@ const docs = [
 ];
 
 const Sidebar: RouteComponent = () => {
+  const navigate = useNavigate();
+
   return (
     <aside className="fixed top-16 left-0 h-[calc(100vh-4rem)] w-[260px] overflow-y-auto border-r border-white/5 bg-[#0b0f19] px-4 py-6 max-lg:hidden transition-all duration-300">
       {docs.map((section) => (
@@ -49,7 +52,11 @@ const Sidebar: RouteComponent = () => {
               <li key={item.path}>
                 <a
                   href={item.path}
-                  className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-400 no-underline transition-all duration-200 hover:bg-white/5 hover:text-orange-400 hover:translate-x-1 [&_svg]:shrink-0 [&_svg]:transition-all [&_svg]:duration-200 [&_svg]:text-gray-600 hover:[&_svg]:text-orange-400"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    navigate(item.path);
+                  }}
+                  className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-400 no-underline transition-all duration-200 hover:bg-white/5 hover:text-orange-400 hover:translate-x-1 cursor-pointer [&_svg]:shrink-0 [&_svg]:transition-all [&_svg]:duration-200 [&_svg]:text-gray-600 hover:[&_svg]:text-orange-400"
                 >
                   <IconChevronRight size={16} />
                   {item.title}

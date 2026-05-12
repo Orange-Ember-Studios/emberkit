@@ -1,7 +1,10 @@
 import type { RouteComponent } from '@emberkit/core';
 import { IconMenu, IconGithub } from '@emberkit/icons';
+import { useNavigate } from '../hooks/useNavigate';
 
 const Header: RouteComponent = () => {
+  const navigate = useNavigate();
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 flex h-16 items-center justify-between border-b border-white/5 bg-[#0b0f19]/80 px-6 backdrop-blur-xl transition-all duration-300">
       <div className="flex items-center gap-3">
@@ -10,16 +13,47 @@ const Header: RouteComponent = () => {
         </button>
         <a
           href="/"
-          className="flex items-center gap-2 text-xl font-bold text-white no-underline transition-all duration-200 hover:opacity-80"
+          onClick={(e) => {
+            e.preventDefault();
+            navigate('/');
+          }}
+          className="flex items-center gap-2 text-xl font-bold text-white no-underline transition-all duration-200 hover:opacity-80 cursor-pointer"
         >
           <span className="text-2xl drop-shadow-[0_0_8px_rgba(249,115,22,0.4)]">🔥</span>
           <span className="bg-gradient-to-r from-orange-400 to-orange-500 bg-clip-text text-transparent transition-all duration-300 hover:from-orange-300 hover:to-orange-400">EmberKit</span>
         </a>
       </div>
       <nav className="flex gap-6 max-sm:hidden">
-        <a href="/docs/introduction" className="text-sm font-medium uppercase tracking-widest text-gray-400 no-underline transition-all duration-200 hover:text-orange-400 hover:drop-shadow-[0_0_8px_rgba(249,115,22,0.3)]">Docs</a>
-        <a href="/docs/api" className="text-sm font-medium uppercase tracking-widest text-gray-400 no-underline transition-all duration-200 hover:text-orange-400 hover:drop-shadow-[0_0_8px_rgba(249,115,22,0.3)]">API</a>
-        <a href="/docs/examples" className="text-sm font-medium uppercase tracking-widest text-gray-400 no-underline transition-all duration-200 hover:text-orange-400 hover:drop-shadow-[0_0_8px_rgba(249,115,22,0.3)]">Examples</a>
+        <a 
+          href="/docs/introduction" 
+          onClick={(e) => {
+            e.preventDefault();
+            navigate('/docs/introduction');
+          }}
+          className="text-sm font-medium uppercase tracking-widest text-gray-400 no-underline transition-all duration-200 hover:text-orange-400 hover:drop-shadow-[0_0_8px_rgba(249,115,22,0.3)] cursor-pointer"
+        >
+          Docs
+        </a>
+        <a 
+          href="/docs/api" 
+          onClick={(e) => {
+            e.preventDefault();
+            navigate('/docs/api');
+          }}
+          className="text-sm font-medium uppercase tracking-widest text-gray-400 no-underline transition-all duration-200 hover:text-orange-400 hover:drop-shadow-[0_0_8px_rgba(249,115,22,0.3)] cursor-pointer"
+        >
+          API
+        </a>
+        <a 
+          href="/docs/examples" 
+          onClick={(e) => {
+            e.preventDefault();
+            navigate('/docs/examples');
+          }}
+          className="text-sm font-medium uppercase tracking-widest text-gray-400 no-underline transition-all duration-200 hover:text-orange-400 hover:drop-shadow-[0_0_8px_rgba(249,115,22,0.3)] cursor-pointer"
+        >
+          Examples
+        </a>
       </nav>
       <div className="flex items-center gap-4">
         <a
