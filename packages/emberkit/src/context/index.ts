@@ -12,7 +12,14 @@ export interface ContextProviderState {
 const contextRegistry = new Map<symbol, Context<unknown>>();
 const contextValues = new Map<symbol, unknown>();
 
-export function createContext<T>(defaultValue?: T): Context<T> {
+export interface ContextBridge<T> {
+  id: symbol;
+  defaultValue: T | undefined;
+  Provider: (props: { value: T; children?: unknown }) => { type: string; props: Record<string, unknown> };
+  use: () => T;
+}
+
+export function createContext<T>(defaultValue?: T): ContextBridge<T> {
   const context: Context<T> = {
     id: Symbol('emberkit.context'),
     defaultValue,
@@ -20,7 +27,14 @@ export function createContext<T>(defaultValue?: T): Context<T> {
 
   contextRegistry.set(context.id, context);
 
-  return context;
+  const Provider = createContextProvider(context);
+
+  return {
+    id: context.id,
+    defaultValue,
+    Provider,
+    use: () => useContext(context),
+  };
 }
 
 export function setContextValue<T>(context: Context<T>, value: T): void {
@@ -28,7 +42,9 @@ export function setContextValue<T>(context: Context<T>, value: T): void {
 }
 
 export function getContextValue<T>(context: Context<T>): T | undefined {
-  return contextValues.get(context.id) as T | undefined;
+  const value = contextValues.get(context.id) as T | undefined;
+  if (value === undefined) return context.defaultValue as T | undefined;
+  return value;
 }
 
 export function hasContext<T>(context: Context<T>): boolean {
@@ -38,13 +54,6 @@ export function hasContext<T>(context: Context<T>): boolean {
 export function clearAllContexts(): void {
   contextRegistry.clear();
   contextValues.clear();
-}
-
-export interface ContextBridge<T> {
-  id: symbol;
-  defaultValue: T | undefined;
-  Provider: (props: { value: T; children?: unknown }) => { type: 'provider'; contextId: symbol; props: { value: T; children?: unknown } };
-  use: () => T;
 }
 
 export function useContext<T>(context: Context<T>): T {

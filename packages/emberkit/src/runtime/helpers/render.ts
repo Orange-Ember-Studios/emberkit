@@ -10,7 +10,7 @@ export function renderElementToHTML(element: JSXElement): string {
   let currentType: string | ((props: Record<string, unknown>) => unknown) = element.type;
   let props = element.props ?? {};
 
-  if (typeof currentType === 'function') {
+  while (typeof currentType === 'function') {
     try {
       const result = (currentType as (props: Record<string, unknown>) => unknown)(props);
       if (result && typeof result === 'object' && 'type' in result) {
@@ -46,9 +46,13 @@ export function renderElementToHTML(element: JSXElement): string {
 
   const attributes = Object.entries(props)
     .filter(([key]) => key !== 'children' && key !== 'key')
+    .filter(([, value]) => typeof value !== 'function' && value != null)
     .map(([key, value]) => {
       // Map React/JSX prop names to HTML attributes
       if (key === 'className') key = 'class';
+      if (key === 'strokeWidth' || key === 'strokeLinecap' || key === 'strokeLinejoin') {
+        key = key.replace(/([A-Z])/g, '-$1').toLowerCase();
+      }
       
       if (value === true) return ` ${key}`;
       if (value === false) return '';
