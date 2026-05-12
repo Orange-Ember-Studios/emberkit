@@ -21,7 +21,7 @@ const Layout: RouteComponent = ({ children }) => {
 
   return (
     <DocsContext.Provider value={context}>
-      <div className="flex min-h-screen flex-col">
+      <div className="flex min-h-screen flex-col bg-[#0b0f19]">
         <Header />
         <div className="flex flex-1 pt-16">
           <Sidebar />
