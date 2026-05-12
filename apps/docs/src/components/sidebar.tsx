@@ -40,16 +40,16 @@ const docs = [
 
 const Sidebar: RouteComponent = () => {
   return (
-    <aside className="fixed top-16 left-0 h-[calc(100vh-4rem)] w-[260px] overflow-y-auto border-r border-white/5 bg-[#0b0f19] px-4 py-6 max-lg:hidden">
+    <aside className="fixed top-16 left-0 h-[calc(100vh-4rem)] w-[260px] overflow-y-auto border-r border-white/5 bg-[#0b0f19] px-4 py-6 max-lg:hidden transition-all duration-300">
       {docs.map((section) => (
-        <div key={section.title} className="mb-6">
-          <h3 className="mb-2 px-3 text-xs font-semibold uppercase tracking-widest text-gray-500">{section.title}</h3>
-          <ul className="list-none">
+        <div key={section.title} className="mb-8">
+          <h3 className="mb-3 px-3 text-xs font-semibold uppercase tracking-widest text-gray-500 transition-colors duration-200">{section.title}</h3>
+          <ul className="list-none space-y-1">
             {section.items.map((item) => (
               <li key={item.path}>
                 <a
                   href={item.path}
-                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-400 no-underline transition-all hover:bg-white/5 hover:text-white [&_svg]:shrink-0 [&_svg]:text-gray-600"
+                  className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-400 no-underline transition-all duration-200 hover:bg-white/5 hover:text-orange-400 hover:translate-x-1 [&_svg]:shrink-0 [&_svg]:transition-all [&_svg]:duration-200 [&_svg]:text-gray-600 hover:[&_svg]:text-orange-400"
                 >
                   <IconChevronRight size={16} />
                   {item.title}
