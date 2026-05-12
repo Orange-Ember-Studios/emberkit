@@ -40,9 +40,9 @@ export function createAction<TData, TVariables>(
     variables: TVariables,
     context?: Partial<ActionContext>,
   ): Promise<ActionResult<TData>> => {
+    let optimisticData: TData | undefined;
+    
     try {
-      let optimisticData: TData | undefined;
-
       if (options?.onMutate) {
         optimisticData = await options.onMutate(variables);
       }

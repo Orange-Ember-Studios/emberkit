@@ -25,7 +25,6 @@
     "@emberkit/core": "workspace:*"
   },
   "devDependencies": {
-    "@emberkit/tsconfig": "workspace:*",
     "@emberkit/core": "workspace:*"
   }
 }

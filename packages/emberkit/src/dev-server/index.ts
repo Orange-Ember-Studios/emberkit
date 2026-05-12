@@ -1,6 +1,3 @@
-export * from './types.js';
-export * from './client.js';
-
 export interface DevServerOptions {
   port?: number;
   host?: string;

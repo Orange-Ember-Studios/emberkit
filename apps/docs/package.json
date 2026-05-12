@@ -4,12 +4,13 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "emberkit dev",
-    "build": "emberkit build",
-    "preview": "emberkit preview"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
     "@emberkit/core": "workspace:*",
-    "@emberkit/icons": "workspace:*"
+    "@emberkit/icons": "workspace:*",
+    "vite": "^6.0.0"
   }
 }

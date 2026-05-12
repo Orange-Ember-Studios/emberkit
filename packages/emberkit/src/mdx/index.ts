@@ -1,7 +1,10 @@
 import type { JSXElement } from '../runtime/types.js';
-import { parseMarkdown, type MarkdownOptions } from '../markdown/index.js';
+import { parseMarkdown } from '../markdown/index.js';
 
-export interface MDXConfig extends MarkdownOptions {
+export interface MDXConfig {
+  gfm?: boolean;
+  breaks?: boolean;
+  tables?: boolean;
   components?: Record<string, (props: Record<string, unknown>) => JSXElement>;
   scope?: Record<string, unknown>;
 }
@@ -31,7 +34,7 @@ class MDXCompiler {
   }
 
   compile(source: string): (props: Record<string, unknown>) => JSXElement {
-    const parsed = parseMarkdown(source, this.config);
+    const parsed = parseMarkdown(source, { gfm: this.config.gfm, breaks: this.config.breaks, tables: this.config.tables });
     const { html, frontmatter } = parsed;
 
     const componentCode = this.generateComponent(html);
@@ -98,10 +101,10 @@ class MDXCompiler {
       };
 
       if (frontmatter) {
-        component.frontmatter = frontmatter;
+        (component as MDXComponent).frontmatter = frontmatter;
       }
 
-      return component;
+      return component as MDXComponent;
     } catch (error) {
       console.error('MDX compilation error:', error);
       return () => ({ type: 'div', props: { children: 'MDX Error' } } as unknown as JSXElement);
@@ -194,10 +197,18 @@ export const DEFAULT_COMPONENTS: Record<string, (props: Record<string, unknown>)
     type: 'img',
     props: { ...props, loading: 'lazy', decoding: 'async' },
   }),
-  table: (props) => ({
-    type: 'div',
-    props: { className: 'table-wrapper', children: { type: 'table', props } },
-  }),
+  table: (props) => {
+    return {
+      type: 'div',
+      props: { 
+        className: 'table-wrapper', 
+        children: [{ 
+          type: 'table', 
+          props: { children: [props.children] } 
+        }] 
+      },
+    } as unknown as JSXElement;
+  },
 };
 
 export function mergeComponents(
@@ -207,5 +218,4 @@ export function mergeComponents(
   return { ...base, ...override };
 }
 
-export { parseMarkdown } from '../markdown/index.js';
-export type { MarkdownOptions } from '../markdown/index.js';
+export { parseMarkdown };

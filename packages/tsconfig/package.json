@@ -1,0 +1,9 @@
+{
+  "name": "@emberkit/tsconfig",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "base.json",
+  "exports": {
+    ".": "./base.json"
+  }
+}

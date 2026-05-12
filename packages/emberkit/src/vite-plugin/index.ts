@@ -1,23 +1,20 @@
 import type { Plugin } from 'vite';
 import type { EmberKitPluginOptions, EmberKitMode } from './types.js';
+import { DEFAULT_CONFIG } from './types.js';
 
 const VIRTUAL_EMBERKIT_CONFIG = 'virtual:emberkit-config';
 const VIRTUAL_EMBERKIT_ROUTES = 'virtual:emberkit-routes';
 
-const DEFAULT_OPTIONS: Required<EmberKitPluginOptions> = {
-  mode: 'hybrid',
-  routeDir: 'src/routes',
-  outputDir: 'dist',
-  jsx: 'automatic',
-  markdown: { gfm: true, breaks: false, html: true, tables: true },
-  mdx: {},
-};
-
-const MD_MIXIN = `__md_import__.default`;
+function resolveConfig(userOptions: EmberKitPluginOptions = {}) {
+  return {
+    ...DEFAULT_CONFIG,
+    ...userOptions,
+    markdown: { ...DEFAULT_CONFIG.markdown, ...userOptions.markdown },
+  };
+}
 
 export function emberkitVitePlugin(userOptions: EmberKitPluginOptions = {}): Plugin {
-  const options = { ...DEFAULT_OPTIONS, ...userOptions };
-  const mode: EmberKitMode = options.mode;
+  const options = resolveConfig(userOptions);
 
   return {
     name: 'emberkit:vite-plugin',
@@ -79,31 +76,13 @@ export function emberkitVitePlugin(userOptions: EmberKitPluginOptions = {}): Plu
 
       return code;
     },
-
-    configureServer(server) {
-      server.httpServer?.once('listening', () => {
-        console.log('[emberkit] Dev server running');
-      });
-    },
-
-    closeBundle() {
-      if (mode === 'static') {
-        console.log('[emberkit] Static build complete');
-      } else if (mode === 'ssr') {
-        console.log('[emberkit] SSR build complete');
-      } else if (mode === 'spa') {
-        console.log('[emberkit] SPA build complete');
-      } else {
-        console.log('[emberkit] Hybrid build complete');
-      }
-    },
   };
 }
 
 function transformMarkdownToJSX(
   code: string,
   id: string,
-  options: Required<EmberKitPluginOptions>,
+  options: ReturnType<typeof resolveConfig>,
 ): { code: string; map?: string } | null {
   const frontmatterMatch = code.match(/^---\n([\s\S]*?)\n---\n?/);
 

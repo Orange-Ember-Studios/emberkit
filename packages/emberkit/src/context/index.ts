@@ -10,6 +10,7 @@ export interface ContextProviderState {
 }
 
 const contextRegistry = new Map<symbol, Context<unknown>>();
+const contextValues = new Map<symbol, unknown>();
 
 export function createContext<T>(defaultValue?: T): Context<T> {
   const context: Context<T> = {
@@ -22,8 +23,12 @@ export function createContext<T>(defaultValue?: T): Context<T> {
   return context;
 }
 
+export function setContextValue<T>(context: Context<T>, value: T): void {
+  contextValues.set(context.id, value);
+}
+
 export function getContextValue<T>(context: Context<T>): T | undefined {
-  return contextRegistry.get(context.id)?.defaultValue as T | undefined;
+  return contextValues.get(context.id) as T | undefined;
 }
 
 export function hasContext<T>(context: Context<T>): boolean {
@@ -32,19 +37,18 @@ export function hasContext<T>(context: Context<T>): boolean {
 
 export function clearAllContexts(): void {
   contextRegistry.clear();
+  contextValues.clear();
 }
 
 export interface ContextBridge<T> {
   id: symbol;
   defaultValue: T | undefined;
-  Provider: {
-    (props: { value: T; children?: unknown }): unknown;
-  };
+  Provider: (props: { value: T; children?: unknown }) => { type: 'provider'; contextId: symbol; props: { value: T; children?: unknown } };
   use: () => T;
 }
 
 export function useContext<T>(context: Context<T>): T {
-  const value = contextRegistry.get(context.id)?.defaultValue;
+  const value = contextValues.get(context.id);
   if (value === undefined) {
     if (context.defaultValue === undefined) {
       throw new Error(`Context ${String(context.id)} has no value`);
@@ -52,4 +56,14 @@ export function useContext<T>(context: Context<T>): T {
     return context.defaultValue as T;
   }
   return value as T;
+}
+
+export function createContextProvider<T>(context: Context<T>) {
+  return function Provider(props: { value: T; children?: unknown }): { type: string; props: Record<string, unknown> } {
+    setContextValue(context, props.value);
+    return {
+      type: 'Fragment',
+      props: { children: props.children },
+    };
+  };
 }

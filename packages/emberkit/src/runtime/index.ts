@@ -20,7 +20,7 @@ export function createElement(
 }
 
 export function render(
-  element: JSXElement | string | null,
+  element: JSXElement | string | null | ((props: Record<string, unknown>) => JSXNode),
   container: Element | string,
   _options?: { hydrate?: boolean },
 ): void {
@@ -34,7 +34,16 @@ export function render(
     throw new Error(`Container element not found: ${container}`);
   }
 
-  const html = renderToString(element as DOMElement);
+  // If element is a function (component), wrap it as a JSX element
+  let jsxElement = element as JSXElement | string;
+  if (typeof element === 'function') {
+    jsxElement = {
+      type: element as (props: Record<string, unknown>) => JSXNode,
+      props: {},
+    } as JSXElement;
+  }
+
+  const html = renderToString(jsxElement);
   target.innerHTML = html;
 }
 

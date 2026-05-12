@@ -74,3 +74,4 @@
 | 5.3 Mutations | 2026-05-11 |
 | 5.4 Meta + SEO | 2026-05-11 |
 | 5.5 Cache + prefetch | 2026-05-11 |
+| MD/MDX support | 2026-05-11 |

@@ -1,6 +1,7 @@
 import type { DOMElement } from '../../runtime/types.js';
 import { createElement } from '../../runtime/index.js';
-import { analyzeTree, getHydrationCandidates, type InteractiveElement } from './analyzer.js';
+import { analyzeTree, getHydrationCandidates } from './analyzer.js';
+import type { InteractiveElement } from '../types.js';
 
 const hydrationCache = new Map<string, Promise<void>>();
 
@@ -93,8 +94,8 @@ export function attachEventHandlers(
 
     if (attrValue) {
       try {
-        const fn = new Function('event', attrValue);
-        element.addEventListener(mapHandlerToEvent(handler), fn);
+        const fn = new Function('event', attrValue) as EventListener;
+        element.addEventListener(mapHandlerToEvent(handler) as keyof ElementEventMap, fn);
       } catch {
         // Invalid handler, skip
       }

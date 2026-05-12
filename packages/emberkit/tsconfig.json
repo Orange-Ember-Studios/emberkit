@@ -1,11 +1,20 @@
 {
-  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "outDir": "./dist",
     "rootDir": "./src",
+    "noEmit": false,
+    "skipLibCheck": true,
+    "strict": false,
     "jsx": "react-jsx",
-    "jsxImportSource": "@emberkit/core"
+    "jsxImportSource": "@emberkit/core",
+    "exactOptionalPropertyTypes": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noImplicitAny": false
   },
   "include": ["src/**/*"],
-  "references": []
+  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx", "src/forms/__tests__/**", "src/meta/__tests__/**", "src/loader/__tests__/**"]
 }

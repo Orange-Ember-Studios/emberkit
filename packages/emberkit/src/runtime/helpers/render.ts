@@ -1,45 +1,69 @@
-import type { DOMElement, JSXElementProps, JSXNode } from '../types.js';
+import type { DOMElement, JSXElement, JSXElementProps, JSXNode } from '../types.js';
 
 const SELF_CLOSING_TAGS = new Set([
   'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'source', 'track', 'wbr',
 ]);
 
-export function renderElementToHTML(element: DOMElement): string {
-  const { type, props } = element;
-  const children = props.children ?? [];
+export function renderElementToHTML(element: JSXElement): string {
+  if (!element) return '';
+  
+  let currentType: string | ((props: Record<string, unknown>) => unknown) = element.type;
+  let props = element.props ?? {};
+
+  if (typeof currentType === 'function') {
+    try {
+      const result = (currentType as (props: Record<string, unknown>) => unknown)(props);
+      if (result && typeof result === 'object' && 'type' in result) {
+        currentType = (result as JSXElement).type;
+        props = (result as JSXElement).props ?? {};
+      } else if (typeof result === 'string' || typeof result === 'number') {
+        return String(result);
+      } else {
+        return '';
+      }
+    } catch (error) {
+      return `<div style="color: red;">Error rendering component</div>`;
+    }
+  }
+
+  const rawChildren = props.children ?? [];
+  const children = Array.isArray(rawChildren) ? rawChildren : [rawChildren];
   const childHtml = children
     .map((child) => {
       if (typeof child === 'string' || typeof child === 'number') {
         return String(child);
       }
       if (typeof child === 'object' && child !== null && 'type' in child) {
-        return renderElementToHTML(child as DOMElement);
+        return renderElementToHTML(child as JSXElement);
       }
       return '';
     })
     .join('');
 
-  if (type === 'Fragment' || type === 'React.Fragment') {
+  if (currentType === 'Fragment' || currentType === 'React.Fragment') {
     return childHtml;
   }
 
   const attributes = Object.entries(props)
     .filter(([key]) => key !== 'children' && key !== 'key')
     .map(([key, value]) => {
+      // Map React/JSX prop names to HTML attributes
+      if (key === 'className') key = 'class';
+      
       if (value === true) return ` ${key}`;
       if (value === false) return '';
       return ` ${key}="${value}"`;
     })
     .join('');
 
-  if (SELF_CLOSING_TAGS.has(type)) {
-    return `<${type}${attributes}/>`;
+  if (SELF_CLOSING_TAGS.has(currentType as string)) {
+    return `<${currentType}${attributes}/>`;
   }
 
-  return `<${type}${attributes}>${childHtml}</${type}>`;
+  return `<${currentType}${attributes}>${childHtml}</${currentType}>`;
 }
 
-export function renderToString(element: DOMElement | string | null | number): string {
+export function renderToString(element: JSXElement | string | null | number): string {
   if (!element && element !== 0) return '';
   if (typeof element === 'string') return element;
   if (typeof element === 'number') return String(element);

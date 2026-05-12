@@ -56,7 +56,7 @@ export function createHotAPI(
     },
 
     decline(): void {
-      import.meta.hot = undefined;
+      (import.meta as unknown as Record<string, unknown>).hot = undefined;
     },
 
     dispose(callback: () => void): void {

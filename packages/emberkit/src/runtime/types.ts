@@ -1,5 +1,5 @@
 export interface JSXElementProps {
-  children?: JSXNode[];
+  children?: JSXNode | JSXNode[];
   key?: string;
   ref?: { current: Element | null };
   [key: string]: unknown;
@@ -10,6 +10,13 @@ export type JSXNode = JSXElement | string | number | null | false | undefined;
 export interface JSXElement {
   type: string | ((props: JSXElementProps) => JSXNode);
   props: JSXElementProps;
+}
+
+export type RouteChildren = JSXNode;
+
+export interface RouteComponent<P extends JSXElementProps = JSXElementProps> {
+  (props: P): JSXNode;
+  displayName?: string;
 }
 
 /* eslint-disable @typescript-eslint/no-empty-object-type */

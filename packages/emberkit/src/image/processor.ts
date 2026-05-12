@@ -92,7 +92,7 @@ export class ImageProcessor {
   }
 
   analyze(stats: ImageStats): void {
-    const savingsPercent = ((stats.savings / stats.originalSize) * 100).toFixed(1);
+    const savingsPercent = parseFloat(((stats.savings / stats.originalSize) * 100).toFixed(1));
 
     if (savingsPercent > 50) {
       console.log(`[Image] Significant savings: ${savingsPercent}% reduction`);

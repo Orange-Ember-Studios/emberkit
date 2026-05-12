@@ -1,8 +1,14 @@
 {
-  "extends": "@emberkit/tsconfig/base.json",
   "compilerOptions": {
-    "outDir": "./dist",
-    "rootDir": "./src"
+    "target": "ES2020",
+    "module": "ESNext",
+    "lib": ["ES2020", "DOM"],
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "jsxImportSource": "@emberkit/core",
+    "strict": false,
+    "skipLibCheck": true,
+    "esModuleInterop": true
   },
-  "include": ["src/**/*", "emberkit.config.ts"]
+  "include": ["src/**/*", "vite.config.ts"]
 }

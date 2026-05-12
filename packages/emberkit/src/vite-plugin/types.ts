@@ -8,15 +8,15 @@ export interface EmberKitPluginOptions {
   routeDir?: string;
   outputDir?: string;
   jsx?: 'automatic' | 'classic';
-  markdown?: MarkdownConfig;
+  markdown?: Partial<MarkdownConfig>;
   mdx?: MDXConfig;
 }
 
 export interface MarkdownConfig {
-  gfm?: boolean;
-  breaks?: boolean;
-  html?: boolean;
-  tables?: boolean;
+  gfm: boolean;
+  breaks: boolean;
+  html: boolean;
+  tables: boolean;
 }
 
 export interface MDXConfig {
@@ -25,3 +25,19 @@ export interface MDXConfig {
 }
 
 export type EmberKitPlugin = (options?: EmberKitPluginOptions) => Plugin;
+
+export const DEFAULT_CONFIG = {
+  mode: 'hybrid' as const,
+  routeDir: 'src/routes',
+  outputDir: 'dist',
+  jsx: 'automatic' as const,
+  markdown: {
+    gfm: true,
+    breaks: false,
+    html: true,
+    tables: true,
+  },
+  mdx: {},
+} as const;
+
+export type ResolvedConfig = typeof DEFAULT_CONFIG & EmberKitPluginOptions;

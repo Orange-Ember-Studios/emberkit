@@ -1,6 +1,6 @@
-import type { RouteComponent } from '@emberkit/core';
 import { createContext, useContext } from '@emberkit/core';
 import { createSignal } from '@emberkit/core';
+import type { RouteComponent } from '@emberkit/core';
 import Sidebar from '../components/sidebar';
 import Header from '../components/header';
 
@@ -11,7 +11,7 @@ interface DocsContextValue {
 
 const DocsContext = createContext<DocsContextValue | null>(null);
 
-const Layout: RouteComponent<{ children?: JSX.Element }> = ({ children }) => {
+const Layout: RouteComponent = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = createSignal(false);
 
   const context: DocsContextValue = {
