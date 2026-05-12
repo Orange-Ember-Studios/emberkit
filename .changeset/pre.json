@@ -1,0 +1,15 @@
+{
+  "mode": "exit",
+  "tag": "alpha",
+  "initialVersions": {
+    "@emberkit/docs": "0.1.0",
+    "@emberkit/cli": "0.1.1",
+    "@emberkit/edge": "0.1.1",
+    "@emberkit/core": "0.1.1",
+    "@emberkit/icons": "0.1.1",
+    "@emberkit/tsconfig": "0.1.1"
+  },
+  "changesets": [
+    "funny-jobs-learn"
+  ]
+}
