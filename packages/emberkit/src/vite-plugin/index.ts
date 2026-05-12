@@ -215,13 +215,15 @@ function processCodeBlocks(html: string): string {
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;');
 
-    if (lang === 'ts' || lang === 'tsx' || lang === 'js' || lang === 'jsx') {
-      highlighted = highlightTS(highlighted);
-    } else if (lang === 'bash' || lang === 'sh') {
-      highlighted = highlightBash(highlighted);
-    } else if (lang === 'json') {
-      highlighted = highlightJSON(highlighted);
-    }
+        if (lang === 'ts' || lang === 'tsx' || lang === 'js' || lang === 'jsx' || lang === 'typescript' || lang === 'javascript') {
+          highlighted = highlightTS(highlighted);
+        }
+        else if (lang === 'bash' || lang === 'sh' || lang === 'shell') {
+          highlighted = highlightBash(highlighted);
+        }
+        else if (lang === 'json') {
+          highlighted = highlightJSON(highlighted);
+        }
 
     const langAttr = lang ? ` data-lang="${lang}"` : '';
     return `<pre${langAttr}><button class="copy-btn" onclick="(async()=>{await navigator.clipboard.writeText(this.closest('pre').querySelector('code').textContent);this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500)})()"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"9\" y=\"9\" width=\"13\" height=\"13\" rx=\"2\" ry=\"2\"/><path d=\"M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1\"/></svg> Copy</button><code class="language-${lang}">${highlighted}</code></pre>`;
