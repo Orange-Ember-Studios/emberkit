@@ -1,6 +1,11 @@
 import type { Plugin } from 'vite';
 import type { EmberKitPluginOptions, EmberKitMode } from './types.js';
 import { DEFAULT_CONFIG } from './types.js';
+import { readdirSync, statSync } from 'node:fs';
+import { join, relative, dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const VIRTUAL_EMBERKIT_CONFIG = 'virtual:emberkit-config';
 const VIRTUAL_EMBERKIT_ROUTES = 'virtual:emberkit-routes';
@@ -15,16 +20,20 @@ function resolveConfig(userOptions: EmberKitPluginOptions = {}) {
 
 export function emberkitVitePlugin(userOptions: EmberKitPluginOptions = {}): Plugin {
   const options = resolveConfig(userOptions);
+  let routesCode = `export const routes = [];`;
 
   return {
     name: 'emberkit:vite-plugin',
     enforce: 'pre',
 
     config() {
+      const pkgRoot = resolve(__dirname, '..', '..');
+      const srcDir = join(pkgRoot, 'src');
+
       return {
         resolve: {
           alias: {
-            '@emberkit/core': new URL('./src/index.ts', import.meta.url).pathname,
+            '@emberkit/core': srcDir,
           },
         },
         esbuild: {
@@ -34,6 +43,13 @@ export function emberkitVitePlugin(userOptions: EmberKitPluginOptions = {}): Plu
           include: ['@emberkit/core'],
         },
       };
+    },
+
+    configResolved(config) {
+      const root = config.root;
+      const routeDir = join(root, options.routeDir ?? 'src/routes');
+      const files = scanRouteFiles(routeDir);
+      routesCode = generateRoutesCode(files, routeDir);
     },
 
     resolveId(id: string) {
@@ -51,7 +67,7 @@ export function emberkitVitePlugin(userOptions: EmberKitPluginOptions = {}): Plu
         return `export const config = ${JSON.stringify(options)};`;
       }
       if (id === VIRTUAL_EMBERKIT_ROUTES) {
-        return `export const routes = [];`;
+        return routesCode;
       }
       return null;
     },
@@ -262,3 +278,71 @@ function processParagraphs(html: string, breaks?: boolean): string {
 }
 
 export type { EmberKitPluginOptions, EmberKitMode };
+
+function scanRouteFiles(dir: string): string[] {
+  const files: string[] = [];
+  const extensions = new Set(['tsx', 'ts', 'jsx', 'js', 'md', 'mdx']);
+
+  function walk(currentDir: string) {
+    let entries;
+    try {
+      entries = readdirSync(currentDir);
+    } catch {
+      return;
+    }
+
+    for (const entry of entries) {
+      const fullPath = join(currentDir, entry);
+      const stat = statSync(fullPath);
+
+      if (stat.isDirectory()) {
+        walk(fullPath);
+      } else {
+        const ext = entry.split('.').pop() ?? '';
+        if (extensions.has(ext)) {
+          files.push(fullPath);
+        }
+      }
+    }
+  }
+
+  walk(dir);
+  return files;
+}
+
+function generateRoutesCode(files: string[], routeDir: string): string {
+  const routeEntries: string[] = [];
+
+  for (const file of files) {
+    const relativePath = relative(routeDir, file).replace(/\\/g, '/');
+    const ext = file.split('.').pop() ?? '';
+    const isMarkdown = ext === 'md' || ext === 'mdx';
+
+    // Skip special files
+    if (relativePath.includes('_layout') || relativePath.includes('_error') || relativePath.includes('_loading')) {
+      continue;
+    }
+    // Skip API routes
+    if (relativePath.startsWith('_api/') || relativePath.includes('/_api/')) {
+      continue;
+    }
+
+    let routePath = relativePath
+      .replace(/\.(tsx|ts|jsx|js|md|mdx)$/, '')
+      .replace(/\/index$/, '')
+      .replace(/\[\.\.\.(\w+)\]/g, ':$1*')
+      .replace(/\[([^\]]+)\]/g, ':$1');
+
+    if (routePath === '') routePath = '/';
+
+    const importPath = file.replace(/\\/g, '/');
+
+    if (isMarkdown) {
+      routeEntries.push(`  { path: ${JSON.stringify('/' + routePath)}, component: () => import(${JSON.stringify(importPath)}), isMarkdown: true }`);
+    } else {
+      routeEntries.push(`  { path: ${JSON.stringify('/' + routePath)}, component: () => import(${JSON.stringify(importPath)}) }`);
+    }
+  }
+
+  return `export const routes = [\n${routeEntries.join(',\n')}\n];`;
+}

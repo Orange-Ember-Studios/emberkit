@@ -19,9 +19,3 @@ export type { FC, RouteComponent, RouteChildren } from './runtime/types.js';
 export function defineConfig(config: Record<string, unknown>): Record<string, unknown> {
   return config;
 }
-
-export function emberkitVitePlugin(options?: Record<string, unknown>) {
-  return { name: 'emberkit', enforce: 'pre' };
-}
-
-export default emberkitVitePlugin;

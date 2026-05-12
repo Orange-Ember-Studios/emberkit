@@ -19,12 +19,25 @@ export function createElement(
   };
 }
 
+function renderToTarget(
+  layout: (props: Record<string, unknown>) => JSXNode,
+  target: Element,
+  routeComponent?: (props: Record<string, unknown>) => JSXNode,
+): void {
+  const jsxElement: JSXElement = {
+    type: layout,
+    props: routeComponent ? { children: [createElement(routeComponent, {})] } : {},
+  } as JSXElement;
+
+  const html = renderToString(jsxElement);
+  target.innerHTML = html;
+}
+
 export function render(
   element: JSXElement | string | null | ((props: Record<string, unknown>) => JSXNode),
   container: Element | string,
-  _options?: { hydrate?: boolean },
+  options?: { hydrate?: boolean; routes?: Array<{ path: string; component: () => Promise<{ default: (props: Record<string, unknown>) => JSXNode }> }> },
 ): void {
-  void _options;
   if (!element) return;
 
   const target =
@@ -34,17 +47,72 @@ export function render(
     throw new Error(`Container element not found: ${container}`);
   }
 
-  // If element is a function (component), wrap it as a JSX element
-  let jsxElement = element as JSXElement | string;
-  if (typeof element === 'function') {
-    jsxElement = {
-      type: element as (props: Record<string, unknown>) => JSXNode,
-      props: {},
-    } as JSXElement;
+  const layout = typeof element === 'function'
+    ? element as (props: Record<string, unknown>) => JSXNode
+    : null;
+
+  if (!layout) {
+    const html = renderToString(element as JSXElement);
+    target.innerHTML = html;
+    return;
   }
 
-  const html = renderToString(jsxElement);
-  target.innerHTML = html;
+  const routes = options?.routes;
+
+  if (!routes || routes.length === 0) {
+    renderToTarget(layout, target);
+    return;
+  }
+
+  function matchRoute(pathname: string): typeof routes[number] | undefined {
+    const normalized = pathname === '/' ? '/' : pathname.replace(/\/$/, '');
+    for (const route of routes) {
+      const routePath = route.path === '/' ? '/' : route.path.replace(/\/$/, '');
+      if (routePath === normalized) return route;
+      if (routePath !== '/' && normalized.startsWith(routePath + '/')) return route;
+      if (routePath !== '/' && routePath.includes(':')) {
+        const routeParts = routePath.split('/');
+        const pathParts = normalized.split('/');
+        if (routeParts.length === pathParts.length) {
+          let match = true;
+          for (let i = 0; i < routeParts.length; i++) {
+            if (routeParts[i].startsWith(':')) continue;
+            if (routeParts[i] !== pathParts[i]) { match = false; break; }
+          }
+          if (match) return route;
+        }
+      }
+    }
+    return undefined;
+  }
+
+  async function renderCurrentRoute() {
+    const matched = matchRoute(window.location.pathname);
+    if (matched) {
+      const mod = await matched.component();
+      renderToTarget(layout, target, mod.default);
+    } else {
+      renderToTarget(layout, target);
+    }
+  }
+
+  renderCurrentRoute();
+
+  window.addEventListener('popstate', () => {
+    renderCurrentRoute();
+  });
+
+  const originalPushState = history.pushState.bind(history);
+  history.pushState = function (...args) {
+    originalPushState(...args);
+    renderCurrentRoute();
+  };
+
+  const originalReplaceState = history.replaceState.bind(history);
+  history.replaceState = function (...args) {
+    originalReplaceState(...args);
+    renderCurrentRoute();
+  };
 }
 
 export function hydrate(

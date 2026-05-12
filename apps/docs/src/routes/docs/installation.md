@@ -1,7 +1,8 @@
-import type { RouteComponent } from '@emberkit/core';
-import { renderMarkdown } from '@emberkit/core';
+---
+title: Installation
+---
 
-const content = `# Installation
+# Installation
 
 Get up and running with EmberKit in minutes.
 
@@ -12,19 +13,19 @@ Get up and running with EmberKit in minutes.
 
 ## Quick Install
 
-\`\`\`bash
+```bash
 # Using pnpm (recommended)
 pnpm create emberkit my-app
 cd my-app
 pnpm install
 pnpm dev
-\`\`\`
+```
 
 ## Manual Setup
 
 If you prefer to set up manually:
 
-\`\`\`bash
+```bash
 # Create project directory
 mkdir my-app && cd my-app
 
@@ -36,13 +37,13 @@ pnpm add @emberkit/core
 
 # Install dev dependencies
 pnpm add -D vite @emberkit/vite-plugin typescript
-\`\`\`
+```
 
 ## Configuration
 
-Create \`emberkit.config.ts\` in your project root:
+Create `emberkit.config.ts` in your project root:
 
-\`\`\`typescript
+```typescript
 import { defineConfig } from '@emberkit/core';
 
 export default defineConfig({
@@ -56,11 +57,11 @@ export default defineConfig({
     target: 'esnext',
   },
 });
-\`\`\`
+```
 
 ## Update package.json
 
-\`\`\`json
+```json
 {
   "scripts": {
     "dev": "emberkit dev",
@@ -68,11 +69,11 @@ export default defineConfig({
     "preview": "emberkit preview"
   }
 }
-\`\`\`
+```
 
 ## Project Structure
 
-\`\`\`
+```
 my-app/
 ├── emberkit.config.ts
 ├── index.html
@@ -82,15 +83,15 @@ my-app/
 │       ├── index.tsx       # → /
 │       └── about.tsx       # → /about
 └── package.json
-\`\`\`
+```
 
 ## Verify Installation
 
 Run the development server:
 
-\`\`\`bash
+```bash
 pnpm dev
-\`\`\`
+```
 
 Open http://localhost:3000 in your browser. You should see the EmberKit welcome page.
 
@@ -98,31 +99,21 @@ Open http://localhost:3000 in your browser. You should see the EmberKit welcome 
 
 ### Port already in use
 
-Change the port in \`emberkit.config.ts\`:
+Change the port in `emberkit.config.ts`:
 
-\`\`\`typescript
+```typescript
 server: { port: 3001 }
-\`\`\`
+```
 
 ### Module resolution errors
 
-Ensure your \`tsconfig.json\` includes:
+Ensure your `tsconfig.json` includes:
 
-\`\`\`json
+```json
 {
   "compilerOptions": {
     "jsxImportSource": "@emberkit/core",
     "moduleResolution": "bundler"
   }
 }
-\`\`\``;
-
-const InstallationPage: RouteComponent = () => {
-  const html = renderMarkdown(content);
-
-  return (
-    <div className="md-content" dangerouslySetInnerHTML={{ __html: html }} />
-  );
-};
-
-export default InstallationPage;
+```

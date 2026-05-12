@@ -1,15 +1,16 @@
-import type { RouteComponent } from '@emberkit/core';
-import { renderMarkdown } from '@emberkit/core';
+---
+title: Quick Start
+---
 
-const content = `# Quick Start
+# Quick Start
 
 Build your first EmberKit page in 5 minutes.
 
 ## Create Your First Route
 
-Routes live in \`src/routes/\`. Create \`index.tsx\`:
+Routes live in `src/routes/`. Create `index.tsx`:
 
-\`\`\`tsx
+```tsx
 import { render } from '@emberkit/core';
 
 function HomePage() {
@@ -22,13 +23,13 @@ function HomePage() {
 }
 
 render(<HomePage />, document.getElementById('app')!);
-\`\`\`
+```
 
 ## Add Dynamic Routes
 
-Create \`[slug].tsx\` for dynamic paths:
+Create `[slug].tsx` for dynamic paths:
 
-\`\`\`tsx
+```tsx
 import type { Loader } from '@emberkit/loader';
 
 export const loader: Loader = async ({ params }) => {
@@ -38,11 +39,11 @@ export const loader: Loader = async ({ params }) => {
 export default function PostPage({ data }: { data: { slug: string } }) {
   return <h1>Post: {data.slug}</h1>;
 }
-\`\`\`
+```
 
 ## Use Signals for State
 
-\`\`\`tsx
+```tsx
 import { createSignal } from '@emberkit/core';
 
 function Counter() {
@@ -57,11 +58,11 @@ function Counter() {
     </div>
   );
 }
-\`\`\`
+```
 
 ## Add Navigation
 
-\`\`\`tsx
+```tsx
 import { navigate, Link } from '@emberkit/core';
 
 function Nav() {
@@ -75,13 +76,13 @@ function Nav() {
     </nav>
   );
 }
-\`\`\`
+```
 
 ## Add a Layout
 
-Create \`_layout.tsx\` to wrap all routes:
+Create `_layout.tsx` to wrap all routes:
 
-\`\`\`tsx
+```tsx
 export default function Layout({ children }) {
   return (
     <div className="app">
@@ -93,28 +94,18 @@ export default function Layout({ children }) {
     </div>
   );
 }
-\`\`\`
+```
 
 ## Build for Production
 
-\`\`\`bash
+```bash
 pnpm build
-\`\`\`
+```
 
-Output will be in \`dist/\`.
+Output will be in `dist/`.
 
 ## What's Next?
 
 - [Components](/docs/components) - Learn about component patterns
 - [Routing](/docs/routing) - Deep dive into file-based routing
-- [Signals](/docs/signals) - Reactive state management`;
-
-const QuickStartPage: RouteComponent = () => {
-  const html = renderMarkdown(content);
-
-  return (
-    <div className="md-content" dangerouslySetInnerHTML={{ __html: html }} />
-  );
-};
-
-export default QuickStartPage;
+- [Signals](/docs/signals) - Reactive state management

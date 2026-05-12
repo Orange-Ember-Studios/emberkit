@@ -1,7 +1,8 @@
-import type { RouteComponent } from '@emberkit/core';
-import { renderMarkdown } from '@emberkit/core';
+---
+title: Introduction
+---
 
-const content = `# Introduction
+# Introduction
 
 EmberKit is a **minimalist, TypeScript-first JSX framework** built for three principles:
 
@@ -25,7 +26,7 @@ Most frameworks ship 40-100KB of JavaScript by default, even for simple static p
 
 ## Core Philosophy
 
-\`\`\`typescript
+```typescript
 // Your code
 function Button({ children }) {
   return <button className="btn">{children}</button>;
@@ -33,11 +34,11 @@ function Button({ children }) {
 
 // Result: Pure HTML, no JavaScript hydration needed
 // <button class="btn">Click me</button>
-\`\`\`
+```
 
 Only when you add interactivity:
 
-\`\`\`typescript
+```typescript
 function Counter() {
   const [count, setCount] = createSignal(0);
 
@@ -48,7 +49,7 @@ function Counter() {
     </button>
   );
 }
-\`\`\`
+```
 
 ## Quick Comparison
 
@@ -63,14 +64,4 @@ function Counter() {
 
 - [Installation](/docs/installation) - Set up your first project
 - [Quick Start](/docs/quick-start) - Build your first page
-- [Core Concepts](/docs/components) - Learn the fundamentals`;
-
-const IntroductionPage: RouteComponent = () => {
-  const html = renderMarkdown(content);
-
-  return (
-    <div className="md-content" dangerouslySetInnerHTML={{ __html: html }} />
-  );
-};
-
-export default IntroductionPage;
+- [Core Concepts](/docs/components) - Learn the fundamentals

@@ -5,7 +5,7 @@ export function createRoute(
   filePath: string,
   routeDir: string = 'src/routes',
 ): Route | null {
-  const relativePath = filePath.replace(/\\/g, '/').replace(routeDir, '').replace(/\.(tsx|ts|jsx|js)$/, '');
+  const relativePath = filePath.replace(/\\/g, '/').replace(routeDir, '').replace(/\.(tsx|ts|jsx|js|md|mdx)$/, '');
 
   if (relativePath.startsWith('/_api/') || relativePath.startsWith('_api/') || relativePath.includes('/_api/')) {
     return null;

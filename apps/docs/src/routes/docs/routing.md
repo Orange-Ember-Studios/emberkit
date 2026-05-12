@@ -1,0 +1,172 @@
+# Routing
+
+EmberKit uses file-based routing. Your file structure under `src/routes/` automatically defines the URL structure.
+
+## Basic Routes
+
+| File | URL |
+|------|-----|
+| `src/routes/index.tsx` | `/` |
+| `src/routes/about.tsx` | `/about` |
+| `src/routes/docs/index.tsx` | `/docs` |
+| `src/routes/docs/installation.tsx` | `/docs/installation` |
+
+## Dynamic Routes
+
+Use square brackets for dynamic segments:
+
+```tsx
+// src/routes/blog/[slug].tsx
+// Matches: /blog/hello-world, /blog/my-post
+
+export default function BlogPost({ params }: { params: { slug: string } }) {
+  return <h1>Post: {params.slug}</h1>;
+}
+```
+
+## Catch-All Routes
+
+Use the spread operator for catch-all routes:
+
+```tsx
+// src/routes/docs/[...rest].tsx
+// Matches: /docs/anything/here
+
+export default function DocsPage({ params }: { params: { rest: string } }) {
+  return <div>Path: {params.rest}</div>;
+}
+```
+
+## Layouts
+
+Create `_layout.tsx` to wrap all routes in a directory:
+
+```tsx
+// src/routes/_layout.tsx — wraps ALL routes
+export default function RootLayout({ children }: { children: unknown }) {
+  return (
+    <div className="app">
+      <nav>...</nav>
+      <main>{children}</main>
+    </div>
+  );
+}
+```
+
+```tsx
+// src/routes/docs/_layout.tsx — wraps /docs/* routes
+export default function DocsLayout({ children }: { children: unknown }) {
+  return (
+    <div className="docs">
+      <aside>Sidebar</aside>
+      <article>{children}</article>
+    </div>
+  );
+}
+```
+
+## Navigation
+
+### Programmatic Navigation
+
+```tsx
+import { navigate } from '@emberkit/core';
+
+function MyComponent() {
+  return (
+    <button onClick={() => navigate('/about')}>
+      Go to About
+    </button>
+  );
+}
+```
+
+### Navigate with Replace
+
+```tsx
+navigate('/new-path', { replace: true });
+```
+
+### Prefetching
+
+```tsx
+import { preload } from '@emberkit/core';
+
+// Add prefetch link to document head
+preload('/about');
+```
+
+## Route Loaders
+
+Loaders fetch data before rendering the route:
+
+```tsx
+// src/routes/blog/[slug].tsx
+import type { Loader, LoaderResult } from '@emberkit/core';
+
+interface PostData {
+  title: string;
+  content: string;
+}
+
+export const loader: Loader = async ({ params }) => {
+  const response = await fetch(`/api/posts/${params.slug}`);
+  const post = await response.json();
+  return { data: post } as LoaderResult<PostData>;
+};
+
+export default function BlogPost({ data }: { data: PostData }) {
+  return (
+    <article>
+      <h1>{data.title}</h1>
+      <div dangerouslySetInnerHTML={{ __html: data.content }} />
+    </article>
+  );
+}
+```
+
+## Error Handling
+
+Create `_error.tsx` to handle route errors:
+
+```tsx
+// src/routes/_error.tsx
+export default function ErrorPage({ error }: { error: { status: number; message: string } }) {
+  return (
+    <div className="error-page">
+      <h1>{error.status}</h1>
+      <p>{error.message}</p>
+    </div>
+  );
+}
+```
+
+## Loading States
+
+Create `_loading.tsx` for loading UI:
+
+```tsx
+// src/routes/_loading.tsx
+export default function Loading() {
+  return <div className="spinner">Loading...</div>;
+}
+```
+
+## API Routes
+
+Create server-only API endpoints under `src/routes/_api/`:
+
+```tsx
+// src/routes/_api/hello.ts
+export async function GET(request: Request) {
+  return new Response(JSON.stringify({ message: 'Hello' }), {
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
+```
+
+## Next Steps
+
+- [Signals](/docs/signals) - Reactive state management
+- [Context](/docs/context) - Sharing state between routes
+- [SSR](/docs/ssr) - Server-side rendering
