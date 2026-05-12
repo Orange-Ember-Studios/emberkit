@@ -239,51 +239,100 @@ function highlightTS(code: string): string {
   const tokens: string[] = [];
   let remaining = code;
 
-  const controlFlow = new Set(['if','else','for','while','do','switch','case','break','continue','return','throw','try','catch','finally','yield','await']);
-  const declarations = new Set(['import','export','from','const','let','var','function','class','extends','super','enum','type','interface','module','namespace','declare','abstract','implements','new','delete','typeof','instanceof','in','of','default','as','satisfies']);
-  const modifiers = new Set(['readonly','public','private','protected','static','abstract','async','override','declare']);
-  const types = new Set(['void','never','unknown','any','null','undefined','true','false','this','keyof','infer','is','asserts']);
-  const builtins = new Set(['console','document','window','Math','JSON','Array','Object','String','Number','Boolean','Promise','Map','Set','RegExp','Date','Error','Symbol','Record','Partial','Required','Pick','Omit','Exclude','Extract','ReturnType','Parameters']);
+  const controlFlow = new Set(['if','else','for','while','do','switch','case','break','continue','return','throw','try','catch','finally']);
+  const declarations = new Set(['import','export','from','const','let','var','function','class','extends','super','enum','type','interface','module','namespace','declare','new','delete','typeof','instanceof','in','of','default','as','satisfies','keyof','infer','is','asserts','abstract','implements']);
+  const modifiers = new Set(['readonly','public','private','protected','static','abstract','async','override']);
+  const literals = new Set(['true','false','null','undefined','this']);
+  const builtins = new Set(['console','document','window','Math','JSON','Array','Object','String','Number','Boolean','Promise','Map','Set','RegExp','Date','Error','Symbol','Record','Partial','Required','Pick','Omit','Exclude','Extract','ReturnType','Parameters','JSX','FC','Props','State','Effect','Memo','Signal','Ref','Context','React']);
 
   while (remaining.length > 0) {
     let m: RegExpMatchArray | null;
 
     // Multi-line comment
     m = remaining.match(/^\/\*[\s\S]*?\*\//);
-    if (m) { tokens.push(`<span class="cm">${m[0]}</span>`); remaining = remaining.slice(m[0].length); continue; }
+    if (m) { tokens.push(`<span class="cm">${escapeHtml(m[0])}</span>`); remaining = remaining.slice(m[0].length); continue; }
 
     // Single-line comment
     m = remaining.match(/^\/\/.*/);
-    if (m) { tokens.push(`<span class="cm">${m[0]}</span>`); remaining = remaining.slice(m[0].length); continue; }
+    if (m) { tokens.push(`<span class="cm">${escapeHtml(m[0])}</span>`); remaining = remaining.slice(m[0].length); continue; }
 
     // Template literal with interpolations
-    m = remaining.match(/^`[^`]*`/);
+    m = remaining.match(/^`/);
     if (m) {
-      let tmpl = m[0];
-      // Highlight ${...} interpolations inside template literals
-      tmpl = tmpl.replace(/\$\{([\s\S]*?)\}/g, (_im, inner) => {
-        return `\${<span class="op">${highlightInlineExpr(inner)}</span>}`;
-      });
+      let tmpl = '`';
+      remaining = remaining.slice(1);
+      while (remaining.length > 0) {
+        if (remaining[0] === '`') { tmpl += '`'; remaining = remaining.slice(1); break; }
+        if (remaining.startsWith('\\')) { tmpl += remaining.slice(0, 2); remaining = remaining.slice(2); continue; }
+        if (remaining.startsWith('${')) {
+          tmpl += '${';
+          remaining = remaining.slice(2);
+          // Parse interpolation until matching }
+          let depth = 1;
+          let expr = '';
+          while (remaining.length > 0 && depth > 0) {
+            if (remaining[0] === '{') depth++;
+            if (remaining[0] === '}') { depth--; if (depth === 0) { remaining = remaining.slice(1); break; } }
+            expr += remaining[0];
+            remaining = remaining.slice(1);
+          }
+          tmpl += highlightInlineExpr(expr) + '}';
+          continue;
+        }
+        tmpl += remaining[0];
+        remaining = remaining.slice(1);
+      }
       tokens.push(`<span class="str">${tmpl}</span>`);
-      remaining = remaining.slice(m[0].length);
       continue;
     }
 
     // String (single, double)
     m = remaining.match(/^('[^']*'|"[^"]*")/);
-    if (m) { tokens.push(`<span class="str">${m[0]}</span>`); remaining = remaining.slice(m[0].length); continue; }
+    if (m) { tokens.push(`<span class="str">${escapeHtml(m[0])}</span>`); remaining = remaining.slice(m[0].length); continue; }
 
-    // JSX tag <Component or <div
-    m = remaining.match(/^(&lt;\/?)([A-Za-z][\w.]*)/);
+    // Arrow function =>
+    m = remaining.match(/^=>/);
+    if (m) { tokens.push(`<span class="op">=&gt;</span>`); remaining = remaining.slice(2); continue; }
+
+    // JSX closing tag </Component>
+    m = remaining.match(/^(&lt;\/)([A-Za-z][\w.]*)(&gt;)/);
+    if (m) {
+      tokens.push(`${m[1]}<span class="tag">${m[2]}</span>${m[3]}`);
+      remaining = remaining.slice(m[0].length);
+      continue;
+    }
+
+    // JSX self-closing or opening tag <Component or <div
+    m = remaining.match(/^(&lt;)([A-Za-z][\w.]*)/);
     if (m) {
       tokens.push(`${m[1]}<span class="tag">${m[2]}</span>`);
       remaining = remaining.slice(m[0].length);
       continue;
     }
 
+    // JSX prop name (word followed by =)
+    m = remaining.match(/^([a-zA-Z_][\w.]*)\s*(?==)/);
+    if (m && !['if','else','for','while','switch','case','return','import','export','from','const','let','var','function','class','new','typeof','instanceof','void','null','undefined','true','false','this'].includes(m[1])) {
+      tokens.push(`<span class="attr">${escapeHtml(m[1])}</span>`);
+      remaining = remaining.slice(m[1].length);
+      continue;
+    }
+
     // Decorator @Decorator
     m = remaining.match(/^@([A-Za-z_]\w*)/);
-    if (m) { tokens.push(`<span class="attr">${m[0]}</span>`); remaining = remaining.slice(m[0].length); continue; }
+    if (m) { tokens.push(`<span class="dec">${m[0]}</span>`); remaining = remaining.slice(m[0].length); continue; }
+
+    // Number (with underscores and scientific notation)
+    m = remaining.match(/^(\d[\d_]*\.?[\d_]*([eE][+-]?\d+)?)/);
+    if (m) { tokens.push(`<span class="num">${m[0]}</span>`); remaining = remaining.slice(m[0].length); continue; }
+
+    // HTML entities — pass through
+    m = remaining.match(/^(&\w+;)/);
+    if (m) { tokens.push(m[0]); remaining = remaining.slice(m[0].length); continue; }
+
+    // Multi-char operators (check before single-char)
+    m = remaining.match(/^(&&|\|\||===|!==|==|!=|<=|>=|\+\+|--|\*\*|=>|\.\.\.|&&amp;&amp;|&amp;&amp;|\|\||===|!==)/);
+    if (m) { tokens.push(`<span class="op">${escapeHtml(m[0])}</span>`); remaining = remaining.slice(m[0].length); continue; }
 
     // Word (keyword, type, builtin, function, identifier)
     m = remaining.match(/^([A-Za-z_$][\w$]*)/);
@@ -293,7 +342,7 @@ function highlightTS(code: string): string {
       if (controlFlow.has(word)) cls = 'kw';
       else if (declarations.has(word)) cls = 'kw';
       else if (modifiers.has(word)) cls = 'kw';
-      else if (types.has(word)) cls = 'type';
+      else if (literals.has(word)) cls = 'val';
       else if (builtins.has(word)) cls = 'type';
       else if (/^[A-Z]/.test(word) && word.length > 1) cls = 'type';
       else {
@@ -306,24 +355,16 @@ function highlightTS(code: string): string {
       continue;
     }
 
-    // Number
-    m = remaining.match(/^(\d[\d_]*\.?[\d_]*([eE][+-]?\d+)?)/);
-    if (m) { tokens.push(`<span class="num">${m[0]}</span>`); remaining = remaining.slice(m[0].length); continue; }
-
-    // HTML entities — pass through
-    m = remaining.match(/^(&\w+;)/);
-    if (m) { tokens.push(m[0]); remaining = remaining.slice(m[0].length); continue; }
-
-    // Operators and punctuation
-    m = remaining.match(/^([{}()\[\];:,.=&lt;&gt;+\-*/|!?~^%]+)/);
-    if (m) { tokens.push(`<span class="op">${m[0]}</span>`); remaining = remaining.slice(m[0].length); continue; }
+    // Single-char operators and punctuation
+    m = remaining.match(/^([{}()\[\];:,.=&lt;&gt;+\-*/|!?~^%])/);
+    if (m) { tokens.push(`<span class="op">${escapeHtml(m[0])}</span>`); remaining = remaining.slice(m[0].length); continue; }
 
     // Whitespace
     m = remaining.match(/^(\s+)/);
     if (m) { tokens.push(m[0]); remaining = remaining.slice(m[0].length); continue; }
 
     // Anything else
-    tokens.push(remaining[0]);
+    tokens.push(escapeHtml(remaining[0]));
     remaining = remaining.slice(1);
   }
 
@@ -333,9 +374,10 @@ function highlightTS(code: string): string {
 // Highlight a short inline expression (for template literal interpolations)
 function highlightInlineExpr(code: string): string {
   return escapeHtml(code)
-    .replace(/\b(const|let|var|return|if|else|new|typeof|instanceof|async|await|function|import)\b/g, '<span class="kw">$1</span>')
-    .replace(/\b(true|false|null|undefined|this)\b/g, '<span class="type">$1</span>')
-    .replace(/(\d+)/g, '<span class="num">$1</span>');
+    .replace(/\b(const|let|var|return|if|else|new|typeof|instanceof|async|await|function|import|from|export)\b/g, '<span class="kw">$1</span>')
+    .replace(/\b(true|false|null|undefined|this)\b/g, '<span class="val">$1</span>')
+    .replace(/(\d+)/g, '<span class="num">$1</span>')
+    .replace(/([A-Z][\w]+)/g, '<span class="type">$1</span>');
 }
 
 function highlightBash(code: string): string {
