@@ -4,6 +4,7 @@
   "type": "module",
   "main": "base.json",
   "exports": {
-    ".": "./base.json"
+    ".": "./base.json",
+    "./base.json": "./base.json"
   }
 }

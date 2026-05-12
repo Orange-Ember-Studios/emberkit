@@ -94,6 +94,9 @@ importers:
       '@emberkit/core':
         specifier: workspace:*
         version: link:../emberkit
+      '@emberkit/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
 
   packages/tsconfig: {}
 
