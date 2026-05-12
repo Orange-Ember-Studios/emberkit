@@ -175,6 +175,8 @@
   .md-content pre > code .tag { color: #f87171; }
   .md-content pre > code .attr { color: #fbbf24; }
   .md-content pre > code .val { color: #34d399; }
+  .md-content pre > code .jsx { color: #38bdf8; }
+  .md-content pre > code .dec { color: #f472b6; }
 
   /* Copy button */
   .md-content pre > .copy-btn {

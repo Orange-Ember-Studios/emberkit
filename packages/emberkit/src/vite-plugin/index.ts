@@ -239,47 +239,88 @@ function highlightTS(code: string): string {
   const tokens: string[] = [];
   let remaining = code;
 
-  // Tokenize to avoid regex conflicts
+  const controlFlow = new Set(['if','else','for','while','do','switch','case','break','continue','return','throw','try','catch','finally','yield','await']);
+  const declarations = new Set(['import','export','from','const','let','var','function','class','extends','super','enum','type','interface','module','namespace','declare','abstract','implements','new','delete','typeof','instanceof','in','of','default','as','satisfies']);
+  const modifiers = new Set(['readonly','public','private','protected','static','abstract','async','override','declare']);
+  const types = new Set(['void','never','unknown','any','null','undefined','true','false','this','keyof','infer','is','asserts']);
+  const builtins = new Set(['console','document','window','Math','JSON','Array','Object','String','Number','Boolean','Promise','Map','Set','RegExp','Date','Error','Symbol','Record','Partial','Required','Pick','Omit','Exclude','Extract','ReturnType','Parameters']);
+
   while (remaining.length > 0) {
+    let m: RegExpMatchArray | null;
+
+    // Multi-line comment
+    m = remaining.match(/^\/\*[\s\S]*?\*\//);
+    if (m) { tokens.push(`<span class="cm">${m[0]}</span>`); remaining = remaining.slice(m[0].length); continue; }
+
     // Single-line comment
-    let m = remaining.match(/^(\/\/.*)/);
-    if (m) { tokens.push(`<span class="cm">${m[1]}</span>`); remaining = remaining.slice(m[1].length); continue; }
+    m = remaining.match(/^\/\/.*/);
+    if (m) { tokens.push(`<span class="cm">${m[0]}</span>`); remaining = remaining.slice(m[0].length); continue; }
 
-    // String (single, double, backtick) — match only plain text quotes, not HTML entities
-    m = remaining.match(/^('[^']*'|"[^"]*"|`[^`]*`)/);
-    if (m) { tokens.push(`<span class="str">${m[1]}</span>`); remaining = remaining.slice(m[1].length); continue; }
+    // Template literal with interpolations
+    m = remaining.match(/^`[^`]*`/);
+    if (m) {
+      let tmpl = m[0];
+      // Highlight ${...} interpolations inside template literals
+      tmpl = tmpl.replace(/\$\{([\s\S]*?)\}/g, (_im, inner) => {
+        return `\${<span class="op">${highlightInlineExpr(inner)}</span>}`;
+      });
+      tokens.push(`<span class="str">${tmpl}</span>`);
+      remaining = remaining.slice(m[0].length);
+      continue;
+    }
 
-    // Word (keyword, type, etc.)
-    m = remaining.match(/^([a-zA-Z_$][\w$]*)/);
+    // String (single, double)
+    m = remaining.match(/^('[^']*'|"[^"]*")/);
+    if (m) { tokens.push(`<span class="str">${m[0]}</span>`); remaining = remaining.slice(m[0].length); continue; }
+
+    // JSX tag <Component or <div
+    m = remaining.match(/^(&lt;\/?)([A-Za-z][\w.]*)/);
+    if (m) {
+      tokens.push(`${m[1]}<span class="tag">${m[2]}</span>`);
+      remaining = remaining.slice(m[0].length);
+      continue;
+    }
+
+    // Decorator @Decorator
+    m = remaining.match(/^@([A-Za-z_]\w*)/);
+    if (m) { tokens.push(`<span class="attr">${m[0]}</span>`); remaining = remaining.slice(m[0].length); continue; }
+
+    // Word (keyword, type, builtin, function, identifier)
+    m = remaining.match(/^([A-Za-z_$][\w$]*)/);
     if (m) {
       const word = m[1];
-      const keywords = new Set(['import','export','from','const','let','var','function','return','if','else','for','while','switch','case','break','continue','new','typeof','instanceof','class','extends','super','this','null','undefined','true','false','async','await','try','catch','finally','throw','default','type','interface','enum','as','keyof','void','never','unknown','any','readonly','public','private','protected','static','abstract','implements','in','of','delete','yield','infer','is']);
-      if (keywords.has(word)) {
-        tokens.push(`<span class="kw">${word}</span>`);
-      } else if (/^[A-Z]/.test(word) && word.length > 1) {
-        tokens.push(`<span class="type">${word}</span>`);
-      } else {
-        tokens.push(word);
+      let cls = '';
+      if (controlFlow.has(word)) cls = 'kw';
+      else if (declarations.has(word)) cls = 'kw';
+      else if (modifiers.has(word)) cls = 'kw';
+      else if (types.has(word)) cls = 'type';
+      else if (builtins.has(word)) cls = 'type';
+      else if (/^[A-Z]/.test(word) && word.length > 1) cls = 'type';
+      else {
+        // Check if followed by ( → function call
+        const ahead = remaining.slice(word.length);
+        if (/^\s*\(/.test(ahead)) cls = 'fn';
       }
+      tokens.push(cls ? `<span class="${cls}">${word}</span>` : word);
       remaining = remaining.slice(word.length);
       continue;
     }
 
     // Number
-    m = remaining.match(/^(\d+\.?\d*)/);
-    if (m) { tokens.push(`<span class="num">${m[1]}</span>`); remaining = remaining.slice(m[1].length); continue; }
+    m = remaining.match(/^(\d[\d_]*\.?[\d_]*([eE][+-]?\d+)?)/);
+    if (m) { tokens.push(`<span class="num">${m[0]}</span>`); remaining = remaining.slice(m[0].length); continue; }
 
-    // HTML entities — pass through as-is
+    // HTML entities — pass through
     m = remaining.match(/^(&\w+;)/);
-    if (m) { tokens.push(m[1]); remaining = remaining.slice(m[1].length); continue; }
+    if (m) { tokens.push(m[0]); remaining = remaining.slice(m[0].length); continue; }
 
-    // JSX angle brackets and punctuation
-    m = remaining.match(/^([{}()\[\];:,.=&lt;&gt;+\-*/|!?~@#%^&]+)/);
-    if (m) { tokens.push(`<span class="op">${m[1]}</span>`); remaining = remaining.slice(m[1].length); continue; }
+    // Operators and punctuation
+    m = remaining.match(/^([{}()\[\];:,.=&lt;&gt;+\-*/|!?~^%]+)/);
+    if (m) { tokens.push(`<span class="op">${m[0]}</span>`); remaining = remaining.slice(m[0].length); continue; }
 
     // Whitespace
     m = remaining.match(/^(\s+)/);
-    if (m) { tokens.push(m[1]); remaining = remaining.slice(m[1].length); continue; }
+    if (m) { tokens.push(m[0]); remaining = remaining.slice(m[0].length); continue; }
 
     // Anything else
     tokens.push(remaining[0]);
@@ -287,6 +328,14 @@ function highlightTS(code: string): string {
   }
 
   return tokens.join('');
+}
+
+// Highlight a short inline expression (for template literal interpolations)
+function highlightInlineExpr(code: string): string {
+  return escapeHtml(code)
+    .replace(/\b(const|let|var|return|if|else|new|typeof|instanceof|async|await|function|import)\b/g, '<span class="kw">$1</span>')
+    .replace(/\b(true|false|null|undefined|this)\b/g, '<span class="type">$1</span>')
+    .replace(/(\d+)/g, '<span class="num">$1</span>');
 }
 
 function highlightBash(code: string): string {
