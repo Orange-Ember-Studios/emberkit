@@ -44,8 +44,14 @@ export function renderElementToHTML(element: JSXElement): string {
     return childHtml;
   }
 
+  // Handle dangerouslySetInnerHTML
+  const dshProp = (props as Record<string, unknown>).dangerouslySetInnerHTML;
+  const innerHtml = (dshProp && typeof dshProp === 'object' && '__html' in dshProp)
+    ? String((dshProp as { __html: unknown }).__html)
+    : childHtml;
+
   const attributes = Object.entries(props)
-    .filter(([key]) => key !== 'children' && key !== 'key')
+    .filter(([key]) => key !== 'children' && key !== 'key' && key !== 'dangerouslySetInnerHTML')
     .filter(([, value]) => typeof value !== 'function' && value != null)
     .map(([key, value]) => {
       // Map React/JSX prop names to HTML attributes
@@ -64,7 +70,7 @@ export function renderElementToHTML(element: JSXElement): string {
     return `<${currentType}${attributes}/>`;
   }
 
-  return `<${currentType}${attributes}>${childHtml}</${currentType}>`;
+  return `<${currentType}${attributes}>${innerHtml}</${currentType}>`;
 }
 
 export function renderToString(element: JSXElement | string | null | number): string {
