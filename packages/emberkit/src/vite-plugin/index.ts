@@ -483,18 +483,22 @@ function generateRoutesCode(files: string[], routeDir: string): string {
 
     let routePath = relativePath
       .replace(/\.(tsx|ts|jsx|js|md|mdx)$/, '')
-      .replace(/\/index$/, '')
+      .replace(/(^|\/)index$/, '$1')
       .replace(/\[\.\.\.(\w+)\]/g, ':$1*')
       .replace(/\[([^\]]+)\]/g, ':$1');
 
-    if (routePath === '') routePath = '/';
+    if (routePath === '' || routePath === '/') {
+      routePath = '/';
+    } else {
+      routePath = '/' + routePath;
+    }
 
     const importPath = file.replace(/\\/g, '/');
 
     if (isMarkdown) {
-      routeEntries.push(`  { path: ${JSON.stringify('/' + routePath)}, component: () => import(${JSON.stringify(importPath)}), isMarkdown: true }`);
+      routeEntries.push(`  { path: ${JSON.stringify(routePath)}, component: () => import(${JSON.stringify(importPath)}), isMarkdown: true }`);
     } else {
-      routeEntries.push(`  { path: ${JSON.stringify('/' + routePath)}, component: () => import(${JSON.stringify(importPath)}) }`);
+      routeEntries.push(`  { path: ${JSON.stringify(routePath)}, component: () => import(${JSON.stringify(importPath)}) }`);
     }
   }
 
