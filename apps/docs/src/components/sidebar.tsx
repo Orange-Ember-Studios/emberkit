@@ -9,6 +9,7 @@ const docs = [
       { title: 'Introduction', path: '/docs/introduction' },
       { title: 'Installation', path: '/docs/installation' },
       { title: 'Quick Start', path: '/docs/quick-start' },
+      { title: 'Built with EmberKit', path: '/docs/built-with-emberkit' },
     ],
   },
   {

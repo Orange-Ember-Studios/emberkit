@@ -108,9 +108,15 @@ class MarkdownParser {
   }
 
   private renderMarkdown(content: string): string {
-    let html = content;
+    // Step 1: Extract all fenced code blocks before any markdown processing
+    const codeBlocks: string[] = [];
+    let html = content.replace(/```(\w*)\n([\s\S]*?)```/g, (_match, lang, code) => {
+      const escaped = this.escapeHtml(code.trim());
+      codeBlocks.push(`<pre><code class="language-${lang}">${escaped}</code></pre>`);
+      return `\n__CODE_BLOCK_${codeBlocks.length - 1}__\n`;
+    });
 
-    html = this.processCodeBlocks(html);
+    // Step 2: Process all other markdown
     html = this.processHeadings(html);
     html = this.processHorizontalRules(html);
     html = this.processLists(html);
@@ -123,14 +129,10 @@ class MarkdownParser {
     html = this.processLineBreaks(html);
     html = this.processComponents(html);
 
-    return html;
-  }
+    // Step 3: Restore code blocks
+    html = html.replace(/__CODE_BLOCK_(\d+)__/g, (_, index) => codeBlocks[Number(index)]);
 
-  private processCodeBlocks(html: string): string {
-    return html.replace(/```(\w*)\n([\s\S]*?)```/g, (_match, lang, code) => {
-      const escaped = this.escapeHtml(code.trim());
-      return `<pre><code class="language-${lang}">${escaped}</code></pre>`;
-    });
+    return html;
   }
 
   private processHeadings(html: string): string {
