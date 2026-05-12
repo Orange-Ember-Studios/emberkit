@@ -211,7 +211,8 @@ function processHeadings(html: string): string {
 function processCodeBlocks(html: string): string {
   return html.replace(/```(\w*)\n([\s\S]*?)```/g, (_match, lang, code) => {
     const escaped = code.trim().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    return `<pre><code class="language-${lang}">${escaped}</code></pre>`;
+    const langAttr = lang ? ` data-lang="${lang}"` : '';
+    return `<pre${langAttr}><code class="language-${lang}">${escaped}</code></pre>`;
   });
 }
 
