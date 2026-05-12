@@ -1,5 +1,12 @@
 # @emberkit/core
 
+## 0.1.2
+
+### Patch Changes
+
+- 34d4667: First Release
+- Initial stable release of all EmberKit packages.
+
 ## 0.1.2-alpha.0
 
 ### Patch Changes

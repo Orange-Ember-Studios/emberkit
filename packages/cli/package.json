@@ -1,6 +1,6 @@
 {
   "name": "@emberkit/cli",
-  "version": "0.1.2-alpha.0",
+  "version": "0.1.2",
   "type": "module",
   "description": "CLI tool for EmberKit projects",
   "license": "Apache-2.0",
