@@ -41,16 +41,16 @@ const docs = [
 
 const Sidebar: RouteComponent = () => {
   return (
-    <aside className="docs-sidebar">
+    <aside className="fixed top-16 left-0 h-[calc(100vh-4rem)] w-[260px] overflow-y-auto border-r border-gray-200 bg-white px-4 py-6 max-lg:hidden">
       {docs.map((section) => (
-        <div key={section.title} className="sidebar-section">
-          <h3 className="sidebar-title">{section.title}</h3>
-          <ul className="sidebar-nav">
+        <div key={section.title} className="mb-6">
+          <h3 className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-gray-400">{section.title}</h3>
+          <ul className="list-none">
             {section.items.map((item) => (
               <li key={item.path}>
                 <a
                   href={item.path}
-                  className="sidebar-link"
+                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-500 no-underline transition-all hover:bg-gray-100 hover:text-gray-800 [&_svg]:shrink-0 [&_svg]:text-gray-400"
                   onClick={(e) => {
                     e.preventDefault();
                     navigate(item.path);

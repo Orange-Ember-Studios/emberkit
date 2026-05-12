@@ -121,7 +121,7 @@ const InstallationPage: RouteComponent = () => {
   const html = renderMarkdown(content);
 
   return (
-    <div className="doc-content" dangerouslySetInnerHTML={{ __html: html }} />
+    <div className="md-content" dangerouslySetInnerHTML={{ __html: html }} />
   );
 };
 

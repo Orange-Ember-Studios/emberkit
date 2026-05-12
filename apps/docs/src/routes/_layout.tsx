@@ -21,11 +21,11 @@ const Layout: RouteComponent = ({ children }) => {
 
   return (
     <DocsContext.Provider value={context}>
-      <div className="docs-layout">
+      <div className="flex min-h-screen flex-col">
         <Header />
-        <div className="docs-content">
+        <div className="flex flex-1 pt-16">
           <Sidebar />
-          <main className="docs-main">
+          <main className="ml-[260px] max-w-[900px] flex-1 px-16 py-12 max-lg:ml-0 max-lg:px-6 max-lg:py-8">
             {children}
           </main>
         </div>

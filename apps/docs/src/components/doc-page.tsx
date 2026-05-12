@@ -10,9 +10,9 @@ const DocPage: RouteComponent<Props> = ({ content, title }) => {
   const html = renderMarkdown(content);
 
   return (
-    <article className="doc-page">
-      {title && <h1 className="doc-title">{title}</h1>}
-      <div className="doc-content" dangerouslySetInnerHTML={{ __html: html }} />
+    <article className="max-w-[800px]">
+      {title && <h1 className="mb-8 text-4xl font-extrabold tracking-tight">{title}</h1>}
+      <div className="md-content" dangerouslySetInnerHTML={{ __html: html }} />
     </article>
   );
 };

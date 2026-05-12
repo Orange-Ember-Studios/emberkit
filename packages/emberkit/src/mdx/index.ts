@@ -153,15 +153,6 @@ export function compileSync(source: string, options?: MDXConfig): MDXComponent {
   return compiler.compile(source);
 }
 
-export async function loadMDX(
-  path: string,
-  options?: MDXConfig,
-): Promise<MDXComponent> {
-  const fs = await import('fs');
-  const source = fs.readFileSync(path, 'utf-8');
-  return compileMDX(source, options);
-}
-
 export function useMDX(source: string, options?: MDXConfig): MDXComponent {
   return compileSync(source, options);
 }
