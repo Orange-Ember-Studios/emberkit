@@ -148,11 +148,11 @@
                 inset 0 1px 0 oklch(100% 0 0 / 0.03);
   }
 
-  /* Copy button */
+  /* Copy button — left of language badge */
   .md-content pre > .copy-btn {
     position: absolute;
     top: 0.5rem;
-    right: 0.5rem;
+    right: 5.5rem;
     display: flex;
     align-items: center;
     gap: 0.35rem;
@@ -192,6 +192,36 @@
     transform: scale(0.95);
   }
 
+  .md-content pre > code {
+    display: block;
+    padding: 1.25rem 1.5rem;
+    background: transparent;
+    color: oklch(88% 0.01 260);
+    font-size: 0.8125rem;
+    line-height: 1.85;
+    overflow-x: auto;
+    tab-size: 2;
+    white-space: pre;
+  }
+
+  /* Syntax highlighting */
+  .md-content pre > code .kw { color: oklch(68% 0.18 300); font-weight: 500; }
+  .md-content pre > code .fn { color: oklch(78% 0.15 210); }
+  .md-content pre > code .str { color: oklch(78% 0.16 145); }
+  .md-content pre > code .num { color: oklch(80% 0.17 80); }
+  .md-content pre > code .cm { color: oklch(55% 0.02 260); font-style: italic; }
+  .md-content pre > code .type { color: oklch(75% 0.15 230); }
+  .md-content pre > code .op { color: oklch(70% 0.05 260); }
+  .md-content pre > code .tag { color: oklch(70% 0.18 15); }
+  .md-content pre > code .attr { color: oklch(78% 0.15 80); }
+  .md-content pre > code .val { color: oklch(78% 0.16 145); }
+
+  /* Scrollbar */
+  .md-content pre > code::-webkit-scrollbar { height: 6px; }
+  .md-content pre > code::-webkit-scrollbar-track { background: transparent; }
+  .md-content pre > code::-webkit-scrollbar-thumb { background: oklch(30% 0.02 260); border-radius: 3px; }
+  .md-content pre > code::-webkit-scrollbar-thumb:hover { background: oklch(40% 0.02 260); }
+
   /* Language label — top right pill */
   .md-content pre[data-lang]::before {
     content: attr(data-lang);
@@ -210,53 +240,6 @@
     border-radius: 9999px;
     z-index: 1;
     pointer-events: none;
-  }
-
-  .md-content pre > code {
-    display: block;
-    padding: 1.25rem 1.5rem;
-    background: transparent;
-    color: oklch(88% 0.01 260);
-    font-size: 0.8125rem;
-    line-height: 1.85;
-    overflow-x: auto;
-    tab-size: 2;
-    white-space: pre;
-  }
-
-  /* Syntax highlighting via CSS */
-  .md-content pre > code .kw,
-  .md-content pre > code .keyword { color: oklch(68% 0.18 300); font-weight: 500; }
-  .md-content pre > code .fn,
-  .md-content pre > code .function { color: oklch(78% 0.15 210); }
-  .md-content pre > code .str,
-  .md-content pre > code .string { color: oklch(78% 0.16 145); }
-  .md-content pre > code .num,
-  .md-content pre > code .number { color: oklch(80% 0.17 80); }
-  .md-content pre > code .cm,
-  .md-content pre > code .comment { color: oklch(55% 0.02 260); font-style: italic; }
-  .md-content pre > code .type { color: oklch(75% 0.15 230); }
-  .md-content pre > code .op { color: oklch(70% 0.05 260); }
-  .md-content pre > code .tag { color: oklch(70% 0.18 15); }
-  .md-content pre > code .attr { color: oklch(78% 0.15 80); }
-  .md-content pre > code .val { color: oklch(78% 0.16 145); }
-
-  /* Scrollbar */
-  .md-content pre > code::-webkit-scrollbar {
-    height: 6px;
-  }
-
-  .md-content pre > code::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  .md-content pre > code::-webkit-scrollbar-thumb {
-    background: oklch(30% 0.02 260);
-    border-radius: 3px;
-  }
-
-  .md-content pre > code::-webkit-scrollbar-thumb:hover {
-    background: oklch(40% 0.02 260);
   }
 
   /* ===== Blockquotes ===== */
