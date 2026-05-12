@@ -1,6 +1,6 @@
 import type { RouteComponent } from '@emberkit/core';
 import { IconChevronRight } from '@emberkit/icons';
-import { useNavigate } from '../hooks/useNavigate';
+import { useNavigate } from '@emberkit/core';
 
 const docs = [
   {
@@ -42,8 +42,24 @@ const docs = [
 const Sidebar: RouteComponent = () => {
   const navigate = useNavigate();
 
+  const closeSidebar = () => {
+    const sidebar = document.querySelector('[data-sidebar]');
+    const backdrop = document.querySelector('[data-sidebar-backdrop]');
+    sidebar?.classList.remove('translate-x-0');
+    sidebar?.classList.add('-translate-x-full');
+    backdrop?.remove();
+
+    const icon = document.querySelector('[data-menu-icon]');
+    if (icon) {
+      icon.innerHTML = '<path d="M3 12h18"/><path d="M3 6h18"/><path d="M3 18h18"/>';
+    }
+  };
+
   return (
-    <aside className="fixed top-16 left-0 h-[calc(100vh-4rem)] w-[260px] overflow-y-auto border-r border-white/5 bg-[#0b0f19] px-4 py-6 max-lg:hidden transition-all duration-300">
+    <aside
+      data-sidebar
+      className="fixed top-16 left-0 z-40 h-[calc(100vh-4rem)] w-[260px] overflow-y-auto border-r border-white/5 bg-[#0b0f19] px-4 py-6 transition-transform duration-300 -translate-x-full lg:translate-x-0"
+    >
       {docs.map((section) => (
         <div key={section.title} className="mb-8">
           <h3 className="mb-3 px-3 text-xs font-semibold uppercase tracking-widest text-gray-500 transition-colors duration-200">{section.title}</h3>
@@ -54,6 +70,7 @@ const Sidebar: RouteComponent = () => {
                   href={item.path}
                   onClick={(e) => {
                     e.preventDefault();
+                    closeSidebar();
                     navigate(item.path);
                   }}
                   className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-400 no-underline transition-all duration-200 hover:bg-white/5 hover:text-orange-400 hover:translate-x-1 cursor-pointer [&_svg]:shrink-0 [&_svg]:transition-all [&_svg]:duration-200 [&_svg]:text-gray-600 hover:[&_svg]:text-orange-400"

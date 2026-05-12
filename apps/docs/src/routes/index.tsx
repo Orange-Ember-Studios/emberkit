@@ -1,6 +1,6 @@
 import type { RouteComponent } from '@emberkit/core';
 import { IconZap, IconPackage, IconTarget, IconType, IconArrowRight } from '@emberkit/icons';
-import { useNavigate } from '../hooks/useNavigate';
+import { useNavigate } from '@emberkit/core';
 
 const HomePage: RouteComponent = () => {
   const navigate = useNavigate();

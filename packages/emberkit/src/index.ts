@@ -3,7 +3,7 @@ export const VERSION = '0.1.0';
 export { createElement, render, hydrate } from './runtime/index.js';
 export { createSignal, createMemo, createEffect, batch, untrack } from './signals/index.js';
 export { createContext, useContext } from './context/index.js';
-export { navigate, preload } from './navigation/index.js';
+export { navigate, preload, useNavigate } from './navigation/index.js';
 export { createRouter, matchRoute } from './router/index.js';
 export { createLoaderData, type LoaderResult } from './loader/index.js';
 export { createErrorBoundary, createLoadingBoundary } from './boundaries/index.js';
