@@ -149,10 +149,6 @@ export default function MDComponent(props) {
     className: 'md-doc',
     'data-file': ${JSON.stringify(id)},
     children: [
-      createElement('div', {
-        className: 'md-frontmatter',
-        children: ${JSON.stringify(JSON.stringify(frontmatter))}
-      }),
       createElement(MDContent, props)
     ]
   });
@@ -194,6 +190,7 @@ function markdownToJSX(
 
   html = processHeadings(html);
   html = processCodeBlocks(html);
+  html = processTables(html);
   html = processLinks(html);
   html = processImages(html);
   html = processLists(html);
@@ -216,6 +213,52 @@ function processCodeBlocks(html: string): string {
     const escaped = code.trim().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     return `<pre><code class="language-${lang}">${escaped}</code></pre>`;
   });
+}
+
+function processTables(html: string): string {
+  const lines = html.split('\n');
+  const result: string[] = [];
+  let i = 0;
+
+  while (i < lines.length) {
+    // Check if this line and the next look like a table
+    if (i + 1 < lines.length &&
+        lines[i].trim().startsWith('|') && lines[i].trim().endsWith('|') &&
+        lines[i + 1].trim().match(/^\|[\s\-:|]+\|$/)) {
+
+      // Parse header row
+      const headerCells = lines[i].trim().split('|').filter(c => c.trim() !== '');
+      result.push('<table>');
+      result.push('<thead><tr>');
+      for (const cell of headerCells) {
+        result.push(`<th>${cell.trim()}</th>`);
+      }
+      result.push('</tr></thead>');
+      result.push('<tbody>');
+
+      // Skip separator row
+      i += 2;
+
+      // Parse data rows
+      while (i < lines.length && lines[i].trim().startsWith('|') && lines[i].trim().endsWith('|')) {
+        const cells = lines[i].trim().split('|').filter(c => c.trim() !== '');
+        result.push('<tr>');
+        for (const cell of cells) {
+          result.push(`<td>${cell.trim()}</td>`);
+        }
+        result.push('</tr>');
+        i++;
+      }
+
+      result.push('</tbody>');
+      result.push('</table>');
+    } else {
+      result.push(lines[i]);
+      i++;
+    }
+  }
+
+  return result.join('\n');
 }
 
 function processLinks(html: string): string {
