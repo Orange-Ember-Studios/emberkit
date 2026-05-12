@@ -45,13 +45,21 @@ export function renderElementToHTML(element: JSXElement): string {
   }
 
   // Handle dangerouslySetInnerHTML
-  const dshProp = (props as Record<string, unknown>).dangerouslySetInnerHTML;
-  const innerHtml = (dshProp && typeof dshProp === 'object' && '__html' in dshProp)
-    ? String((dshProp as { __html: unknown }).__html)
-    : childHtml;
+  let innerHtml = childHtml;
+  for (const [key, value] of Object.entries(props)) {
+    if (key.toLowerCase().replace(/_/g, '') === 'dangerouslysetinnerhtml' ||
+        (typeof value === 'object' && value !== null && '__html' in (value as Record<string, unknown>))) {
+      innerHtml = String((value as { __html: unknown }).__html);
+      break;
+    }
+  }
 
   const attributes = Object.entries(props)
-    .filter(([key]) => key !== 'children' && key !== 'key' && key !== 'dangerouslySetInnerHTML')
+    .filter(([key, value]) => {
+      if (key === 'children' || key === 'key') return false;
+      if (typeof value === 'object' && value !== null && '__html' in (value as Record<string, unknown>)) return false;
+      return true;
+    })
     .filter(([, value]) => typeof value !== 'function' && value != null)
     .map(([key, value]) => {
       // Map React/JSX prop names to HTML attributes
