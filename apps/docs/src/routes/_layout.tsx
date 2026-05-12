@@ -25,7 +25,7 @@ const Layout: RouteComponent = ({ children }) => {
         <Header />
         <div className="flex flex-1 pt-16">
           <Sidebar />
-          <main className="ml-[260px] max-w-[900px] flex-1 px-16 py-12 max-lg:ml-0 max-lg:px-6 max-lg:py-8">
+          <main className="ml-[260px] flex-1 px-16 py-12 max-lg:ml-0 max-lg:px-6 max-lg:py-8">
             {children}
           </main>
         </div>
