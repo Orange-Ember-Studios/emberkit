@@ -22,9 +22,10 @@ export function createHtmlDocument(
     lang?: string;
     doctype?: string;
     baseUrl?: string;
+    headExtra?: string;
   } = {},
 ): string {
-  const { title = '', lang = 'en', doctype = '<!DOCTYPE html>', baseUrl = '' } = options;
+  const { title = '', lang = 'en', doctype = '<!DOCTYPE html>', baseUrl = '', headExtra = '' } = options;
 
   const fullHtml = doctype + '\n' +
     `<html${lang ? ` lang="${lang}"` : ''}>\n` +
@@ -33,6 +34,7 @@ export function createHtmlDocument(
     `<meta name="viewport" content="width=device-width, initial-scale=1">\n` +
     (title ? `<title>${escapeHtml(title)}</title>\n` : '') +
     (baseUrl ? `<base href="${baseUrl}">\n` : '') +
+    (headExtra ? headExtra + '\n' : '') +
     '</head>\n' +
     `<body>\n${html}\n</body>\n` +
     '</html>';

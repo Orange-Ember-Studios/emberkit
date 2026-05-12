@@ -3,8 +3,17 @@
   "version": "0.1.0",
   "type": "module",
   "description": "Edge runtime adapter for EmberKit",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/orange-ember-studios/emberkit.git",
+    "directory": "packages/edge"
+  },
+  "homepage": "https://emberkit.dev",
+  "keywords": ["emberkit", "edge", "cloudflare", "deno", "serverless"],
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "files": ["dist"],
   "exports": {
     ".": {
       "import": "./dist/index.js",

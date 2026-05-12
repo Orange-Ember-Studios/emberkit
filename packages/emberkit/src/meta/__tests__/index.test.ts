@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import {
   MetaGenerator,
   createMetaGenerator,
@@ -9,6 +9,14 @@ import {
   generateLinks,
   mergeMeta,
 } from '../index.js';
+import { Head } from '../head.js';
+import {
+  registerHeadContent,
+  drainHeadContent,
+  clearHeadContent,
+  peekHeadContent,
+} from '../head-registry.js';
+import { createElement } from '../../runtime/index.js';
 
 describe('Meta', () => {
   describe('MetaGenerator', () => {
@@ -198,6 +206,159 @@ describe('Meta', () => {
       expect(merged.title).toBe('Override Title');
       expect(merged.openGraph?.type).toBe('website');
       expect(merged.openGraph?.title).toBe('OG Title');
+    });
+  });
+
+  describe('head registry', () => {
+    beforeEach(() => {
+      clearHeadContent();
+    });
+
+    it('should register and drain content', () => {
+      registerHeadContent('<title>Test</title>');
+      registerHeadContent('<meta name="description" content="desc">');
+
+      const result = drainHeadContent();
+
+      expect(result).toContain('<title>Test</title>');
+      expect(result).toContain('<meta name="description" content="desc">');
+    });
+
+    it('should clear after drain', () => {
+      registerHeadContent('<title>Test</title>');
+      drainHeadContent();
+
+      const result = drainHeadContent();
+
+      expect(result).toBe('');
+    });
+
+    it('should peek without clearing', () => {
+      registerHeadContent('<title>Test</title>');
+
+      const peeked = peekHeadContent();
+      const drained = drainHeadContent();
+
+      expect(peeked).toBe('<title>Test</title>');
+      expect(drained).toBe('<title>Test</title>');
+    });
+
+    it('should clear explicitly', () => {
+      registerHeadContent('<title>Test</title>');
+      clearHeadContent();
+
+      const result = drainHeadContent();
+
+      expect(result).toBe('');
+    });
+  });
+
+  describe('Head component', () => {
+    beforeEach(() => {
+      clearHeadContent();
+    });
+
+    it('should register shorthand title', () => {
+      Head({ title: 'My Page' });
+
+      const content = drainHeadContent();
+
+      expect(content).toContain('My Page</title>');
+      expect(content).toContain('name="title" content="My Page"');
+    });
+
+    it('should register shorthand description', () => {
+      Head({ description: 'Page description' });
+
+      const content = drainHeadContent();
+
+      expect(content).toContain('name="description" content="Page description"');
+    });
+
+    it('should register shorthand Open Graph tags', () => {
+      Head({
+        og: {
+          type: 'article',
+          title: 'OG Title',
+          image: 'https://example.com/og.png',
+        },
+      });
+
+      const content = drainHeadContent();
+
+      expect(content).toContain('property="og:type" content="article"');
+      expect(content).toContain('property="og:title" content="OG Title"');
+      expect(content).toContain('property="og:image" content="https://example.com/og.png"');
+    });
+
+    it('should register shorthand Twitter tags', () => {
+      Head({
+        twitter: {
+          card: 'summary_large_image',
+          site: '@emberkit',
+        },
+      });
+
+      const content = drainHeadContent();
+
+      expect(content).toContain('name="twitter:card" content="summary_large_image"');
+      expect(content).toContain('name="twitter:site" content="@emberkit"');
+    });
+
+    it('should register canonical link', () => {
+      Head({ canonical: 'https://example.com/page' });
+
+      const content = drainHeadContent();
+
+      expect(content).toContain('rel="canonical" href="https://example.com/page"');
+    });
+
+    it('should register children as raw HTML', () => {
+      const child = createElement('meta', { name: 'author', content: 'Test Author' });
+      Head({ children: child });
+
+      const content = drainHeadContent();
+
+      expect(content).toContain('name="author"');
+      expect(content).toContain('content="Test Author"');
+    });
+
+    it('should register multiple children', () => {
+      const children = [
+        createElement('title', {}, 'My Page'),
+        createElement('meta', { name: 'description', content: 'Desc' }),
+      ];
+      Head({ children });
+
+      const content = drainHeadContent();
+
+      expect(content).toContain('<title>My Page</title>');
+      expect(content).toContain('name="description"');
+    });
+
+    it('should return null (renders nothing in body)', () => {
+      const result = Head({ title: 'Test' });
+
+      expect(result).toBeNull();
+    });
+
+    it('should accumulate from multiple Head calls', () => {
+      Head({ title: 'Page 1' });
+      Head({ description: 'Desc 1' });
+
+      const content = drainHeadContent();
+
+      expect(content).toContain('Page 1</title>');
+      expect(content).toContain('name="description" content="Desc 1"');
+    });
+
+    it('should escape HTML in shorthand props', () => {
+      Head({ title: '<script>alert("xss")</script>' });
+
+      const content = drainHeadContent();
+
+      expect(content).not.toContain('<script>');
+      expect(content).toContain('&lt;script&gt;');
     });
   });
 });

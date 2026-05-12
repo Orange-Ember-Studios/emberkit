@@ -27,6 +27,7 @@ const docs = [
       { title: 'Forms & Mutations', path: '/docs/forms' },
       { title: 'Hydration', path: '/docs/hydration' },
       { title: 'SEO & Meta', path: '/docs/meta' },
+      { title: 'Head Component', path: '/docs/head' },
     ],
   },
   {

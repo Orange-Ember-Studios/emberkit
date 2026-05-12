@@ -1,3 +1,12 @@
+export { Head } from './head.js';
+export type { HeadProps } from './head.js';
+export {
+  registerHeadContent,
+  drainHeadContent,
+  peekHeadContent,
+  clearHeadContent,
+} from './head-registry.js';
+
 export interface MetaData {
   title?: string;
   description?: string;

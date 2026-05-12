@@ -1,6 +1,7 @@
 import { dev } from './commands/dev.js';
 import { build } from './commands/build.js';
 import { preview } from './commands/preview.js';
+import { create } from './commands/create.js';
 
 export interface CLIConfig {
   version: string;
@@ -25,8 +26,8 @@ export async function runCLI(args: string[]): Promise<void> {
     case 'preview':
       await preview(restArgs);
       break;
-    case 'init':
-      await runInit(restArgs);
+    case 'create':
+      await handleCreate(restArgs);
       break;
     case 'generate':
       await runGenerate(restArgs);
@@ -53,10 +54,10 @@ function showHelp(): void {
 Usage: emberkit <command> [options]
 
 Commands:
+  create <name>        Create a new EmberKit project
   dev                  Start development server
   build                Build for production
   preview              Preview production build
-  init [template]      Initialize a new EmberKit project
   generate <type>      Generate code (routes, components, etc.)
 
 Options:
@@ -64,17 +65,27 @@ Options:
   --version, -v       Show version number
 
 Examples:
+  emberkit create my-app
   emberkit dev
   emberkit build
-  emberkit preview
-  emberkit init
   emberkit generate route about
 `);
 }
 
-async function runInit(_args: string[]): Promise<void> {
-  console.log('🚀 Initializing EmberKit project...');
-  console.log('(Not yet implemented)');
+async function handleCreate(args: string[]): Promise<void> {
+  const name = args[0];
+  if (!name) {
+    console.error('Error: Project name is required.');
+    console.error('Usage: emberkit create <project-name>');
+    process.exit(1);
+  }
+
+  const noInstall = args.includes('--no-install');
+
+  await create({
+    name,
+    noInstall,
+  });
 }
 
 async function runGenerate(args: string[]): Promise<void> {

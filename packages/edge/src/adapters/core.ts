@@ -39,7 +39,7 @@ export function createEdgeAdapter(config: EdgeConfig = {}): EdgeAdapter {
           },
         });
       } catch (error) {
-        return handleRenderError(error, context);
+        return handleRenderError(error instanceof Error ? error : new Error(String(error)), context);
       }
     },
     handleError(error) {
@@ -58,7 +58,7 @@ export function createEdgeAdapter(config: EdgeConfig = {}): EdgeAdapter {
   };
 }
 
-function handleRenderError(error: Error, context: EdgeContext): Response {
+function handleRenderError(error: Error, _context: EdgeContext): Response {
   console.error('[Edge] Render error:', error);
 
   return new Response(
@@ -145,9 +145,9 @@ export const EDGE_RUNTIME_SYMBOL = Symbol.for('emberkit.edge.runtime');
 
 export function isEdgeEnvironment(): boolean {
   return (
-    typeof globalThis.__cf !== 'undefined' ||
-    typeof Deno !== 'undefined' ||
-    typeof Bun !== 'undefined'
+    typeof (globalThis as Record<string, unknown>).__cf !== 'undefined' ||
+    typeof (globalThis as Record<string, unknown>).Deno !== 'undefined' ||
+    typeof (globalThis as Record<string, unknown>).Bun !== 'undefined'
   );
 }
 

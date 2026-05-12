@@ -8,5 +8,6 @@
     "module": "ESNext",
     "moduleResolution": "bundler"
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*"],
+  "exclude": ["src/templates/starter/**/*"]
 }

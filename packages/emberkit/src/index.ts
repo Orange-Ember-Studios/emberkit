@@ -14,6 +14,11 @@ export { compileMDX, compileSync, useMDX } from './mdx/index.js';
 
 export { DataCache, createCache, getCached, setCache, prefetch } from './cache/index.js';
 
+export { Head } from './meta/index.js';
+export type { HeadProps } from './meta/index.js';
+export { generateMeta, generateBreadcrumbs, generateArticleSchema, generateProductSchema } from './meta/index.js';
+export type { MetaData, OpenGraphData, TwitterCardData } from './meta/index.js';
+
 export type { FC, RouteComponent, RouteChildren } from './runtime/types.js';
 
 export function defineConfig(config: Record<string, unknown>): Record<string, unknown> {

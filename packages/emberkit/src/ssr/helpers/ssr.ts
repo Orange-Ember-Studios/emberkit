@@ -1,6 +1,7 @@
 import type { JSXNode } from '../../runtime/types.js';
 import type { LoaderResult } from '../../loader/types.js';
 import { renderToHTMLString, createHtmlDocument } from './render-html.js';
+import { drainHeadContent } from '../../meta/head-registry.js';
 import type { SSRRenderOptions, SSRRenderResult } from '../types.js';
 import { getStatusText } from '../types.js';
 
@@ -8,14 +9,18 @@ export function renderSSR(
   element: JSXNode | null,
   options: SSRRenderOptions = {},
 ): SSRRenderResult {
-  const { doctype = '<!DOCTYPE html>', title, lang = 'en', baseUrl } = options;
+  const { doctype = '<!DOCTYPE html>', title, lang = 'en', baseUrl, headExtra } = options;
 
   const html = renderToHTMLString(element);
-  const docOptions: { title?: string; lang?: string; doctype?: string; baseUrl?: string } = {};
+  const collectedHead = drainHeadContent();
+  const allHeadExtra = [headExtra, collectedHead].filter(Boolean).join('\n');
+
+  const docOptions: { title?: string; lang?: string; doctype?: string; baseUrl?: string; headExtra?: string } = {};
   if (title !== undefined) docOptions.title = title;
   if (lang !== undefined) docOptions.lang = lang;
   if (doctype !== undefined) docOptions.doctype = doctype;
   if (baseUrl !== undefined) docOptions.baseUrl = baseUrl;
+  if (allHeadExtra) docOptions.headExtra = allHeadExtra;
   const fullHtml = createHtmlDocument(html, docOptions);
 
   return {
@@ -38,9 +43,13 @@ export function renderSSRWithError(
   const errorHtml = error ? `<div class="error"><h1>Error ${status}</h1><p>${message}</p></div>` : '';
 
   const html = renderToHTMLString(element) + errorHtml;
+  const collectedHead = drainHeadContent();
+  const allHeadExtra = [options.headExtra, collectedHead].filter(Boolean).join('\n');
+
   const fullHtml = createHtmlDocument(html, {
     title: `Error ${status} - ${getStatusText(status)}`,
     ...options,
+    ...(allHeadExtra ? { headExtra: allHeadExtra } : {}),
   });
 
   return {

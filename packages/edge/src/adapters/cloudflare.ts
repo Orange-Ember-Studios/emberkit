@@ -54,7 +54,7 @@ async function handleAPIRequest(
 
 async function handlePageRequest(
   request: Request,
-  env: Record<string, unknown>,
+  _env: Record<string, unknown>,
   ctx: { waitUntil: (promise: Promise<unknown>) => void },
 ): Promise<Response> {
   const url = new URL(request.url);
@@ -111,13 +111,13 @@ async function renderPage(path: string, ctx: RenderContext): Promise<void> {
   ctx.end();
 }
 
-async function getStaticPage(path: string): Promise<string | null> {
+async function getStaticPage(_path: string): Promise<string | null> {
   return null;
 }
 
 function getAPIHandler(
-  route: string,
-  method: string,
+  _route: string,
+  _method: string,
 ): ((request: Request, env: Record<string, unknown>) => Promise<Response>) | null {
   return null;
 }

@@ -35,6 +35,36 @@ describe('Markdown', () => {
       expect(result.html).toContain('<em>italic</em>');
     });
 
+    it('should parse bold italic combined', () => {
+      const result = parseMarkdown('***bold italic***');
+
+      expect(result.html).toContain('<strong><em>bold italic</em></strong>');
+    });
+
+    it('should parse strikethrough', () => {
+      const result = parseMarkdown('~~deleted text~~');
+
+      expect(result.html).toContain('<del>deleted text</del>');
+    });
+
+    it('should parse horizontal rules with ---', () => {
+      const result = parseMarkdown('---');
+
+      expect(result.html).toContain('<hr>');
+    });
+
+    it('should parse horizontal rules with ***', () => {
+      const result = parseMarkdown('***');
+
+      expect(result.html).toContain('<hr>');
+    });
+
+    it('should parse horizontal rules with ___', () => {
+      const result = parseMarkdown('___');
+
+      expect(result.html).toContain('<hr>');
+    });
+
     it('should parse links', () => {
       const result = parseMarkdown('[Click here](https://example.com)');
 
@@ -60,6 +90,20 @@ describe('Markdown', () => {
       const result = parseMarkdown('> This is a quote');
 
       expect(result.html).toContain('<blockquote>');
+    });
+
+    it('should parse nested blockquotes', () => {
+      const result = parseMarkdown('> Level 1\n>> Level 2');
+
+      expect(result.html).toContain('<blockquote>');
+      expect(result.html).toContain('Level 1');
+      expect(result.html).toContain('Level 2');
+    });
+
+    it('should parse images', () => {
+      const result = parseMarkdown('![Alt text](image.png)');
+
+      expect(result.html).toContain('<img src="image.png" alt="Alt text"');
     });
   });
 

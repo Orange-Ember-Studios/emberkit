@@ -13,6 +13,7 @@ export interface SSRRenderOptions {
   lang?: string;
   baseUrl?: string;
   streaming?: boolean;
+  headExtra?: string;
 }
 
 export interface SSRRenderResult {

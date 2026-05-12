@@ -112,11 +112,12 @@ class MarkdownParser {
 
     html = this.processCodeBlocks(html);
     html = this.processHeadings(html);
+    html = this.processHorizontalRules(html);
     html = this.processLists(html);
     html = this.processTaskLists(html);
     html = this.processTables(html);
-    html = this.processLinks(html);
     html = this.processImages(html);
+    html = this.processLinks(html);
     html = this.processBlockquotes(html);
     html = this.processEmphasis(html);
     html = this.processLineBreaks(html);
@@ -250,14 +251,69 @@ class MarkdownParser {
   }
 
   private processBlockquotes(html: string): string {
-    return html.replace(/^>\s+(.+)/gm, '<blockquote>$1</blockquote>');
+    const lines = html.split('\n');
+    const result: string[] = [];
+    let inBlockquote = false;
+    let depth = 0;
+
+    for (const line of lines) {
+      const match = line.match(/^(\s*)>\s?(.*)/);
+      if (match) {
+        const indent = match[1].length;
+        const content = match[2];
+        const newDepth = Math.floor(indent / 2) + 1;
+
+        if (!inBlockquote) {
+          for (let i = 0; i < newDepth; i++) {
+            result.push('<blockquote>');
+          }
+          depth = newDepth;
+          inBlockquote = true;
+        } else if (newDepth > depth) {
+          for (let i = depth; i < newDepth; i++) {
+            result.push('<blockquote>');
+          }
+          depth = newDepth;
+        } else if (newDepth < depth) {
+          for (let i = depth; i > newDepth; i--) {
+            result.push('</blockquote>');
+          }
+          depth = newDepth;
+        }
+
+        result.push(content || '<br>');
+      } else {
+        if (inBlockquote) {
+          for (let i = depth; i > 0; i--) {
+            result.push('</blockquote>');
+          }
+          inBlockquote = false;
+          depth = 0;
+        }
+        result.push(line);
+      }
+    }
+
+    if (inBlockquote) {
+      for (let i = depth; i > 0; i--) {
+        result.push('</blockquote>');
+      }
+    }
+
+    return result.join('\n');
   }
 
   private processEmphasis(html: string): string {
     return html
-      .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*([^*]+)\*/g, '<em>$1</em>')
-      .replace(/`([^`]+)`/g, '<code>$1</code>');
+      .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>')
+      .replace(/~~(.+?)~~/g, '<del>$1</del>')
+      .replace(/`([^`]+)`/g, (_match, code) => `<code>${this.escapeHtml(code)}</code>`);
+  }
+
+  private processHorizontalRules(html: string): string {
+    return html.replace(/^([-*_])\s*\1\s*\1[\s-]*$/gm, '<hr>');
   }
 
   private processLineBreaks(html: string): string {

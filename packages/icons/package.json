@@ -3,17 +3,24 @@
   "version": "0.1.0",
   "type": "module",
   "description": "SVG icon library for EmberKit",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/orange-ember-studios/emberkit.git",
+    "directory": "packages/icons"
+  },
+  "homepage": "https://emberkit.dev",
+  "keywords": ["emberkit", "icons", "svg", "components"],
+  "sideEffects": false,
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "files": ["dist"],
   "exports": {
     ".": {
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
     }
   },
-  "files": [
-    "dist"
-  ],
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",

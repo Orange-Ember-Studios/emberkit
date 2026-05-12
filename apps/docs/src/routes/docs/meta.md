@@ -2,6 +2,149 @@
 
 EmberKit provides built-in tools for managing meta tags, Open Graph, Twitter cards, and structured data.
 
+## The `<Head>` Component
+
+The recommended way to manage `<head>` tags is the `<Head>` component. It renders nothing in the body and automatically injects tags into `<head>` during SSR. On the client, it updates `document.head` directly.
+
+### With JSX Children
+
+Pass any `<head>` elements as children:
+
+```tsx
+import { Head } from '@emberkit/core';
+
+function MyPage() {
+  return (
+    <>
+      <Head>
+        <title>My Page - EmberKit</title>
+        <meta name="description" content="A page built with EmberKit" />
+        <meta name="keywords" content="emberkit, framework, typescript" />
+        <meta property="og:title" content="My Page" />
+        <meta property="og:image" content="https://example.com/og.png" />
+        <link rel="canonical" href="https://example.com/my-page" />
+      </Head>
+      <h1>Welcome to My Page</h1>
+      <p>Page content goes here.</p>
+    </>
+  );
+}
+```
+
+### With Shorthand Props
+
+For common use cases, use shorthand props instead of raw JSX:
+
+```tsx
+<Head
+  title="My Page - EmberKit"
+  description="A page built with EmberKit"
+  keywords={['emberkit', 'framework', 'typescript']}
+  author="EmberKit Team"
+  robots="index, follow"
+  canonical="https://example.com/my-page"
+/>
+```
+
+### Open Graph
+
+```tsx
+<Head
+  title="My Page"
+  description="Page description"
+  og={{
+    type: 'article',
+    title: 'My Page',
+    description: 'Page description for social sharing',
+    url: 'https://example.com/my-page',
+    image: 'https://example.com/og-image.png',
+    locale: 'en_US',
+    siteName: 'My Site',
+  }}
+/>
+```
+
+### Twitter Cards
+
+```tsx
+<Head
+  twitter={{
+    card: 'summary_large_image',
+    site: '@emberkit',
+    creator: '@author',
+    title: 'My Page',
+    description: 'Page description',
+    image: 'https://example.com/twitter-image.png',
+  }}
+/>
+```
+
+### Structured Data (JSON-LD)
+
+Use children for structured data scripts:
+
+```tsx
+import { generateArticleSchema } from '@emberkit/core';
+
+function ArticlePage() {
+  const schema = generateArticleSchema({
+    title: 'My Article',
+    description: 'Article description',
+    author: 'John Doe',
+    publishedAt: '2025-01-15',
+    url: 'https://example.com/article',
+  });
+
+  return (
+    <>
+      <Head>
+        <title>My Article</title>
+        <script type="application/ld+json">{schema}</script>
+      </Head>
+      <article>...</article>
+    </>
+  );
+}
+```
+
+### Multiple `<Head>` Components
+
+You can use multiple `<Head>` components (e.g., in a layout and a page). All tags are collected and injected into `<head>`:
+
+```tsx
+// _layout.tsx
+function Layout({ children }) {
+  return (
+    <>
+      <Head>
+        <meta name="theme-color" content="#0b0f19" />
+      </Head>
+      {children}
+    </>
+  );
+}
+
+// pages/about.tsx
+function AboutPage() {
+  return (
+    <>
+      <Head>
+        <title>About Us</title>
+        <meta name="description" content="About our team" />
+      </Head>
+      <h1>About</h1>
+    </>
+  );
+}
+```
+
+### How It Works
+
+| Context | Behavior |
+|---------|----------|
+| **SSR** | Renders `null` in body, registers tags to an internal registry. `renderSSR()` drains the registry and injects tags into `<head>`. |
+| **Client SPA** | Renders `null` in body, updates `document.head` directly. Uses `data-ek-head` attribute to track managed tags so re-renders replace rather than duplicate. |
+
 ## Basic Meta Tags
 
 ```tsx
@@ -140,6 +283,7 @@ const pageMeta = mergeMeta(DEFAULT_META, {
 
 ## Next Steps
 
+- [Head Component](/docs/head) - Declarative `<head>` management with `<Head>`
 - [SSR](/docs/ssr) - Server-side meta rendering
 - [Markdown/MDX](/docs/markdown) - Frontmatter meta
 - [Edge Deployment](/docs/edge) - Edge-rendered meta

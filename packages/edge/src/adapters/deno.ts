@@ -29,7 +29,7 @@ async function handleAPI(request: Request): Promise<Response> {
   );
 }
 
-async function handlePage(request: Request, path: string): Promise<Response> {
+async function handlePage(_request: Request, path: string): Promise<Response> {
   const html = await renderPageToHTML(path);
 
   return new Response(html, {
@@ -69,7 +69,7 @@ function escapeHtml(str: string): string {
   })[c] ?? c);
 }
 
-export function createKVStore(namespace: string) {
+export function createKVStore(_namespace: string) {
   const store = new Map<string, { value: string; expireAt?: number }>();
 
   return {

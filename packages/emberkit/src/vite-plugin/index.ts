@@ -190,9 +190,10 @@ function markdownToJSX(
 
   html = processCodeBlocks(html);
   html = processHeadings(html);
+  html = processHorizontalRules(html);
   html = processTables(html);
-  html = processLinks(html);
   html = processImages(html);
+  html = processLinks(html);
   html = processLists(html);
   html = processBlockquotes(html);
   html = processEmphasis(html);
@@ -210,10 +211,7 @@ function processHeadings(html: string): string {
 
 function processCodeBlocks(html: string): string {
   return html.replace(/```(\w*)\n([\s\S]*?)```/g, (_match, lang, code) => {
-    let highlighted = code.trim()
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
+    let highlighted = code.trim();
 
         if (lang === 'ts' || lang === 'tsx' || lang === 'js' || lang === 'jsx' || lang === 'typescript' || lang === 'javascript') {
           highlighted = highlightTS(highlighted);
@@ -223,6 +221,9 @@ function processCodeBlocks(html: string): string {
         }
         else if (lang === 'json') {
           highlighted = highlightJSON(highlighted);
+        }
+        else {
+          highlighted = escapeHtml(highlighted);
         }
 
     const langAttr = lang ? ` data-lang="${lang}"` : '';
@@ -297,17 +298,17 @@ function highlightTS(code: string): string {
     if (m) { tokens.push(`<span class="op">=&gt;</span>`); remaining = remaining.slice(2); continue; }
 
     // JSX closing tag </Component>
-    m = remaining.match(/^(&lt;\/)([A-Za-z][\w.]*)(&gt;)/);
+    m = remaining.match(/^(<\/)([A-Za-z][\w.]*)(>)/);
     if (m) {
-      tokens.push(`${m[1]}<span class="tag">${m[2]}</span>${m[3]}`);
+      tokens.push(`${escapeHtml(m[1])}<span class="tag">${m[2]}</span>${escapeHtml(m[3])}`);
       remaining = remaining.slice(m[0].length);
       continue;
     }
 
     // JSX self-closing or opening tag <Component or <div
-    m = remaining.match(/^(&lt;)([A-Za-z][\w.]*)/);
+    m = remaining.match(/^(<)([A-Za-z][\w.]*)/);
     if (m) {
-      tokens.push(`${m[1]}<span class="tag">${m[2]}</span>`);
+      tokens.push(`${escapeHtml(m[1])}<span class="tag">${m[2]}</span>`);
       remaining = remaining.slice(m[0].length);
       continue;
     }
@@ -328,12 +329,8 @@ function highlightTS(code: string): string {
     m = remaining.match(/^(\d[\d_]*\.?[\d_]*([eE][+-]?\d+)?)/);
     if (m) { tokens.push(`<span class="num">${m[0]}</span>`); remaining = remaining.slice(m[0].length); continue; }
 
-    // HTML entities — pass through
-    m = remaining.match(/^(&\w+;)/);
-    if (m) { tokens.push(m[0]); remaining = remaining.slice(m[0].length); continue; }
-
     // Multi-char operators (check before single-char)
-    m = remaining.match(/^(&&|\|\||===|!==|==|!=|<=|>=|\+\+|--|\*\*|=>|\.\.\.|&&amp;&amp;|&amp;&amp;|\|\||===|!==)/);
+    m = remaining.match(/^(&&|\|\||===|!==|==|!=|<=|>=|\+\+|--|\*\*|=>|\.\.\.)/);
     if (m) { tokens.push(`<span class="op">${escapeHtml(m[0])}</span>`); remaining = remaining.slice(m[0].length); continue; }
 
     // Word (keyword, type, builtin, function, identifier)
@@ -358,7 +355,7 @@ function highlightTS(code: string): string {
     }
 
     // Single-char operators and punctuation
-    m = remaining.match(/^([{}()\[\];:,.=&lt;&gt;+\-*/|!?~^%])/);
+    m = remaining.match(/^([{}()\[\];:,.=<>\-*/|!?~^%])/);
     if (m) { tokens.push(`<span class="op">${escapeHtml(m[0])}</span>`); remaining = remaining.slice(m[0].length); continue; }
 
     // Whitespace
@@ -421,7 +418,7 @@ function highlightBash(code: string): string {
 }
 
 function highlightJSON(code: string): string {
-  let result = code;
+  let result = escapeHtml(code);
   // Keys
   result = result.replace(/(&quot;[^&]*&quot;|"[^"]*")\s*:/g, '<span class="attr">$1</span>:');
   // String values
@@ -508,14 +505,69 @@ function processLists(html: string): string {
 }
 
 function processBlockquotes(html: string): string {
-  return html.replace(/^>\s+(.+)/gm, '<blockquote>$1</blockquote>');
+  const lines = html.split('\n');
+  const result: string[] = [];
+  let inBlockquote = false;
+  let depth = 0;
+
+  for (const line of lines) {
+    const match = line.match(/^(\s*)>\s?(.*)/);
+    if (match) {
+      const indent = match[1].length;
+      const content = match[2];
+      const newDepth = Math.floor(indent / 2) + 1;
+
+      if (!inBlockquote) {
+        for (let i = 0; i < newDepth; i++) {
+          result.push('<blockquote>');
+        }
+        depth = newDepth;
+        inBlockquote = true;
+      } else if (newDepth > depth) {
+        for (let i = depth; i < newDepth; i++) {
+          result.push('<blockquote>');
+        }
+        depth = newDepth;
+      } else if (newDepth < depth) {
+        for (let i = depth; i > newDepth; i--) {
+          result.push('</blockquote>');
+        }
+        depth = newDepth;
+      }
+
+      result.push(content || '<br>');
+    } else {
+      if (inBlockquote) {
+        for (let i = depth; i > 0; i--) {
+          result.push('</blockquote>');
+        }
+        inBlockquote = false;
+        depth = 0;
+      }
+      result.push(line);
+    }
+  }
+
+  if (inBlockquote) {
+    for (let i = depth; i > 0; i--) {
+      result.push('</blockquote>');
+    }
+  }
+
+  return result.join('\n');
+}
+
+function processHorizontalRules(html: string): string {
+  return html.replace(/^([-*_])\s*\1\s*\1[\s-]*$/gm, '<hr>');
 }
 
 function processEmphasis(html: string): string {
   return html
-    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*([^*]+)\*/g, '<em>$1</em>')
-    .replace(/`([^`]+)`/g, '<code>$1</code>');
+    .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/~~(.+?)~~/g, '<del>$1</del>')
+    .replace(/`([^`]+)`/g, (_match, code) => `<code>${escapeHtml(code)}</code>`);
 }
 
 function processParagraphs(html: string, breaks?: boolean): string {
@@ -534,7 +586,8 @@ function processParagraphs(html: string, breaks?: boolean): string {
         if (!p) return '';
 
         if (p.startsWith('<h') || p.startsWith('<ul') || p.startsWith('<ol') ||
-            p.startsWith('<pre') || p.startsWith('<blockquote') || p.startsWith('<table')) {
+            p.startsWith('<pre') || p.startsWith('<blockquote') || p.startsWith('<table') ||
+            p.startsWith('<hr')) {
           return p;
         }
 

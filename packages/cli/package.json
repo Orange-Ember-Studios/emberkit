@@ -2,10 +2,21 @@
   "name": "@emberkit/cli",
   "version": "0.1.0",
   "type": "module",
+  "description": "CLI tool for EmberKit projects",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/orange-ember-studios/emberkit.git",
+    "directory": "packages/cli"
+  },
+  "homepage": "https://emberkit.dev",
+  "keywords": ["emberkit", "cli", "devtools", "vite", "framework"],
   "bin": {
     "emberkit": "./bin/emberkit.js"
   },
   "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist", "bin"],
   "exports": {
     ".": {
       "import": "./dist/index.js",
