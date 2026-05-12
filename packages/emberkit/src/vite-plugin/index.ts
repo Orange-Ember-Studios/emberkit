@@ -210,10 +210,88 @@ function processHeadings(html: string): string {
 
 function processCodeBlocks(html: string): string {
   return html.replace(/```(\w*)\n([\s\S]*?)```/g, (_match, lang, code) => {
-    const escaped = code.trim().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    let highlighted = code.trim()
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+
+    if (lang === 'ts' || lang === 'tsx' || lang === 'js' || lang === 'jsx') {
+      highlighted = highlightTS(highlighted);
+    } else if (lang === 'bash' || lang === 'sh') {
+      highlighted = highlightBash(highlighted);
+    } else if (lang === 'json') {
+      highlighted = highlightJSON(highlighted);
+    } else if (lang === 'css') {
+      highlighted = highlightCSS(highlighted);
+    } else if (lang === 'html') {
+      highlighted = highlightHTML(highlighted);
+    }
+
     const langAttr = lang ? ` data-lang="${lang}"` : '';
-    return `<pre${langAttr}><code class="language-${lang}">${escaped}</code></pre>`;
+    return `<pre${langAttr}><code class="language-${lang}">${highlighted}</code></pre>`;
   });
+}
+
+function highlightTS(code: string): string {
+  // Comments
+  code = code.replace(/(\/\/[^\n]*)/g, '<span class="cm">$1</span>');
+  // Strings (double, single, backtick)
+  code = code.replace(/(&apos;[^&apos;]*&apos;|&quot;[^&quot;]*&quot;|'[^']*'|"[^"]*"|`[^`]*`)/g, '<span class="str">$1</span>');
+  // Keywords
+  code = code.replace(/\b(import|export|from|const|let|var|function|return|if|else|for|while|switch|case|break|continue|new|delete|typeof|instanceof|in|of|class|extends|super|this|null|undefined|true|false|async|await|try|catch|finally|throw|yield|default|type|interface|enum|implements|abstract|readonly|private|public|protected|static|as|is|keyof|infer|void|never|unknown|any)\b/g, '<span class="kw">$1</span>');
+  // Types (PascalCase after colon or in generic)
+  code = code.replace(/(:\s*)([A-Z]\w+)/g, '$1<span class="type">$2</span>');
+  // Numbers
+  code = code.replace(/\b(\d+\.?\d*)\b/g, '<span class="num">$1</span>');
+  return code;
+}
+
+function highlightBash(code: string): string {
+  // Comments
+  code = code.replace(/(#[^\n]*)/g, '<span class="cm">$1</span>');
+  // Strings
+  code = code.replace(/(&quot;[^&quot;]*&quot;|"[^"]*"|'[^']*')/g, '<span class="str">$1</span>');
+  // Keywords
+  code = code.replace(/\b(sudo|cd|mkdir|rm|cp|mv|ls|cat|echo|npm|pnpm|yarn|git|curl|chmod|export|source|cd)\b/g, '<span class="kw">$1</span>');
+  // Flags
+  code = code.replace(/(\s)(--?\w[\w-]*)/g, '$1<span class="attr">$2</span>');
+  return code;
+}
+
+function highlightJSON(code: string): string {
+  // Keys
+  code = code.replace(/(&quot;[^&quot;]*&quot;|"[^"]*")\s*:/g, '<span class="attr">$1</span>:');
+  // String values
+  code = code.replace(/:\s*(&quot;[^&quot;]*&quot;|"[^"]*")/g, ': <span class="val">$1</span>');
+  // Numbers
+  code = code.replace(/:\s*(\d+\.?\d*)/g, ': <span class="num">$1</span>');
+  // Booleans
+  code = code.replace(/:\s*(true|false|null)/g, ': <span class="kw">$1</span>');
+  return code;
+}
+
+function highlightCSS(code: string): string {
+  // Comments
+  code = code.replace(/(\/\*[\s\S]*?\*\/)/g, '<span class="cm">$1</span>');
+  // Properties
+  code = code.replace(/([\w-]+)\s*:/g, '<span class="attr">$1</span>:');
+  // Values with units
+  code = code.replace(/:\s*([\d.]+(?:px|rem|em|%|vh|vw|s|ms))/g, ': <span class="num">$1</span>');
+  // Colors
+  code = code.replace(/(#[0-9a-fA-F]{3,8})\b/g, '<span class="val">$1</span>');
+  // Selectors (lines starting with . # etc)
+  code = code.replace(/^(\s*[.#][\w-]+)/gm, '<span class="type">$1</span>');
+  return code;
+}
+
+function highlightHTML(code: string): string {
+  // Tags
+  code = code.replace(/(&lt;\/?)([\w-]+)/g, '$1<span class="tag">$2</span>');
+  // Attributes
+  code = code.replace(/\s([\w-]+)=/g, ' <span class="attr">$1</span>=');
+  // Strings
+  code = code.replace(/(".*?")/g, '<span class="str">$1</span>');
+  return code;
 }
 
 function processTables(html: string): string {

@@ -43,8 +43,6 @@
     letter-spacing: -0.02em;
     line-height: 1.3;
     margin: 3rem 0 1rem;
-    padding-top: 2rem;
-    border-top: 1px solid oklch(92.8% 0.006 264.531);
     color: oklch(21% 0.034 264.665);
   }
 
@@ -142,20 +140,64 @@
     position: relative;
     margin: 1.5rem 0;
     border-radius: 0.75rem;
+    border: 1px solid oklch(20% 0.02 260);
     overflow: hidden;
+    background: oklch(12% 0.015 260);
+    box-shadow: 0 4px 16px oklch(0% 0 0 / 0.2),
+                0 1px 3px oklch(0% 0 0 / 0.1),
+                inset 0 1px 0 oklch(100% 0 0 / 0.03);
+  }
+
+  /* Language label — top right pill */
+  .md-content pre[data-lang]::before {
+    content: attr(data-lang);
+    position: absolute;
+    top: 0.625rem;
+    right: 0.75rem;
+    padding: 0.2rem 0.625rem;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: oklch(75% 0.08 277);
+    background: oklch(58.5% 0.233 277.117 / 0.15);
+    border: 1px solid oklch(58.5% 0.233 277.117 / 0.2);
+    border-radius: 9999px;
+    z-index: 1;
+    pointer-events: none;
   }
 
   .md-content pre > code {
     display: block;
     padding: 1.25rem 1.5rem;
-    background: oklch(15% 0.02 260);
-    color: oklch(92% 0.01 260);
+    background: transparent;
+    color: oklch(88% 0.01 260);
     font-size: 0.8125rem;
-    line-height: 1.8;
+    line-height: 1.85;
     overflow-x: auto;
     tab-size: 2;
+    white-space: pre;
   }
 
+  /* Syntax highlighting via CSS */
+  .md-content pre > code .kw,
+  .md-content pre > code .keyword { color: oklch(68% 0.18 300); font-weight: 500; }
+  .md-content pre > code .fn,
+  .md-content pre > code .function { color: oklch(78% 0.15 210); }
+  .md-content pre > code .str,
+  .md-content pre > code .string { color: oklch(78% 0.16 145); }
+  .md-content pre > code .num,
+  .md-content pre > code .number { color: oklch(80% 0.17 80); }
+  .md-content pre > code .cm,
+  .md-content pre > code .comment { color: oklch(55% 0.02 260); font-style: italic; }
+  .md-content pre > code .type { color: oklch(75% 0.15 230); }
+  .md-content pre > code .op { color: oklch(70% 0.05 260); }
+  .md-content pre > code .tag { color: oklch(70% 0.18 15); }
+  .md-content pre > code .attr { color: oklch(78% 0.15 80); }
+  .md-content pre > code .val { color: oklch(78% 0.16 145); }
+
+  /* Scrollbar */
   .md-content pre > code::-webkit-scrollbar {
     height: 6px;
   }
@@ -165,29 +207,12 @@
   }
 
   .md-content pre > code::-webkit-scrollbar-thumb {
-    background: oklch(35% 0.02 260 / 0.5);
+    background: oklch(30% 0.02 260);
     border-radius: 3px;
   }
 
   .md-content pre > code::-webkit-scrollbar-thumb:hover {
-    background: oklch(45% 0.02 260 / 0.7);
-  }
-
-  /* Code block language label */
-  .md-content pre[data-lang]::before {
-    content: attr(data-lang);
-    position: absolute;
-    top: 0.5rem;
-    right: 0.75rem;
-    padding: 0.15rem 0.5rem;
-    font-family: var(--font-mono);
-    font-size: 0.6875rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: oklch(70% 0.02 260);
-    background: oklch(20% 0.02 260 / 0.5);
-    border-radius: 0.25rem;
+    background: oklch(40% 0.02 260);
   }
 
   /* ===== Blockquotes ===== */
