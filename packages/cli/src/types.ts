@@ -1,3 +1,13 @@
+export interface CLIContext {
+  config: {
+    version: string;
+    projectRoot: string;
+  };
+  cwd: string;
+  args: string[];
+  flags: Record<string, string | boolean>;
+}
+
 export interface Command {
   name: string;
   description: string;

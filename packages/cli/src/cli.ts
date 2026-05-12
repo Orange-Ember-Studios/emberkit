@@ -1,35 +1,32 @@
-import type { Command } from './types.js';
+import { dev } from './commands/dev.js';
+import { build } from './commands/build.js';
+import { preview } from './commands/preview.js';
 
 export interface CLIConfig {
   version: string;
-  commands: Map<string, Command>;
   projectRoot: string;
-}
-
-export interface CLIContext {
-  config: CLIConfig;
-  cwd: string;
-  args: string[];
-  flags: Record<string, string | boolean>;
 }
 
 export async function runCLI(args: string[]): Promise<void> {
   const [command, ...restArgs] = args.slice(2);
 
   if (!command) {
-    await showHelp();
+    showHelp();
     return;
   }
 
   switch (command) {
-    case 'init':
-      await runInit(restArgs);
-      break;
     case 'dev':
-      await runDev(restArgs);
+      await dev(restArgs);
       break;
     case 'build':
-      await runBuild(restArgs);
+      await build(restArgs);
+      break;
+    case 'preview':
+      await preview(restArgs);
+      break;
+    case 'init':
+      await runInit(restArgs);
       break;
     case 'generate':
       await runGenerate(restArgs);
@@ -40,49 +37,44 @@ export async function runCLI(args: string[]): Promise<void> {
       break;
     case '--help':
     case '-h':
-      await showHelp();
+      showHelp();
       break;
     default:
       console.error(`Unknown command: ${command}`);
-      await showHelp();
+      showHelp();
       process.exit(1);
   }
 }
 
-async function showHelp(): Promise<void> {
+function showHelp(): void {
   console.log(`
-EmberKit CLI v0.1.0
+🔥 EmberKit CLI v0.1.0
 
 Usage: emberkit <command> [options]
 
 Commands:
-  init [template]     Initialize a new EmberKit project
-  dev                Start development server
-  build              Build for production
-  generate <type>    Generate code (routes, components, etc.)
+  dev                  Start development server
+  build                Build for production
+  preview              Preview production build
+  init [template]      Initialize a new EmberKit project
+  generate <type>      Generate code (routes, components, etc.)
 
 Options:
-  --help, -h         Show this help message
-  --version, -v      Show version number
+  --help, -h          Show this help message
+  --version, -v       Show version number
 
 Examples:
-  emberkit init
   emberkit dev
   emberkit build
+  emberkit preview
+  emberkit init
   emberkit generate route about
 `);
 }
 
-async function runInit(args: string[]): Promise<void> {
-  console.log('Initializing EmberKit project...');
-}
-
-async function runDev(args: string[]): Promise<void> {
-  console.log('Starting development server...');
-}
-
-async function runBuild(args: string[]): Promise<void> {
-  console.log('Building for production...');
+async function runInit(_args: string[]): Promise<void> {
+  console.log('🚀 Initializing EmberKit project...');
+  console.log('(Not yet implemented)');
 }
 
 async function runGenerate(args: string[]): Promise<void> {
@@ -91,7 +83,6 @@ async function runGenerate(args: string[]): Promise<void> {
     console.error('Usage: emberkit generate <type> <name>');
     process.exit(1);
   }
-  console.log(`Generating ${type}: ${name}`);
+  console.log(`🎨 Generating ${type}: ${name}`);
+  console.log('(Not yet implemented)');
 }
-
-export { runCLI };

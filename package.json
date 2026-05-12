@@ -10,7 +10,7 @@
     "test": "pnpm -r test",
     "typecheck": "pnpm -r typecheck",
     "build": "pnpm -r build",
-    "dev": "pnpm -r --parallel dev",
+    "dev": "pnpm --filter @emberkit/docs dev",
     "build:cli": "pnpm --filter @emberkit/cli build"
   },
   "devDependencies": {

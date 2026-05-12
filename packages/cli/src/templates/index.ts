@@ -1,5 +1,3 @@
-import type { GeneratorOptions } from '../types.js';
-
 export const routeTemplate = `import type { RouteComponent } from '@emberkit/runtime';
 
 const {{name}}Route: RouteComponent = (props) => {
@@ -136,7 +134,7 @@ export function formatTemplate(
   let result = template;
 
   for (const [key, value] of Object.entries(params)) {
-    result = result.replaceAll(`{{${key}}}`, value);
+    result = result.split(`{{${key}}}`).join(value);
   }
 
   return result;
