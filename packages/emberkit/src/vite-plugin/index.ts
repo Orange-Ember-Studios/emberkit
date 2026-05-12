@@ -188,8 +188,8 @@ function markdownToJSX(
 ): string {
   let html = content;
 
-  html = processHeadings(html);
   html = processCodeBlocks(html);
+  html = processHeadings(html);
   html = processTables(html);
   html = processLinks(html);
   html = processImages(html);
@@ -292,16 +292,37 @@ function highlightTS(code: string): string {
 function highlightBash(code: string): string {
   const lines = code.split('\n');
   return lines.map(line => {
-    // Comment
-    if (line.trimStart().startsWith('#')) {
-      return `<span class="cm">${line}</span>`;
+    const trimmed = line.trimStart();
+    // Comment — escape first
+    if (trimmed.startsWith('#')) {
+      return `<span class="cm">${escapeHtml(line)}</span>`;
     }
-    // Highlight commands and flags
-    let result = escapeHtml(line);
-    result = result.replace(/\b(sudo|cd|mkdir|rm|cp|mv|ls|cat|echo|npm|pnpm|yarn|git|curl|chmod|export|source|node|npx|bun|deno)\b/g, '<span class="kw">$1</span>');
-    result = result.replace(/(\s)(--?[\w-]+)/g, '$1<span class="attr">$2</span>');
-    result = result.replace(/(&quot;[^&]*&quot;|"[^"]*"|'[^']*')/g, '<span class="str">$1</span>');
-    return result;
+    // Tokenize to avoid regex conflicts with HTML tags
+    const tokens: string[] = [];
+    let remaining = escapeHtml(line);
+    while (remaining.length > 0) {
+      // HTML entity — pass through
+      let m = remaining.match(/^(&\w+;)/);
+      if (m) { tokens.push(m[1]); remaining = remaining.slice(m[1].length); continue; }
+      // Quoted string
+      m = remaining.match(/^(&quot;[^&]*?&quot;|&apos;[^&]*?&apos;)/);
+      if (m) { tokens.push(`<span class="str">${m[1]}</span>`); remaining = remaining.slice(m[1].length); continue; }
+      // Flag
+      m = remaining.match(/^(\s+)(--?[\w-]+)/);
+      if (m) { tokens.push(`${m[1]}<span class="attr">${m[2]}</span>`); remaining = remaining.slice(m[0].length); continue; }
+      // Word (potential command)
+      m = remaining.match(/^([a-zA-Z][\w-]*)/);
+      if (m) {
+        const cmds = new Set(['sudo','cd','mkdir','rm','cp','mv','ls','cat','echo','npm','pnpm','yarn','git','curl','chmod','export','source','node','npx','bun','deno','grep','awk','sed','find','docker','kubectl']);
+        tokens.push(cmds.has(m[1]) ? `<span class="kw">${m[1]}</span>` : m[1]);
+        remaining = remaining.slice(m[1].length);
+        continue;
+      }
+      // Anything else
+      tokens.push(remaining[0]);
+      remaining = remaining.slice(1);
+    }
+    return tokens.join('');
   }).join('\n');
 }
 
