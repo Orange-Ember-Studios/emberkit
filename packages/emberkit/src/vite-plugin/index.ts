@@ -40,7 +40,7 @@ export function emberkitVitePlugin(userOptions: EmberKitPluginOptions = {}): Plu
           jsxImportSource: '@emberkit/core',
         },
         optimizeDeps: {
-          include: ['@emberkit/core'],
+          exclude: ['@emberkit/core'],
         },
       };
     },
