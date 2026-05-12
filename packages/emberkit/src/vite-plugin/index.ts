@@ -386,13 +386,14 @@ function highlightBash(code: string): string {
   const lines = code.split('\n');
   return lines.map(line => {
     const trimmed = line.trimStart();
-    // Comment — escape first
+    // Comment
     if (trimmed.startsWith('#')) {
-      return `<span class="cm">${escapeHtml(line)}</span>`;
+      return `<span class="cm">${line}</span>`;
     }
-    // Tokenize to avoid regex conflicts with HTML tags
+    // Content is already HTML-escaped by processCodeBlocks
+    // Tokenize directly without double-escaping
     const tokens: string[] = [];
-    let remaining = escapeHtml(line);
+    let remaining = line;
     while (remaining.length > 0) {
       // HTML entity — pass through
       let m = remaining.match(/^(&\w+;)/);
