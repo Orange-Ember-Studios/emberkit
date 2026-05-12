@@ -221,10 +221,6 @@ function processCodeBlocks(html: string): string {
       highlighted = highlightBash(highlighted);
     } else if (lang === 'json') {
       highlighted = highlightJSON(highlighted);
-    } else if (lang === 'css') {
-      highlighted = highlightCSS(highlighted);
-    } else if (lang === 'html') {
-      highlighted = highlightHTML(highlighted);
     }
 
     const langAttr = lang ? ` data-lang="${lang}"` : '';
@@ -232,66 +228,94 @@ function processCodeBlocks(html: string): string {
   });
 }
 
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
 function highlightTS(code: string): string {
-  // Comments
-  code = code.replace(/(\/\/[^\n]*)/g, '<span class="cm">$1</span>');
-  // Strings (double, single, backtick)
-  code = code.replace(/(&apos;[^&apos;]*&apos;|&quot;[^&quot;]*&quot;|'[^']*'|"[^"]*"|`[^`]*`)/g, '<span class="str">$1</span>');
-  // Keywords
-  code = code.replace(/\b(import|export|from|const|let|var|function|return|if|else|for|while|switch|case|break|continue|new|delete|typeof|instanceof|in|of|class|extends|super|this|null|undefined|true|false|async|await|try|catch|finally|throw|yield|default|type|interface|enum|implements|abstract|readonly|private|public|protected|static|as|is|keyof|infer|void|never|unknown|any)\b/g, '<span class="kw">$1</span>');
-  // Types (PascalCase after colon or in generic)
-  code = code.replace(/(:\s*)([A-Z]\w+)/g, '$1<span class="type">$2</span>');
-  // Numbers
-  code = code.replace(/\b(\d+\.?\d*)\b/g, '<span class="num">$1</span>');
-  return code;
+  const tokens: string[] = [];
+  let remaining = code;
+
+  // Tokenize to avoid regex conflicts
+  while (remaining.length > 0) {
+    // Single-line comment
+    let m = remaining.match(/^(\/\/.*)/);
+    if (m) { tokens.push(`<span class="cm">${m[1]}</span>`); remaining = remaining.slice(m[1].length); continue; }
+
+    // String (single, double, backtick) — match only plain text quotes, not HTML entities
+    m = remaining.match(/^('[^']*'|"[^"]*"|`[^`]*`)/);
+    if (m) { tokens.push(`<span class="str">${m[1]}</span>`); remaining = remaining.slice(m[1].length); continue; }
+
+    // Word (keyword, type, etc.)
+    m = remaining.match(/^([a-zA-Z_$][\w$]*)/);
+    if (m) {
+      const word = m[1];
+      const keywords = new Set(['import','export','from','const','let','var','function','return','if','else','for','while','switch','case','break','continue','new','typeof','instanceof','class','extends','super','this','null','undefined','true','false','async','await','try','catch','finally','throw','default','type','interface','enum','as','keyof','void','never','unknown','any','readonly','public','private','protected','static','abstract','implements','in','of','delete','yield','infer','is']);
+      if (keywords.has(word)) {
+        tokens.push(`<span class="kw">${word}</span>`);
+      } else if (/^[A-Z]/.test(word) && word.length > 1) {
+        tokens.push(`<span class="type">${word}</span>`);
+      } else {
+        tokens.push(word);
+      }
+      remaining = remaining.slice(word.length);
+      continue;
+    }
+
+    // Number
+    m = remaining.match(/^(\d+\.?\d*)/);
+    if (m) { tokens.push(`<span class="num">${m[1]}</span>`); remaining = remaining.slice(m[1].length); continue; }
+
+    // HTML entities — pass through as-is
+    m = remaining.match(/^(&\w+;)/);
+    if (m) { tokens.push(m[1]); remaining = remaining.slice(m[1].length); continue; }
+
+    // JSX angle brackets and punctuation
+    m = remaining.match(/^([{}()\[\];:,.=&lt;&gt;+\-*/|!?~@#%^&]+)/);
+    if (m) { tokens.push(`<span class="op">${m[1]}</span>`); remaining = remaining.slice(m[1].length); continue; }
+
+    // Whitespace
+    m = remaining.match(/^(\s+)/);
+    if (m) { tokens.push(m[1]); remaining = remaining.slice(m[1].length); continue; }
+
+    // Anything else
+    tokens.push(remaining[0]);
+    remaining = remaining.slice(1);
+  }
+
+  return tokens.join('');
 }
 
 function highlightBash(code: string): string {
-  // Comments
-  code = code.replace(/(#[^\n]*)/g, '<span class="cm">$1</span>');
-  // Strings
-  code = code.replace(/(&quot;[^&quot;]*&quot;|"[^"]*"|'[^']*')/g, '<span class="str">$1</span>');
-  // Keywords
-  code = code.replace(/\b(sudo|cd|mkdir|rm|cp|mv|ls|cat|echo|npm|pnpm|yarn|git|curl|chmod|export|source|cd)\b/g, '<span class="kw">$1</span>');
-  // Flags
-  code = code.replace(/(\s)(--?\w[\w-]*)/g, '$1<span class="attr">$2</span>');
-  return code;
+  const lines = code.split('\n');
+  return lines.map(line => {
+    // Comment
+    if (line.trimStart().startsWith('#')) {
+      return `<span class="cm">${line}</span>`;
+    }
+    // Highlight commands and flags
+    let result = escapeHtml(line);
+    result = result.replace(/\b(sudo|cd|mkdir|rm|cp|mv|ls|cat|echo|npm|pnpm|yarn|git|curl|chmod|export|source|node|npx|bun|deno)\b/g, '<span class="kw">$1</span>');
+    result = result.replace(/(\s)(--?[\w-]+)/g, '$1<span class="attr">$2</span>');
+    result = result.replace(/(&quot;[^&]*&quot;|"[^"]*"|'[^']*')/g, '<span class="str">$1</span>');
+    return result;
+  }).join('\n');
 }
 
 function highlightJSON(code: string): string {
+  let result = code;
   // Keys
-  code = code.replace(/(&quot;[^&quot;]*&quot;|"[^"]*")\s*:/g, '<span class="attr">$1</span>:');
+  result = result.replace(/(&quot;[^&]*&quot;|"[^"]*")\s*:/g, '<span class="attr">$1</span>:');
   // String values
-  code = code.replace(/:\s*(&quot;[^&quot;]*&quot;|"[^"]*")/g, ': <span class="val">$1</span>');
+  result = result.replace(/:\s*(&quot;[^&]*&quot;|"[^"]*")/g, ': <span class="val">$1</span>');
   // Numbers
-  code = code.replace(/:\s*(\d+\.?\d*)/g, ': <span class="num">$1</span>');
-  // Booleans
-  code = code.replace(/:\s*(true|false|null)/g, ': <span class="kw">$1</span>');
-  return code;
-}
-
-function highlightCSS(code: string): string {
-  // Comments
-  code = code.replace(/(\/\*[\s\S]*?\*\/)/g, '<span class="cm">$1</span>');
-  // Properties
-  code = code.replace(/([\w-]+)\s*:/g, '<span class="attr">$1</span>:');
-  // Values with units
-  code = code.replace(/:\s*([\d.]+(?:px|rem|em|%|vh|vw|s|ms))/g, ': <span class="num">$1</span>');
-  // Colors
-  code = code.replace(/(#[0-9a-fA-F]{3,8})\b/g, '<span class="val">$1</span>');
-  // Selectors (lines starting with . # etc)
-  code = code.replace(/^(\s*[.#][\w-]+)/gm, '<span class="type">$1</span>');
-  return code;
-}
-
-function highlightHTML(code: string): string {
-  // Tags
-  code = code.replace(/(&lt;\/?)([\w-]+)/g, '$1<span class="tag">$2</span>');
-  // Attributes
-  code = code.replace(/\s([\w-]+)=/g, ' <span class="attr">$1</span>=');
-  // Strings
-  code = code.replace(/(".*?")/g, '<span class="str">$1</span>');
-  return code;
+  result = result.replace(/:\s*(\d+\.?\d*)/g, ': <span class="num">$1</span>');
+  // Booleans and null
+  result = result.replace(/:\s*(true|false|null)/g, ': <span class="kw">$1</span>');
+  return result;
 }
 
 function processTables(html: string): string {
@@ -380,23 +404,31 @@ function processEmphasis(html: string): string {
 }
 
 function processParagraphs(html: string, breaks?: boolean): string {
-  const paragraphs = html.split('\n\n');
+  // Split on pre blocks to avoid processing code content
+  const parts = html.split(/(<pre[\s\S]*?<\/pre>)/);
 
-  return paragraphs
-    .map((p) => {
-      p = p.trim();
-      if (!p) return '';
+  return parts.map((part) => {
+    // Don't process content inside pre tags
+    if (part.startsWith('<pre')) return part;
 
-      if (p.startsWith('<h') || p.startsWith('<ul') || p.startsWith('<ol') ||
-          p.startsWith('<pre') || p.startsWith('<blockquote') || p.startsWith('<table')) {
-        return p;
-      }
+    const paragraphs = part.split('\n\n');
 
-      p = p.replace(/\n/g, breaks ? '<br>' : ' ');
+    return paragraphs
+      .map((p) => {
+        p = p.trim();
+        if (!p) return '';
 
-      return `<p>${p}</p>`;
-    })
-    .join('\n');
+        if (p.startsWith('<h') || p.startsWith('<ul') || p.startsWith('<ol') ||
+            p.startsWith('<pre') || p.startsWith('<blockquote') || p.startsWith('<table')) {
+          return p;
+        }
+
+        p = p.replace(/\n/g, breaks ? '<br>' : ' ');
+
+        return `<p>${p}</p>`;
+      })
+      .join('\n');
+  }).join('');
 }
 
 export type { EmberKitPluginOptions, EmberKitMode };
