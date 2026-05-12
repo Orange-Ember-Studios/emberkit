@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "emberkit dev",
     "build": "emberkit build",
-    "preview": "emberkit preview"
+    "preview": "emberkit preview",
+    "deploy": "wrangler deploy",
+    "deploy:preview": "wrangler deploy --preview"
   },
   "dependencies": {
     "@emberkit/cli": "workspace:*",
@@ -15,5 +17,8 @@
     "@tailwindcss/vite": "^4.3.0",
     "tailwindcss": "^4.3.0",
     "vite": "^6.0.0"
+  },
+  "devDependencies": {
+    "wrangler": "^4.90.1"
   }
 }
