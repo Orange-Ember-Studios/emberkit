@@ -40,6 +40,6 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "@emberkit/tsconfig": "^0.2.0"
+    "@emberkit/tsconfig": "^0.2.1"
   }
 }
