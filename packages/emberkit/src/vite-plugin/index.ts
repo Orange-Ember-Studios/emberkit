@@ -4,6 +4,7 @@ import { DEFAULT_CONFIG } from './types.js';
 import { readdirSync, statSync } from 'node:fs';
 import { join, relative, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { compile } from '@mdx-js/mdx';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -86,7 +87,11 @@ export function emberkitVitePlugin(userOptions: EmberKitPluginOptions = {}): Plu
         return null;
       }
 
-      if (isMD || isMDX) {
+      if (isMDX) {
+        return transformMDX(code, id);
+      }
+
+      if (isMD) {
         return transformMarkdownToJSX(code, id, options);
       }
 
@@ -151,6 +156,109 @@ export default function MDComponent(props) {
     children: [
       createElement(MDContent, props)
     ]
+  });
+}
+`;
+
+  return { code: componentCode };
+}
+
+async function transformMDX(
+  code: string,
+  id: string,
+): Promise<{ code: string } | null> {
+  const frontmatterMatch = code.match(/^---\n([\s\S]*?)\n---\n?/);
+
+  let frontmatter: Record<string, unknown> = {};
+  let content = code;
+
+  if (frontmatterMatch) {
+    const fmContent = frontmatterMatch[1];
+    frontmatter = parseFrontmatter(fmContent);
+    content = code.slice(frontmatterMatch[0].length);
+  }
+
+  // Extract code blocks before MDX compilation to preserve syntax
+  const codeBlocks: { html: string; index: number }[] = [];
+  let processedContent = content.replace(/```(\w*)\n([\s\S]*?)```/g, (_match, lang, blockCode) => {
+    const html = renderCodeBlock(lang, blockCode);
+    codeBlocks.push({ html, index: codeBlocks.length });
+    return `<CodeBlock_${codeBlocks.length - 1} />`;
+  });
+
+  const compiled = await compile(processedContent, {
+    outputFormat: 'program',
+    development: false,
+    jsx: false,
+    jsxImportSource: '@emberkit/core',
+  });
+
+  let compiledCode = String(compiled);
+
+  // Build code block component definitions
+  const codeBlockComponents = codeBlocks
+    .map((block) => {
+      const escapedHtml = JSON.stringify(block.html);
+      return `function CodeBlock_${block.index}() {
+  return createElement('div', { 
+    dangerouslySetInnerHTML: { __html: ${escapedHtml} }
+  });
+}`;
+    })
+    .join('\n\n');
+
+  // Rename the MDX default export so we can wrap it
+  compiledCode = compiledCode.replace(
+    'export default function MDXContent',
+    'function _MDXContent',
+  );
+
+  const exportLines: string[] = [];
+
+  if (frontmatter.title) {
+    exportLines.push(`export const title = ${JSON.stringify(frontmatter.title)};`);
+  }
+  if (frontmatter.description) {
+    exportLines.push(`export const description = ${JSON.stringify(frontmatter.description)};`);
+  }
+  if (frontmatter.author) {
+    exportLines.push(`export const author = ${JSON.stringify(frontmatter.author)};`);
+  }
+  if (frontmatter.date) {
+    exportLines.push(`export const date = ${JSON.stringify(frontmatter.date)};`);
+  }
+
+  exportLines.push(`export const metadata = ${JSON.stringify(frontmatter)};`);
+
+  // Build components override object
+  const componentsOverride = codeBlocks.length > 0
+    ? `
+const _codeBlockComponents = {
+  ${codeBlocks.map(b => `CodeBlock_${b.index}`).join(', ')}
+};
+`
+    : '';
+
+  const componentCode = `
+import { createElement } from '@emberkit/core';
+
+${exportLines.join('\n')}
+
+${codeBlockComponents}
+${componentsOverride}
+
+${compiledCode}
+
+export default function MDXComponent(props) {
+  const components = {
+    ...(props.components || {}),
+    ${codeBlocks.map(b => `CodeBlock_${b.index}`).join(', ')}
+  };
+  
+  return createElement('div', {
+    className: 'md-content md-doc',
+    'data-file': ${JSON.stringify(id)},
+    children: createElement(_MDXContent, { ...props, components })
   });
 }
 `;

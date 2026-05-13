@@ -29,6 +29,7 @@ const docs = [
       { title: 'Hydration', path: '/docs/hydration' },
       { title: 'SEO & Meta', path: '/docs/meta' },
       { title: 'Head Component', path: '/docs/head' },
+      { title: 'Icons', path: '/docs/icons' },
     ],
   },
   {

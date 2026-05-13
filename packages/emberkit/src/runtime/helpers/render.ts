@@ -6,6 +6,8 @@ const SELF_CLOSING_TAGS = new Set([
 
 let handlerCounter = 0;
 const handlerRegistry = new Map<string, (e: Event) => void>();
+let renderDepth = 0;
+const MAX_RENDER_DEPTH = 100;
 
 export function getHandler(id: string): ((e: Event) => void) | undefined {
   return handlerRegistry.get(id);
@@ -18,22 +20,37 @@ export function clearHandlers(): void {
 
 export function renderElementToHTML(element: JSXElement): string {
   if (!element) return '';
+  if (renderDepth > MAX_RENDER_DEPTH) {
+    renderDepth = 0;
+    return '';
+  }
+  renderDepth++;
   
   let currentType: string | ((props: Record<string, unknown>) => unknown) = element.type;
   let props = element.props ?? {};
+  let depth = 0;
 
-  while (typeof currentType === 'function') {
+  while (typeof currentType === 'function' && depth < 50) {
+    depth++;
     try {
       const result = (currentType as (props: Record<string, unknown>) => unknown)(props);
       if (result && typeof result === 'object' && 'type' in result) {
         currentType = (result as JSXElement).type;
         props = (result as JSXElement).props ?? {};
       } else if (typeof result === 'string' || typeof result === 'number') {
+        renderDepth--;
         return String(result);
+      } else if (Array.isArray(result)) {
+        const r = result.map((item) => renderToString(item as JSXElement | string)).join('');
+        renderDepth--;
+        return r;
       } else {
+        renderDepth--;
         return '';
       }
     } catch (error) {
+      renderDepth--;
+      console.error('[EmberKit render error]', error);
       return `<div style="color: red;">Error rendering component</div>`;
     }
   }
@@ -41,15 +58,7 @@ export function renderElementToHTML(element: JSXElement): string {
   const rawChildren = props.children ?? [];
   const children = Array.isArray(rawChildren) ? rawChildren : [rawChildren];
   const childHtml = children
-    .map((child) => {
-      if (typeof child === 'string' || typeof child === 'number') {
-        return String(child);
-      }
-      if (typeof child === 'object' && child !== null && 'type' in child) {
-        return renderElementToHTML(child as JSXElement);
-      }
-      return '';
-    })
+    .map((child) => renderToString(child as JSXElement | string))
     .join('');
 
   if (currentType === 'Fragment' || currentType === 'React.Fragment') {
@@ -95,17 +104,20 @@ export function renderElementToHTML(element: JSXElement): string {
   }
 
   if (SELF_CLOSING_TAGS.has(currentType as string)) {
+    renderDepth--;
     return `<${currentType}${attributes}${onclickAttr}/>`;
   }
 
+  renderDepth--;
   return `<${currentType}${attributes}${onclickAttr}>${innerHtml}</${currentType}>`;
 }
 
-export function renderToString(element: JSXElement | string | null | number): string {
+export function renderToString(element: JSXElement | string | null | number | unknown[]): string {
   if (!element && element !== 0) return '';
   if (typeof element === 'string') return element;
   if (typeof element === 'number') return String(element);
-  return renderElementToHTML(element);
+  if (Array.isArray(element)) return element.map((item) => renderToString(item as JSXElement | string)).join('');
+  return renderElementToHTML(element as JSXElement);
 }
 
 export function getComponentName(
