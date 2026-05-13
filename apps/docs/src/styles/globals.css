@@ -249,6 +249,10 @@
                 inset 0 1px 0 rgba(255, 255, 255, 0.03);
   }
 
+  pre code {
+    tab-size: 2;
+  }
+
   .md-content pre > code {
     display: block;
     padding: 1.25rem 1.5rem;
@@ -262,18 +266,30 @@
   }
 
   /* Syntax highlighting — dark theme */
-  .md-content pre > code .kw { color: #c084fc; font-weight: 500; }
-  .md-content pre > code .fn { color: #60a5fa; }
-  .md-content pre > code .str { color: #34d399; }
-  .md-content pre > code .num { color: #fbbf24; }
-  .md-content pre > code .cm { color: #6b7280; font-style: italic; }
-  .md-content pre > code .type { color: #38bdf8; }
-  .md-content pre > code .op { color: #9ca3af; }
-  .md-content pre > code .tag { color: #f87171; }
-  .md-content pre > code .attr { color: #fbbf24; }
-  .md-content pre > code .val { color: #34d399; }
-  .md-content pre > code .jsx { color: #38bdf8; }
-  .md-content pre > code .dec { color: #f472b6; }
+  .md-content pre > code .kw,
+  pre code .kw { color: #c084fc; font-weight: 500; }
+  .md-content pre > code .fn,
+  pre code .fn { color: #60a5fa; }
+  .md-content pre > code .str,
+  pre code .str { color: #34d399; }
+  .md-content pre > code .num,
+  pre code .num { color: #fbbf24; }
+  .md-content pre > code .cm,
+  pre code .cm { color: #6b7280; font-style: italic; }
+  .md-content pre > code .type,
+  pre code .type { color: #38bdf8; }
+  .md-content pre > code .op,
+  pre code .op { color: #9ca3af; }
+  .md-content pre > code .tag,
+  pre code .tag { color: #f87171; }
+  .md-content pre > code .attr,
+  pre code .attr { color: #fbbf24; }
+  .md-content pre > code .val,
+  pre code .val { color: #34d399; }
+  .md-content pre > code .jsx,
+  pre code .jsx { color: #38bdf8; }
+  .md-content pre > code .dec,
+  pre code .dec { color: #f472b6; }
 
   /* Copy button */
   .md-content pre > .copy-btn {

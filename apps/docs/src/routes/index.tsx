@@ -1,6 +1,7 @@
 import type { RouteComponent } from '@emberkit/core';
 import { IconZap, IconPackage, IconTarget, IconType, IconArrowRight } from '@emberkit/icons';
 import { useNavigate } from '@emberkit/core';
+import { CodeBlock } from '../components/code-block';
 
 const HomePage: RouteComponent = () => {
   const navigate = useNavigate();
@@ -97,7 +98,7 @@ const HomePage: RouteComponent = () => {
               <div className="h-3 w-3 rounded-full bg-green-500/80 transition-all duration-300 hover:scale-125" />
               <span className="ml-3 text-xs font-medium text-gray-500 transition-colors duration-300">counter.tsx</span>
             </div>
-            <pre className="overflow-x-auto p-6 text-sm leading-7 text-gray-300"><code>{`import { createSignal, render } from '@emberkit/core';
+            <CodeBlock code={`import { createSignal, render } from '@emberkit/core';
 
 function Counter() {
   const [count, setCount] = createSignal(0);
@@ -109,7 +110,7 @@ function Counter() {
   );
 }
 
-render(<Counter />, document.body);`}</code></pre>
+render(<Counter />, document.body);`} language="tsx" />
           </div>
 
           <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3">
