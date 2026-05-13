@@ -823,6 +823,556 @@ export const IconHelpCircle = createSvgIcon({
   ],
 });
 
+export const IconXTwitter = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'currentColor',
+  stroke: false,
+  children: [
+    { type: 'path', props: { d: 'M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126h1.835z' } },
+  ],
+});
+
+export const IconLinkedIn = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'rect', props: { x: 2, y: 2, width: 20, height: 20, rx: 3, stroke: 'currentColor', strokeWidth: 2 } },
+    { type: 'path', props: { d: 'M7 11v6M7 8v.01M11 17v-4c0-1.5 1-2.5 2.5-2.5S16 11.5 16 12v5', stroke: 'currentColor', strokeWidth: 2 } },
+  ],
+});
+
+export const IconFacebook = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'path', props: { d: 'M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3V2z', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' } },
+  ],
+});
+
+export const IconInstagram = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'rect', props: { x: 2, y: 2, width: 20, height: 20, rx: 5 } },
+    { type: 'circle', props: { cx: 12, cy: 12, r: 4 } },
+    { type: 'circle', props: { cx: 17.5, cy: 6.5, r: 1, fill: 'currentColor', stroke: 'none' } },
+  ],
+});
+
+export const IconYoutube = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'path', props: { d: 'M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.94 2c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z' } },
+    { type: 'polygon', props: { points: '9.75,15.02 15.5,12 9.75,8.98' } },
+  ],
+});
+
+export const IconDiscord = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'path', props: { d: 'M9 12a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm6 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z' } },
+    { type: 'path', props: { d: 'M7.5 7.5c2-.5 4.5-.5 4.5-.5s2.5 0 4.5.5m-9 0c-.5.5-1 1.5-1 3.5 0 4 1 6 1 6s1 1.5 2.5 2m11.5-11.5c.5.5 1 1.5 1 3.5 0 4-1 6-1 6s-1 1.5-2.5 2' } },
+  ],
+});
+
+export const IconReddit = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'circle', props: { cx: 12, cy: 12, r: 10 } },
+    { type: 'circle', props: { cx: 9, cy: 11, r: 1.5, fill: 'currentColor', stroke: 'none' } },
+    { type: 'circle', props: { cx: 15, cy: 11, r: 1.5, fill: 'currentColor', stroke: 'none' } },
+    { type: 'path', props: { d: 'M8 14s1.5 2 4 2 4-2 4-2' } },
+    { type: 'path', props: { d: 'M15 8l1 1m-1-1l1-1m-1 1l-1-1m1 1l1 1' } },
+  ],
+});
+
+export const IconTwitch = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'path', props: { d: 'M21 2H3v16h5v4l4-4h5l4-4V2zm-10 9V7m5 4V7' } },
+  ],
+});
+
+export const IconSlack = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'path', props: { d: 'M14.5 10c-.83 0-1.5-.67-1.5-1.5v-5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5z' } },
+    { type: 'path', props: { d: 'M20.5 10H19V8.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z' } },
+    { type: 'path', props: { d: 'M9.5 14c.83 0 1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5S8 21.33 8 20.5v-5c0-.83.67-1.5 1.5-1.5z' } },
+    { type: 'path', props: { d: 'M3.5 14H5v1.5c0 .83-.67 1.5-1.5 1.5S2 16.33 2 15.5 2.67 14 3.5 14z' } },
+    { type: 'path', props: { d: 'M14 14.5c0-.83.67-1.5 1.5-1.5h5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-5c-.83 0-1.5-.67-1.5-1.5z' } },
+    { type: 'path', props: { d: 'M15.5 19H14v1.5c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5-.67-1.5-1.5-1.5z' } },
+  ],
+});
+
+export const IconTikTok = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'path', props: { d: 'M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5' } },
+  ],
+});
+
+export const IconWhatsApp = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'path', props: { d: 'M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z' } },
+    { type: 'path', props: { d: 'M15.2 13.5c-.3-.1-1.7-.8-2-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-.9 1.2-.2.2-.3.2-.6.1-.3-.1-1.2-.4-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.4.1-.6.1-.1.3-.3.4-.5.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5-.1-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4s1.1 2.8 1.2 3c.2.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.7.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.3.2-.6.2-1.2.2-1.3-.1-.1-.3-.2-.6-.3z' } },
+  ],
+});
+
+export const IconDribbble = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'circle', props: { cx: 12, cy: 12, r: 10 } },
+    { type: 'path', props: { d: 'M8.56 2.75c4.37 6.03 6.02 9.42 8.03 17.72m2.54-15.38c-3.72 4.35-8.94 5.66-16.88 5.85m19.5 1.9c-3.5-.93-6.63-.82-8.94 0-2.58.92-5.01 2.86-7.44 6.32' } },
+  ],
+});
+
+export const IconBehance = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'path', props: { d: 'M1 12.5h7.5c1.93 0 3.5-1.57 3.5-3.5S10.43 5.5 8.5 5.5H1v7zm0 0v3h8c2.21 0 4-1.79 4-4s-1.79-4-4-4H1m11.5 1h4c1.93 0 3.5 1.57 3.5 3.5S18.43 13 16.5 13H12.5v-2.5zm0 0v-5H16c1.38 0 2.5 1.12 2.5 2.5S17.38 10.5 16 10.5h-3.5M5 17h10' } },
+  ],
+});
+
+export const IconPinterest = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'circle', props: { cx: 12, cy: 12, r: 10 } },
+    { type: 'path', props: { d: 'M8 21c.5-1.5 1.5-4 2-5.5.5-1.5.5-2 1-3s1-1.5 1-2.5c0-1.5-1-2.5-2-2.5-1.5 0-2.5 1-2.5 2.5 0 .5.1 1 .3 1.3L6 16c-.5 2 .5 4 2.5 5 2 1 4-.5 5-2s1.5-3 1-5-.5-3-2-3c-2 0-3 2-2 4' } },
+  ],
+});
+
+export const IconAstro = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'path', props: { d: 'M12 2L2 19.5h20L12 2z' } },
+    { type: 'circle', props: { cx: 12, cy: 14, r: 2.5, fill: 'currentColor', stroke: 'none' } },
+  ],
+});
+
+export const IconVue = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'path', props: { d: 'M2 3h4l6 10.5L18 3h4L12 21 2 3z' } },
+    { type: 'path', props: { d: 'M7 3l5 8.5L17 3' } },
+  ],
+});
+
+export const IconAngular = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'path', props: { d: 'M12 2L3 7v10l9 5 9-5V7l-9-5z' } },
+    { type: 'path', props: { d: 'M12 6l-4.5 8h3v5l4.5-8h-3V6z' } },
+  ],
+});
+
+export const IconReact = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'circle', props: { cx: 12, cy: 12, r: 2 } },
+    { type: 'ellipse', props: { cx: 12, cy: 12, rx: 10, ry: 4 } },
+    { type: 'ellipse', props: { cx: 12, cy: 12, rx: 10, ry: 4, transform: 'rotate(60 12 12)' } },
+    { type: 'ellipse', props: { cx: 12, cy: 12, rx: 10, ry: 4, transform: 'rotate(120 12 12)' } },
+  ],
+});
+
+export const IconSvelte = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'path', props: { d: 'M12 2C6.5 2 4 6 4 8s2 4 4.5 5C5 14 3 17 3 19c0 3 3.5 5 9 5s9-2 9-5c0-2-2-5-5.5-6C19 12 21 10 21 8s-2.5-6-9-6z' } },
+  ],
+});
+
+export const IconNodeJs = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'path', props: { d: 'M12 2l-8 4.5v9l8 4.5 8-4.5v-9L12 2z' } },
+    { type: 'path', props: { d: 'M12 11V6m0 0L8 8m4-2l4 2m-8 3l4 2 4-2' } },
+  ],
+});
+
+export const IconNpm = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'rect', props: { x: 2, y: 2, width: 20, height: 20, rx: 2 } },
+    { type: 'path', props: { d: 'M6 18V6h12v12h-4v-8H6v8' } },
+  ],
+});
+
+export const IconYarn = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'circle', props: { cx: 12, cy: 12, r: 10 } },
+    { type: 'circle', props: { cx: 12, cy: 12, r: 4 } },
+    { type: 'path', props: { d: 'M12 2v6m0 8v6M2 12h6m8 0h6' } },
+  ],
+});
+
+export const IconPnpm = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'rect', props: { x: 2, y: 2, width: 20, height: 20, rx: 2 } },
+    { type: 'path', props: { d: 'M6 6h4v4H6V6zm0 8h4v4H6v-4zm8-8h4v4h-4V6zm0 8h4v4h-4v-4z' } },
+  ],
+});
+
+export const IconVite = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'path', props: { d: 'M12 2L2 19.5h4L12 8l6 11.5h4L12 2z' } },
+    { type: 'path', props: { d: 'M12 8l-4 7.5h3v3.5l3-5.5h-3V8z' } },
+  ],
+});
+
+export const IconNextJs = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'circle', props: { cx: 12, cy: 12, r: 10 } },
+    { type: 'path', props: { d: 'M9 15V9h4c1.5 0 2.5 1 2.5 2.5S14.5 14 13 14H11v1H9zm2-3h2c.5 0 1-.5 1-1s-.5-1-1-1h-2v2z' } },
+  ],
+});
+
+export const IconRemix = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'path', props: { d: 'M4 4h6v6H4V4zm0 10h6v6H4v-6zm10-10h6v6h-6V4zm3 10l3 3m0 0l-3 3m3-3h-6' } },
+  ],
+});
+
+export const IconNuxt = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'path', props: { d: 'M12 2L2 19.5h8L12 14l2 5.5h8L12 2z' } },
+    { type: 'path', props: { d: 'M12 14l-3 5.5h2L12 14z' } },
+  ],
+});
+
+export const IconSolid = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'path', props: { d: 'M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2z' } },
+    { type: 'circle', props: { cx: 12, cy: 12, r: 3 } },
+  ],
+});
+
+export const IconElectron = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'circle', props: { cx: 12, cy: 12, r: 3 } },
+    { type: 'ellipse', props: { cx: 12, cy: 12, rx: 10, ry: 4 } },
+    { type: 'ellipse', props: { cx: 12, cy: 12, rx: 10, ry: 4, transform: 'rotate(60 12 12)' } },
+    { type: 'ellipse', props: { cx: 12, cy: 12, rx: 10, ry: 4, transform: 'rotate(120 12 12)' } },
+  ],
+});
+
+export const IconTailwind = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'path', props: { d: 'M6 8c1.5-2 3-3 4.5-3 2.5 0 3 1.5 4.5 1.5 1.5 0 2.5-1.5 4.5-1.5 1.5 0 3 1 4.5 3-1.5 2-3 3-4.5 3-2.5 0-3-1.5-4.5-1.5-1.5 0-2.5 1.5-4.5 1.5-1.5 0-3-1-4.5-3z' } },
+    { type: 'path', props: { d: 'M2 16c1.5-2 3-3 4.5-3 2.5 0 3 1.5 4.5 1.5 1.5 0 2.5-1.5 4.5-1.5 1.5 0 3 1 4.5 3-1.5 2-3 3-4.5 3-2.5 0-3-1.5-4.5-1.5-1.5 0-2.5 1.5-4.5 1.5-1.5 0-3-1-4.5-3z' } },
+  ],
+});
+
+export const IconWebpack = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'path', props: { d: 'M12 2L2 7v10l10 5 10-5V7L12 2z' } },
+    { type: 'path', props: { d: 'M12 7l-5 2.5v5L12 17l5-2.5v-5L12 7z' } },
+  ],
+});
+
+export const IconRollup = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'path', props: { d: 'M12 2L2 12l10 10 10-10L12 2z' } },
+    { type: 'path', props: { d: 'M12 7v10m-5-5h10' } },
+  ],
+});
+
+export const IconEsbuild = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'path', props: { d: 'M12 2L2 7v10l10 5 10-5V7L12 2z' } },
+    { type: 'path', props: { d: 'M12 7v5m0 0l3 3m-3-3l-3 3' } },
+  ],
+});
+
+export const IconTypeScript = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'rect', props: { x: 2, y: 2, width: 20, height: 20, rx: 2 } },
+    { type: 'path', props: { d: 'M8 15V9h2.5c1.5 0 2.5 1 2.5 2.5S12 14 10.5 14H10v1H8zm2-3h.5c.5 0 1-.5 1-1s-.5-1-1-1H10v2z' } },
+    { type: 'path', props: { d: 'M14 12c0-1.5 1-2.5 2.5-2.5S19 10.5 19 12v3h-2v-3c0-.5-.5-1-1-1s-1 .5-1 1v3h-2v-3z' } },
+  ],
+});
+
+export const IconJavaScript = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'rect', props: { x: 2, y: 2, width: 20, height: 20, rx: 2 } },
+    { type: 'path', props: { d: 'M8 15V9h2c1.5 0 2 1 2 2s-.5 2-2 2H10v2H8zm2-3h.5c.5 0 1-.5 1-1s-.5-1-1-1H10v2z' } },
+    { type: 'path', props: { d: 'M14 15V9h2v6h-2zm4 0V9h2v6h-2z' } },
+  ],
+});
+
+export const IconBun = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'circle', props: { cx: 12, cy: 12, r: 10 } },
+    { type: 'path', props: { d: 'M8 10c1-2 2-2 4-2s3 1 4 3c-1 2-2 3-4 3s-3-1-4-3z' } },
+  ],
+});
+
+export const IconDeno = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'path', props: { d: 'M4 4h7v7H4V4zm0 9h7v7H4v-7zm9-9h7v7h-7V4zm0 9h7v7h-7v-7z' } },
+  ],
+});
+
+export const IconDocker = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'path', props: { d: 'M4 14h16v2c0 2-2 4-4 4H8c-2 0-4-2-4-4v-2zm0 0V8c1 0 2 0 3 1s2 1 3 1 2 0 3-1 2-1 3-1 2 0 3 1 2 1 3 1V9c-1 0-2 0-3-1s-2-1-3-1-2 0-3 1-2 1-3 1-2 0-3-1-2-1-3-1-2 0-3 1' } },
+  ],
+});
+
+export const IconKubernetes = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'path', props: { d: 'M12 2L3 7v10l9 5 9-5V7l-9-5z' } },
+    { type: 'circle', props: { cx: 12, cy: 12, r: 3 } },
+    { type: 'path', props: { d: 'M12 5v4m0 6v4m-5-9h4m4 0h4' } },
+  ],
+});
+
+export const IconGit = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'path', props: { d: 'M4 20l4-4m0 0l4-4m-4 4l-4-4m4 4l4 4m-4-4l4-4m0 0l4-4m-4 4l-4-4m8 4l4 4m-4-4l4-4' } },
+    { type: 'circle', props: { cx: 12, cy: 12, r: 2, fill: 'currentColor', stroke: 'none' } },
+  ],
+});
+
+export const IconGitHub = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'path', props: { d: 'M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22' } },
+  ],
+});
+
+export const IconGitLab = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'path', props: { d: 'M12 2L2 12l10 10 10-10L12 2z' } },
+    { type: 'path', props: { d: 'M12 2l3 8h6l-5 4 2 8-6-5-6 5 2-8-5-4h6l3-8' } },
+  ],
+});
+
+export const IconBitbucket = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'path', props: { d: 'M2 4h20l-2 16H4L2 4z' } },
+    { type: 'path', props: { d: 'M9 8l1 8m5-8l-1 8' } },
+  ],
+});
+
+export const IconFigma = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'rect', props: { x: 6, y: 2, width: 6, height: 6, rx: 3 } },
+    { type: 'rect', props: { x: 12, y: 2, width: 6, height: 6, rx: 3 } },
+    { type: 'rect', props: { x: 6, y: 8, width: 6, height: 6, rx: 3 } },
+    { type: 'circle', props: { cx: 15, cy: 11, r: 3 } },
+    { type: 'rect', props: { x: 6, y: 14, width: 6, height: 6, rx: 3 } },
+  ],
+});
+
+export const IconVSCode = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'path', props: { d: 'M16 3l-5 5-5-5H2v18l5-5 5 5 5-5 5 5V3l-6 6V9l4-4V3z' } },
+  ],
+});
+
+export const IconVim = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'rect', props: { x: 2, y: 2, width: 20, height: 20, rx: 2 } },
+    { type: 'path', props: { d: 'M7 7l5 5-5 5m5-5h5' } },
+  ],
+});
+
+export const IconIntelliJ = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'rect', props: { x: 2, y: 2, width: 20, height: 20, rx: 2 } },
+    { type: 'path', props: { d: 'M7 8v8l3-4-3-4zm4 0h2l3 4-3 4h-2' } },
+  ],
+});
+
+export const IconChrome = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'circle', props: { cx: 12, cy: 12, r: 10 } },
+    { type: 'circle', props: { cx: 12, cy: 12, r: 4 } },
+    { type: 'path', props: { d: 'M12 8l-6 0 3 5.2m0 0L9 18.4m3-5.2l6 0-3 5.2m0 0l3 5.2' } },
+  ],
+});
+
+export const IconFirefox = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'circle', props: { cx: 12, cy: 12, r: 10 } },
+    { type: 'path', props: { d: 'M8 12c0-2.2 1.8-4 4-4s4 1.8 4 4-1.8 4-4 4-4-1.8-4-4z' } },
+    { type: 'path', props: { d: 'M12 8V2m0 14v6M8 12H2m14 0h6' } },
+  ],
+});
+
+export const IconWindows = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'path', props: { d: 'M3 3h8v8H3V3zm10 0h8v8h-8V3zM3 13h8v8H3v-8zm10 0h8v8h-8v-8z' } },
+  ],
+});
+
+export const IconApple = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'path', props: { d: 'M12 2c-2 0-4 2-4 5 0 4 4 7 4 7s4-3 4-7c0-3-2-5-4-5z' } },
+    { type: 'path', props: { d: 'M12 14c-4 0-8 2-8 4v2h16v-2c0-2-4-4-8-4z' } },
+  ],
+});
+
+export const IconLinux = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'path', props: { d: 'M12 2c-3 0-5 2-5 5v3c0 1-1 2-2 3 0 0 0 2 1 3 0 2 1 4 3 5 1 1 2 1 3 1s2 0 3-1c2-1 3-3 3-5 1-1 1-3 1-3-1-1-2-2-2-3V7c0-3-2-5-5-5z' } },
+    { type: 'circle', props: { cx: 9, cy: 7, r: 1, fill: 'currentColor', stroke: 'none' } },
+    { type: 'circle', props: { cx: 15, cy: 7, r: 1, fill: 'currentColor', stroke: 'none' } },
+  ],
+});
+
+export const IconAndroid = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'path', props: { d: 'M5 12c0-4 3-7 7-7s7 3 7 7v7H5v-7z' } },
+    { type: 'path', props: { d: 'M8 12v3m8-3v3m-7 4h6m-8-7l-2-3m14 3l2-3' } },
+    { type: 'circle', props: { cx: 9, cy: 10, r: 1, fill: 'currentColor', stroke: 'none' } },
+    { type: 'circle', props: { cx: 15, cy: 10, r: 1, fill: 'currentColor', stroke: 'none' } },
+  ],
+});
+
+export const IconHeroku = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'path', props: { d: 'M4 18h16M4 6c2 4 4 4 8 4s6 0 8-4' } },
+    { type: 'circle', props: { cx: 12, cy: 12, r: 3 } },
+  ],
+});
+
+export const IconVercel = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'path', props: { d: 'M12 3L2 19h20L12 3z' } },
+  ],
+});
+
+export const IconNetlify = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'path', props: { d: 'M12 2L4 7v10l8 5 8-5V7l-8-5z' } },
+    { type: 'path', props: { d: 'M8 12l4 4 4-4' } },
+  ],
+});
+
+export const IconCloudflare = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'path', props: { d: 'M5 17h14a4 4 0 0 0 0-8 4 4 0 0 0-8-1 4 4 0 0 0-6 9z' } },
+  ],
+});
+
+export const IconAWS = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'rect', props: { x: 2, y: 6, width: 20, height: 12, rx: 2 } },
+    { type: 'path', props: { d: 'M7 10h2l1 2-1 2H7l-1-2 1-2zm4 0h2l1 2-1 2h-2l-1-2 1-2zm4 0h2l1 2-1 2h-2l-1-2 1-2z' } },
+  ],
+});
+
+export const IconGCP = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'path', props: { d: 'M12 2L4 7v10l8 5 8-5V7l-8-5z' } },
+    { type: 'path', props: { d: 'M12 7v5m0 0l3 3m-3-3l-3 3' } },
+  ],
+});
+
+export const IconAzure = createSvgIcon({
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  children: [
+    { type: 'path', props: { d: 'M3 18l5-14h2l-5 14H3zm7 0l3-10h2l-3 10h-2zm5 0l3-8h2l-3 8h-2z' } },
+  ],
+});
+
 export default {
   Menu: IconMenu,
   X: IconX,
@@ -922,4 +1472,63 @@ export default {
   CheckCircle: IconCheckCircle,
   XCircle: IconXCircle,
   HelpCircle: IconHelpCircle,
+  XTwitter: IconXTwitter,
+  LinkedIn: IconLinkedIn,
+  Facebook: IconFacebook,
+  Instagram: IconInstagram,
+  Youtube: IconYoutube,
+  Discord: IconDiscord,
+  Reddit: IconReddit,
+  Twitch: IconTwitch,
+  Slack: IconSlack,
+  Dribbble: IconDribbble,
+  Behance: IconBehance,
+  Pinterest: IconPinterest,
+  TikTok: IconTikTok,
+  WhatsApp: IconWhatsApp,
+  Astro: IconAstro,
+  Vue: IconVue,
+  Angular: IconAngular,
+  React: IconReact,
+  Svelte: IconSvelte,
+  NodeJs: IconNodeJs,
+  Npm: IconNpm,
+  Yarn: IconYarn,
+  Pnpm: IconPnpm,
+  Vite: IconVite,
+  NextJs: IconNextJs,
+  Remix: IconRemix,
+  Nuxt: IconNuxt,
+  Solid: IconSolid,
+  Electron: IconElectron,
+  Tailwind: IconTailwind,
+  Webpack: IconWebpack,
+  Rollup: IconRollup,
+  Esbuild: IconEsbuild,
+  TypeScript: IconTypeScript,
+  JavaScript: IconJavaScript,
+  Bun: IconBun,
+  Deno: IconDeno,
+  Docker: IconDocker,
+  Kubernetes: IconKubernetes,
+  Git: IconGit,
+  GitHub: IconGitHub,
+  GitLab: IconGitLab,
+  Bitbucket: IconBitbucket,
+  Figma: IconFigma,
+  VSCode: IconVSCode,
+  Vim: IconVim,
+  IntelliJ: IconIntelliJ,
+  Chrome: IconChrome,
+  Firefox: IconFirefox,
+  Windows: IconWindows,
+  Apple: IconApple,
+  Linux: IconLinux,
+  Android: IconAndroid,
+  Heroku: IconHeroku,
+  Vercel: IconVercel,
+  Netlify: IconNetlify,
+  AWS: IconAWS,
+  GCP: IconGCP,
+  Azure: IconAzure,
 };
