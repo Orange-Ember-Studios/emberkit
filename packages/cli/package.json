@@ -45,6 +45,7 @@
     "inquirer": "^9.2.0"
   },
   "devDependencies": {
-    "@types/inquirer": "^9.0.3"
+    "@types/inquirer": "^9.0.3",
+    "@emberkit/tsconfig": "workspace:*"
   }
 }
