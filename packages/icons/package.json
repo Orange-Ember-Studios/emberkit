@@ -37,14 +37,13 @@
     "lint": "eslint src --ext .ts,.tsx",
     "format": "prettier --write \"src/**/*.{ts,tsx}\""
   },
-  "dependencies": {},
-  "peerDependencies": {
-    "@emberkit/core": "workspace:*"
-  },
   "dependencies": {
     "@emberkit/tsconfig": "^0.2.1"
   },
+  "peerDependencies": {
+    "@emberkit/core": "^0.2.0"
+  },
   "devDependencies": {
-    "@emberkit/core": "workspace:*"
+    "@emberkit/core": "^0.2.0"
   }
 }

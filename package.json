@@ -9,7 +9,7 @@
     "format": "pnpm -r format",
     "test": "pnpm -r test",
     "typecheck": "pnpm -r typecheck",
-    "build": "pnpm -r build",
+    "build": "pnpm install && pnpm -r build",
     "dev": "pnpm --filter @emberkit/docs dev",
     "build:cli": "pnpm --filter @emberkit/cli build",
     "changeset": "changeset",
