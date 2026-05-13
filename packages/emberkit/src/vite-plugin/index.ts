@@ -5,6 +5,7 @@ import { readdirSync, statSync } from 'node:fs';
 import { join, relative, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { compile } from '@mdx-js/mdx';
+import remarkGfm from 'remark-gfm';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -191,6 +192,7 @@ async function transformMDX(
     development: false,
     jsx: false,
     jsxImportSource: '@emberkit/core',
+    remarkPlugins: [remarkGfm],
   });
 
   let compiledCode = String(compiled);
@@ -249,6 +251,28 @@ ${componentsOverride}
 
 ${compiledCode}
 
+function _GfmTable(props) {
+  return createElement('div', { className: 'table-wrapper' },
+    createElement('table', { className: 'gfm-table' }, props.children)
+  );
+}
+
+function _GfmUl(props) {
+  return createElement('ul', { className: 'task-list' }, props.children);
+}
+
+function _GfmLi(props) {
+  return createElement('li', { className: 'task-item' }, props.children);
+}
+
+function _GfmDel(props) {
+  return createElement('span', { className: 'strikethrough' }, props.children);
+}
+
+function _GfmSup(props) {
+  return createElement('span', { className: 'footnote-ref' }, props.children);
+}
+
 export default function MDXComponent(props) {
   const components = {
     ...(props.components || {}),
@@ -258,7 +282,17 @@ export default function MDXComponent(props) {
   return createElement('div', {
     className: 'md-content md-doc',
     'data-file': ${JSON.stringify(id)},
-    children: createElement(_MDXContent, { ...props, components })
+    children: createElement(_MDXContent, { 
+      ...props, 
+      components: {
+        ...components,
+        table: _GfmTable,
+        ul: _GfmUl,
+        li: _GfmLi,
+        del: _GfmDel,
+        sup: _GfmSup,
+      }
+    })
   });
 }
 `;

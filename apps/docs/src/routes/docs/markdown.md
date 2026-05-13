@@ -85,10 +85,12 @@ console.log(result.data); // { title: 'My Post', date: '2025-01-15', tags: [...]
 | Links | `[text](url)` | Supported |
 | Images | `![alt](src)` | Supported |
 | Blockquotes | `> quote` | Supported |
+| Footnotes | `[^1]` | Supported |
+| Definition Lists | `term: definition` | Supported |
 
 ## MDX Compiler
 
-For more complex use cases, use the MDX compiler:
+For more complex use cases, use the MDX compiler. MDX files support all Markdown features plus JSX:
 
 ```tsx
 import { compileMDX } from '@emberkit/core';
@@ -97,6 +99,13 @@ const component = await compileMDX(`
 # Title
 
 Some content with **markup**.
+
+- [x] Task 1
+- [ ] Task 2
+
+| Column 1 | Column 2 |
+|----------|----------|
+| Cell 1   | Cell 2   |
 `);
 
 // component is a function that returns JSX

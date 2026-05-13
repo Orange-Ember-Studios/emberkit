@@ -441,6 +441,18 @@
     font-style: italic;
   }
 
+  /* ===== Strikethrough ===== */
+  .md-content del {
+    color: #6b7280;
+    text-decoration: line-through;
+    text-decoration-color: rgba(107, 114, 128, 0.5);
+  }
+
+  .md-content del:hover {
+    color: #9ca3af;
+    text-decoration-color: rgba(156, 163, 175, 0.7);
+  }
+
   /* ===== Task Lists ===== */
   .md-content .task-list {
     list-style: none;
@@ -506,5 +518,60 @@
 
   .md-content a:hover::after {
     width: 100%;
+  }
+
+  /* ===== Footnotes ===== */
+  .md-content .footnotes {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .md-content .footnotes hr {
+    display: none;
+  }
+
+  .md-content .footnotes ol {
+    padding-left: 1.5rem;
+  }
+
+  .md-content .footnotes li {
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    color: #6b7280;
+  }
+
+  .md-content sup {
+    font-size: 0.75em;
+    vertical-align: super;
+    line-height: 0;
+  }
+
+  .md-content sup a {
+    color: oklch(72% 0.19 50);
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .md-content sup a:hover {
+    color: oklch(80% 0.19 50);
+  }
+
+  /* ===== Definition Lists (GFM) ===== */
+  .md-content dl {
+    margin: 1rem 0;
+    padding: 0;
+  }
+
+  .md-content dt {
+    font-weight: 600;
+    color: #f3f4f6;
+    margin-bottom: 0.25rem;
+  }
+
+  .md-content dd {
+    margin-left: 1.5rem;
+    margin-bottom: 1rem;
+    color: #9ca3af;
   }
 }
