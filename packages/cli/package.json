@@ -42,10 +42,10 @@
   },
   "dependencies": {
     "commander": "^11.1.0",
-    "inquirer": "^9.2.0"
+    "inquirer": "^9.2.0",
+    "@emberkit/tsconfig": "^0.2.1"
   },
   "devDependencies": {
-    "@types/inquirer": "^9.0.3",
-    "@emberkit/tsconfig": "^0.2.1"
+    "@types/inquirer": "^9.0.3"
   }
 }

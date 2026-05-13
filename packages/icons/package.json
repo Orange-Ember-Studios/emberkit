@@ -41,8 +41,10 @@
   "peerDependencies": {
     "@emberkit/core": "workspace:*"
   },
-  "devDependencies": {
-    "@emberkit/core": "workspace:*",
+  "dependencies": {
     "@emberkit/tsconfig": "^0.2.1"
+  },
+  "devDependencies": {
+    "@emberkit/core": "workspace:*"
   }
 }
