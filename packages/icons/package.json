@@ -43,6 +43,6 @@
   },
   "devDependencies": {
     "@emberkit/core": "workspace:*",
-    "@emberkit/tsconfig": "workspace:*"
+    "@emberkit/tsconfig": "^0.2.0"
   }
 }
