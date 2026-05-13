@@ -1,13 +1,22 @@
 {
-  "extends": "@emberkit/tsconfig/base.json",
   "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": false,
     "outDir": "./dist",
     "rootDir": "./src",
-    "noEmit": false,
-    "allowImportingTsExtensions": false,
-    "module": "ESNext",
-    "moduleResolution": "bundler"
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
   },
   "include": ["src/**/*"],
-  "exclude": ["src/templates/starter/**/*"]
+  "exclude": ["node_modules", "dist", "src/templates/starter/**/*"]
 }

@@ -38,8 +38,6 @@
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
     "test": "vitest"
   },
-  "dependencies": {
-    "@emberkit/tsconfig": "^0.2.1"
-  },
+  "dependencies": {},
   "devDependencies": {}
 }
