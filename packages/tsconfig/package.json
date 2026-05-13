@@ -21,7 +21,8 @@
     "access": "public"
   },
   "files": [
-    "base.json"
+    "base.json",
+    "package.json"
   ],
   "exports": {
     ".": "./base.json",
