@@ -42,6 +42,7 @@ import {
   IconChrome, IconFirefox, IconWindows, IconApple,
   IconLinux, IconAndroid, IconHeroku, IconVercel,
   IconNetlify, IconCloudflare, IconAWS, IconGCP, IconAzure,
+  IconEmberKit,
 } from '@emberkit/icons';
 
 type IconComponent = (props: { size?: number; className?: string; color?: string }) => unknown;
@@ -210,6 +211,7 @@ const icons: IconEntry[] = [
   { name: 'IconAWS', component: IconAWS },
   { name: 'IconGCP', component: IconGCP },
   { name: 'IconAzure', component: IconAzure },
+  { name: 'IconEmberKit', component: IconEmberKit },
 ];
 
 function IconShowcase() {

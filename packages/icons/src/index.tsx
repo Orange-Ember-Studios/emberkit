@@ -1702,3 +1702,17 @@ export default {
   GCP: IconGCP,
   Azure: IconAzure,
 };
+
+export const IconEmberKit = createSvgIcon({
+  viewBox: '0 0 32 32',
+  fill: 'currentColor',
+  stroke: false,
+  children: [
+    {
+      type: 'path',
+      props: {
+        d: 'M16 2c0 0-7 9-7 15.5c0 4.5 2.5 8 5.5 9.5c.5-2 2-3.5 3.5-4.5c1.5-1 3-1.5 4-1.5c.5 2.5-1 5-3 6.5c-2 1.5-4.5 1.5-6.5 0c-2-1.5-2.5-4-1.5-6.5c.5-1.5 1.5-3 3-4.5c1.5-1.5 2.5-3.5 2.5-6c0-2-1-4-2.5-5c1 0 1.5.5 1.5.5z',
+      },
+    },
+  ],
+});
