@@ -1,41 +1,62 @@
 import type { Signal, SignalOptions } from '../types.js';
-import { DEFAULT_EQUALS } from '../types.js';
+
+let sigIndex = 0;
+const sigRegistry = new Map<number, { subscribe: (fn: (v: unknown) => void) => () => void }>();
+
+export function resetSigIndex(): void { sigIndex = 0; }
+
+export function getSignalByIndex(idx: number): { subscribe: (fn: (v: unknown) => void) => () => void } | undefined {
+  return sigRegistry.get(idx);
+}
 
 export function createSignal<T>(
   initialValue: T,
   options: SignalOptions<T> = {},
 ): [() => T, (newValue: T) => void] & Signal<T> {
-  const { equals = DEFAULT_EQUALS } = options;
   let value = initialValue;
+  const subs = new Set<(v: T) => void>();
 
-  function notify(): void {
-    void equals;
-  }
+  const idx = sigIndex++;
 
   function getter(): T {
     return value;
   }
+  (getter as any).__idx = idx;
 
-  function setter(newValue: T): void {
-    if (!equals(value, newValue)) {
-      value = newValue;
-      notify();
+  function setter(newValue: T | ((prev: T) => T)): void {
+    const next = typeof newValue === 'function' ? (newValue as (prev: T) => T)(value) : newValue;
+    if (value === next) return;
+    value = next;
+    if (subs.size > 0) {
+      const fns = [...subs];
+      for (let i = 0; i < fns.length; i++) fns[i](value);
     }
   }
+
+  function subscribe(fn: (v: T) => void): () => void {
+    subs.add(fn);
+    return () => subs.delete(fn);
+  }
+
+  sigRegistry.set(idx, { subscribe: subscribe as (fn: (v: unknown) => void) => () => void });
 
   const signal = {
     get value(): T {
       return value;
     },
-    set value(newValue: T) {
-      if (!equals(value, newValue)) {
-        value = newValue;
-        notify();
+    set value(newValue: T | ((prev: T) => T)) {
+      const next = typeof newValue === 'function' ? (newValue as (prev: T) => T)(value) : newValue;
+      if (value === next) return;
+      value = next;
+      if (subs.size > 0) {
+        const fns = [...subs];
+        for (let i = 0; i < fns.length; i++) fns[i](value);
       }
     },
     peek(): T {
       return value;
     },
+    subscribe,
     [Symbol.iterator](): IterableIterator<(() => T) | ((newValue: T) => void)> {
       let index = 0;
       const methods = [getter, setter];
@@ -53,7 +74,6 @@ export function createSignal<T>(
     },
   } as [() => T, (newValue: T) => void] & Signal<T>;
 
-  // Make it array-like for tuple destructuring: [getter, setter]
   signal[0] = getter;
   signal[1] = setter;
   (signal as any).length = 2;
@@ -83,6 +103,7 @@ export function createMemo<T>(
       }
       return value;
     },
+    subscribe: () => (() => {}) as () => void,
   };
 }
 

@@ -14,6 +14,7 @@
     "@emberkit/cli": "workspace:*",
     "@emberkit/core": "workspace:*",
     "@emberkit/icons": "workspace:*",
+    "@emberkit/ui": "workspace:*",
     "@tailwindcss/vite": "^4.3.0",
     "tailwindcss": "^4.3.0",
     "vite": "^6.0.0"

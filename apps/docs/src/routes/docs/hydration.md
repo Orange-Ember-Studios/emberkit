@@ -1,82 +1,108 @@
 # Hydration
 
-Hydration is the process of making server-rendered HTML interactive. Only components with event handlers receive JavaScript — static content stays as pure HTML.
+Hydration is the process of making server-rendered HTML interactive. EmberKit's hydration is lightweight and targeted — instead of re-rendering the entire component tree, it connects signals to specific DOM elements via declarative `data-ek-bind` attributes.
 
 ## How It Works
 
-1. Server renders the full page as HTML
-2. Browser displays the HTML immediately (fast First Contentful Paint)
-3. EmberKit analyzes the DOM for interactive elements
-4. Only interactive elements are hydrated with JavaScript
+1. **SSR renders the full HTML** — All components render to HTML on the server. Zero JavaScript is needed to see the page.
+
+2. **Browser displays HTML immediately** — Fast First Contentful Paint. The page is fully visible and usable.
+
+3. **Hydration scans for bindings** — A tiny script (`~1KB`) runs after the page loads. It finds elements with `data-ek-bind` attributes and connects signals to DOM nodes via `signal.subscribe()`.
+
+4. **Targeted updates** — When a signal changes, only the bound DOM element updates. No virtual DOM, no diffing, no re-render.
 
 ```tsx
-// This component gets NO JavaScript — pure HTML
+// Static: pure HTML, zero JS
 function Footer() {
-  return <footer>© 2025 EmberKit</footer>;
+  return <footer>&copy; 2025 EmberKit</footer>;
 }
 
-// This component gets hydration JavaScript
+// Interactive: signal-driven DOM binding
 function Counter() {
   const [count, setCount] = createSignal(0);
-  return <button onClick={() => setCount(c => c + 1)}>Count: {count()}</button>;
+  return (
+    <div>
+      <button onClick={() => setCount(c => c + 1)}>+</button>
+      <span data-ek-bind={count}>{count()}</span>
+      <button onClick={() => setCount(c => c - 1)}>-</button>
+    </div>
+  );
 }
 ```
 
-## Hydration Strategies
+## data-ek-bind Reference
 
-EmberKit determines the best strategy per element:
+`data-ek-bind` connects a signal getter directly to a DOM element. The framework serializes the signal's identity during SSR and reconnects it during hydration.
 
-| Strategy | When | Behavior |
-|----------|------|----------|
-| `eager` | Elements with event handlers | Hydrate immediately |
-| `lazy` | Interactive but not critical | Hydrate on idle |
-| `deferred` | Non-urgent interactive | Hydrate after timeout |
-| `none` | Static elements | Never hydrate |
+| Pattern | Behavior |
+|---------|----------|
+| `<span data-ek-bind={count}>{count()}</span>` | Updates `textContent` when signal changes |
+| `<div data-ek-bind={open} data-ek-show="opacity-100" data-ek-hide="opacity-0">` | Adds/removes CSS classes based on truthiness |
+| `<div data-ek-bind={tab} data-ek-show-when="preview">` | Toggles a `hidden` class when signal equals a specific string |
 
-## Controlling Hydration
+### textContent Binding (default)
 
-Use `data-hydrate` attributes to override the default strategy:
-
-```tsx
-// Never hydrate this element
-<div data-hydrate="false">Static content</div>
-
-// Hydrate lazily
-<div data-hydrate="lazy">Low priority interactive</div>
-
-// Hydrate after 2 seconds
-<div data-hydrate="deferred">Deferred interactive</div>
-```
-
-## Analyzing Hydration
-
-The analyzer inspects the component tree to determine what needs hydration:
-
-```typescript
-import { analyzeTree } from '@emberkit/core';
-
-const manifest = analyzeTree(rootElement);
-console.log(manifest.hydrationRequired);  // elements needing JS
-console.log(manifest.hydrationSkipped);    // static elements
-```
-
-## Performance Impact
-
-| Approach | Bundle Size | FCP | TTI |
-|----------|------------|-----|-----|
-| Traditional SPA | ~100KB+ | Slow | Slow |
-| EmberKit selective | ~5-10KB | Fast | Fast |
-| Static only | 0KB | Instant | Instant |
-
-## Example
+No extra attributes needed — the element's text stays in sync:
 
 ```tsx
-import { createSignal } from '@emberkit/core';
+const [name, setName] = createSignal('Alice');
+return <p data-ek-bind={name}>{name()}</p>;
+// When setName('Bob'), the <p> textContent updates.
+```
 
+### Class Toggle Binding
+
+Use `data-ek-show` / `data-ek-hide` to toggle CSS class sets based on a boolean signal:
+
+```tsx
+const [open, setOpen] = createSignal(false);
+return (
+  <div data-ek-bind={open} data-ek-show="opacity-100" data-ek-hide="opacity-0 pointer-events-none" class="opacity-0 pointer-events-none">
+    Panel content
+  </div>
+);
+```
+
+### String Match Binding
+
+Use `data-ek-show-when` for tab-like switching:
+
+```tsx
+const [tab, setTab] = createSignal('preview');
+return (
+  <>
+    <div data-ek-bind={tab} data-ek-show-when="preview" class="p-4">Preview panel</div>
+    <div data-ek-bind={tab} data-ek-show-when="code" class="p-4 hidden">Code panel</div>
+  </>
+);
+```
+
+Customize the hide class with `data-ek-hide-class` (defaults to `"hidden"`).
+
+## Components Accepting Signals
+
+Interactive components detect when a prop is a signal (has `__idx` / `subscribe`) and apply bindings automatically. This keeps consumer code clean:
+
+```tsx
+const [open, setOpen] = createSignal(false);
+
+// Pass the signal — Modal handles data-ek-bind internally
+<Modal open={open} onClose={() => setOpen(false)} />
+
+// Or pass a plain boolean — SSR only, no hydration
+<Modal open={true} />
+```
+
+## What Gets Hydrated
+
+Only elements with `data-ek-bind` or event handlers (`data-ekclick`) receive JavaScript. Everything else stays as pure HTML.
+
+```tsx
 function App() {
   return (
     <div>
-      {/* No JS — renders as static HTML */}
+      {/* Zero JS — pure HTML */}
       <header>
         <h1>My App</h1>
         <nav>
@@ -85,48 +111,28 @@ function App() {
         </nav>
       </header>
 
-      {/* Gets hydration JS */}
-      <SearchBar />
+      {/* Gets hydration — signal binding on value */}
+      <span data-ek-bind={count}>{count()}</span>
 
-      {/* No JS — pure content */}
+      {/* Zero JS — pure content */}
       <article>
         <p>This content never needs JavaScript.</p>
       </article>
-
-      {/* Gets hydration JS */}
-      <CommentForm />
     </div>
-  );
-}
-
-function SearchBar() {
-  const [query, setQuery] = createSignal('');
-  return (
-    <input
-      type="search"
-      value={query()}
-      onInput={(e) => setQuery(e.target.value)}
-      placeholder="Search..."
-    />
-  );
-}
-
-function CommentForm() {
-  const [comment, setComment] = createSignal('');
-  return (
-    <form onSubmit={(e) => { e.preventDefault(); /* submit */ }}>
-      <textarea
-        value={comment()}
-        onInput={(e) => setComment(e.target.value)}
-      />
-      <button type="submit">Post</button>
-    </form>
   );
 }
 ```
 
+## Performance Impact
+
+| Approach | Bundle Size | FCP | TTI |
+|----------|------------|-----|-----|
+| Traditional SPA | ~100KB+ | Slow | Slow |
+| EmberKit hydration | ~1-2KB | Fast | Fast |
+| Static only | 0KB | Instant | Instant |
+
 ## Next Steps
 
-- [SSR](/docs/ssr) - Server-side rendering
-- [Components](/docs/components) - Static vs interactive components
-- [Edge Deployment](/docs/edge) - Edge SSR performance
+- [Signals](/docs/signals) — Signal API and subscribe
+- [SSR](/docs/ssr) — Server-side rendering
+- [Components](/docs/components) — Static vs interactive components

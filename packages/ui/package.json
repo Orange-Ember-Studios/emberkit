@@ -1,0 +1,80 @@
+{
+  "name": "@emberkit/ui",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Atomic design system for EmberKit – tokens, atoms, molecules, organisms, templates",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/orange-ember-studios/emberkit.git",
+    "directory": "packages/ui"
+  },
+  "homepage": "https://emberkit.dev",
+  "keywords": [
+    "emberkit",
+    "ui",
+    "design-system",
+    "atomic-design",
+    "tailwind"
+  ],
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "style": "./dist/tokens/tokens.css",
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./tokens": {
+      "import": "./dist/tokens/index.js",
+      "types": "./dist/tokens/index.d.ts"
+    },
+    "./tokens.css": {
+      "import": "./dist/tokens/tokens.css",
+      "style": "./dist/tokens/tokens.css"
+    },
+    "./atoms": {
+      "import": "./dist/atoms/index.js",
+      "types": "./dist/atoms/index.d.ts"
+    },
+    "./molecules": {
+      "import": "./dist/molecules/index.js",
+      "types": "./dist/molecules/index.d.ts"
+    },
+    "./organisms": {
+      "import": "./dist/organisms/index.js",
+      "types": "./dist/organisms/index.d.ts"
+    },
+    "./templates": {
+      "import": "./dist/templates/index.js",
+      "types": "./dist/templates/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc && cp src/tokens/tokens.css dist/tokens/tokens.css",
+    "dev": "tsc --watch",
+    "lint": "eslint src --ext .ts,.tsx",
+    "format": "prettier --write \"src/**/*.{ts,tsx,css}\""
+  },
+  "dependencies": {
+    "@emberkit/core": "^0.2.0",
+    "@emberkit/icons": "^0.2.0"
+  },
+  "devDependencies": {
+    "@emberkit/core": "^0.2.0",
+    "@emberkit/icons": "^0.2.0",
+    "tailwindcss": "^4.0.0"
+  },
+  "peerDependencies": {
+    "@emberkit/core": "^0.2.0",
+    "@emberkit/icons": "^0.2.0",
+    "tailwindcss": "^4.0.0"
+  }
+}

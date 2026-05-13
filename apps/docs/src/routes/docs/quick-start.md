@@ -43,6 +43,8 @@ export default function PostPage({ data }: { data: { slug: string } }) {
 
 ## Use Signals for State
 
+Signals store state and automatically update the DOM without re-rendering. Use `data-ek-bind` to connect a signal to an element:
+
 ```tsx
 import { createSignal } from '@emberkit/core';
 
@@ -51,7 +53,9 @@ function Counter() {
 
   return (
     <div>
-      <p>Count: {count()}</p>
+      <p>
+        Count: <span data-ek-bind={count}>{count()}</span>
+      </p>
       <button onClick={() => setCount(c => c + 1)}>
         Increment
       </button>
@@ -59,6 +63,23 @@ function Counter() {
   );
 }
 ```
+
+The `<span>` renders with the initial count value in the HTML. When the button is clicked, `setCount` updates the signal, and only the `<span>`'s `textContent` changes — no re-render of the whole component.
+
+### DOM Binding Patterns
+
+```tsx
+// textContent sync (default)
+<span data-ek-bind={name}>{name()}</span>
+
+// Class toggle (show/hide)
+<div data-ek-bind={open} data-ek-show="opacity-100" data-ek-hide="opacity-0 pointer-events-none">
+
+// String match (tabs)
+<div data-ek-bind={tab} data-ek-show-when="preview">Preview</div>
+```
+
+See [Hydration](/docs/hydration) for the full reference.
 
 ## Add Navigation
 

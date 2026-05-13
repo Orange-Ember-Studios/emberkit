@@ -1,5 +1,6 @@
 import type { JSXElementProps, JSXNode, DOMElement, JSXElement } from './types.js';
 import { renderToString, getHandler, clearHandlers } from './helpers/render.js';
+import { getSignalByIndex } from '../signals/helpers/core.js';
 
 export function createElement(
   type: string | ((props: JSXElementProps) => JSXNode),
@@ -39,14 +40,65 @@ function renderToTarget(
   routeComponent?: (props: Record<string, unknown>) => JSXNode,
 ): void {
   clearHandlers();
+
   const jsxElement: JSXElement = {
     type: layout,
     props: routeComponent ? { children: [createElement(routeComponent, {})] } : {},
   } as JSXElement;
 
   const html = renderToString(jsxElement);
+
   target.innerHTML = html;
   attachEventHandlers(target);
+  hydrateSignalBindings(target);
+}
+
+function hydrateSignalBindings(container: Element): void {
+  const els = container.querySelectorAll('[data-ek-bind]');
+  els.forEach((el) => {
+    const idx = parseInt(el.getAttribute('data-ek-bind') ?? '', 10);
+    if (isNaN(idx)) return;
+    const sig = getSignalByIndex(idx);
+    if (!sig) return;
+    const showClasses = el.getAttribute('data-ek-show') ?? '';
+    const hideClasses = el.getAttribute('data-ek-hide') ?? '';
+    const showWhen = el.getAttribute('data-ek-show-when');
+    const hideClass = el.getAttribute('data-ek-hide-class') ?? 'hidden';
+    const activeWhen = el.getAttribute('data-ek-active-when');
+    const activeClass = el.getAttribute('data-ek-active-class');
+    const inactiveClassAttr = el.getAttribute('data-ek-inactive-class');
+
+    sig.subscribe((val: unknown) => {
+      if (activeWhen != null && activeClass != null && activeClass.length > 0) {
+        const isActive = String(val) === activeWhen;
+        activeClass.split(' ').forEach((c) => { if (c) el.classList.toggle(c, isActive); });
+        if (inactiveClassAttr && inactiveClassAttr.length > 0) {
+          inactiveClassAttr.split(' ').forEach((c) => { if (c) el.classList.toggle(c, !isActive); });
+        }
+        return;
+      }
+      if (activeClass != null && activeClass.length > 0 && (!inactiveClassAttr || inactiveClassAttr.length === 0)) {
+        const isVisible = !!val;
+        activeClass.split(' ').forEach((c) => { if (c) el.classList.toggle(c, isVisible); });
+        return;
+      }
+      if (showWhen != null) {
+        el.classList.toggle(hideClass, String(val) !== showWhen);
+        return;
+      }
+      if (showClasses || hideClasses) {
+        const isVisible = !!val;
+        if (showClasses) {
+          showClasses.split(' ').forEach((c) => el.classList.toggle(c, isVisible));
+        }
+        if (hideClasses) {
+          hideClasses.split(' ').forEach((c) => el.classList.toggle(c, !isVisible));
+        }
+        return;
+      }
+      el.textContent = String(val);
+    });
+  });
 }
 
 export function render(

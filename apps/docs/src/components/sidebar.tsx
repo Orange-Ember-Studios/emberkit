@@ -30,6 +30,7 @@ const docs = [
       { title: 'SEO & Meta', path: '/docs/meta' },
       { title: 'Head Component', path: '/docs/head' },
       { title: 'Icons', path: '/docs/icons' },
+      { title: 'UI Components', path: '/docs/ui' },
     ],
   },
   {

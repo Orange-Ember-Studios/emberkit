@@ -78,16 +78,18 @@ export function renderElementToHTML(element: JSXElement): string {
     .filter(([key, value]) => {
       if (key === 'children' || key === 'key') return false;
       if (typeof value === 'object' && value !== null && '__html' in (value as Record<string, unknown>)) return false;
+      if (value == null) return false;
+      if (typeof value === 'function' && key !== 'data-ek-bind') return false;
       return true;
     })
-    .filter(([, value]) => typeof value !== 'function' && value != null)
     .map(([key, value]) => {
-      // Map React/JSX prop names to HTML attributes
       if (key === 'className') key = 'class';
       if (key === 'strokeWidth' || key === 'strokeLinecap' || key === 'strokeLinejoin') {
         key = key.replace(/([A-Z])/g, '-$1').toLowerCase();
       }
-      
+      if (key === 'data-ek-bind' && typeof value === 'function' && (value as any).__idx != null) {
+        return ` data-ek-bind="${(value as any).__idx}"`;
+      }
       if (value === true) return ` ${key}`;
       if (value === false) return '';
       return ` ${key}="${value}"`;

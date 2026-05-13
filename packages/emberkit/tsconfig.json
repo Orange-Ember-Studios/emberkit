@@ -6,6 +6,8 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "noEmit": false,
+    "declaration": true,
+    "declarationMap": true,
     "skipLibCheck": true,
     "strict": false,
     "jsx": "react-jsx",
@@ -15,6 +17,14 @@
     "noUnusedParameters": false,
     "noImplicitAny": false
   },
-  "include": ["src/**/*"],
-  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx", "src/forms/__tests__/**", "src/meta/__tests__/**", "src/loader/__tests__/**"]
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
+    "src/forms/__tests__/**",
+    "src/meta/__tests__/**",
+    "src/loader/__tests__/**"
+  ]
 }

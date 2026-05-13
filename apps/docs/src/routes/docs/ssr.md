@@ -102,7 +102,7 @@ SSR works at the edge. See [Edge Deployment](/docs/edge) for deploying to Cloudf
 - Sub-50ms TTFB for SSR
 - Streaming support for large pages
 - Automatic code splitting
-- Selective hydration (only interactive components get JS)
+- Selective hydration via `data-ek-bind` (only bound elements get JS)
 
 ## Next Steps
 

@@ -78,8 +78,8 @@ function TodoList({ items }: { items: string[] }) {
 
 EmberKit makes a key distinction:
 
-- **Static components** (no event handlers) render to pure HTML with zero JavaScript
-- **Interactive components** (with `onClick`, `onChange`, etc.) receive client-side hydration
+- **Static components** (no event handlers, no signal bindings) render to pure HTML with zero JavaScript
+- **Interactive components** (with `onClick`, `onChange`, etc. or `data-ek-bind`) receive targeted client-side hydration
 
 ```tsx
 // Static: renders to <h1>Hello</h1>, no JS shipped
@@ -87,12 +87,42 @@ function Title() {
   return <h1>Hello</h1>;
 }
 
-// Interactive: ships a small hydration script
+// Interactive via event handler (data-ekclick)
 function Counter() {
   const [count, setCount] = createSignal(0);
-  return <button onClick={() => setCount(c => c + 1)}>Count: {count()}</button>;
+  return (
+    <div>
+      <button onClick={() => setCount(c => c + 1)}>+</button>
+      <span data-ek-bind={count}>{count()}</span>
+    </div>
+  );
+}
+
+// Interactive via signal binding only (no events, still gets JS)
+function LiveTime() {
+  const [time, setTime] = createSignal(new Date().toLocaleTimeString());
+  setInterval(() => setTime(new Date().toLocaleTimeString()), 1000);
+  return <p data-ek-bind={time}>{time()}</p>;
 }
 ```
+
+Components can accept signals directly — the component decides whether to apply bindings:
+
+```tsx
+// Consumer passes the signal, component handles binding
+<Modal open={open} onClose={() => setOpen(false)} />
+
+// Component implementation
+function Modal({ open, onClose }: { open: (() => boolean) | boolean; onClose: () => void }) {
+  const isSignal = typeof open === 'function' && (open as any).__idx != null;
+  const openVal = isSignal ? (open as () => boolean)() : open;
+  const bindAttr = isSignal ? { 'data-ek-bind': open, 'data-ek-show': 'opacity-100', 'data-ek-hide': 'opacity-0 pointer-events-none' } : {};
+
+  return <div class={openVal ? 'opacity-100' : 'opacity-0 pointer-events-none'} {...bindAttr}>...</div>;
+}
+```
+
+See [Hydration](/docs/hydration) for the complete `data-ek-bind` reference.
 
 ## Props Interface
 

@@ -5,11 +5,13 @@ export interface SignalOptions<T> {
 export interface Signal<T> {
   value: T;
   readonly peek: () => T;
+  subscribe: (fn: (v: T) => void) => () => void;
 }
 
 export interface ReadonlySignal<T> {
   readonly value: T;
   readonly peek: () => T;
+  subscribe: (fn: (v: T) => void) => () => void;
 }
 
 export interface WritableSignal<T> extends Signal<T> {
