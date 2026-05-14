@@ -1,5 +1,11 @@
 # @emberkit/edge
 
+## 0.2.1
+
+### Patch Changes
+
+- fcea5e8: fix: resolve TS2580 process global error in getMemoryUsage by accessing via globalThis
+
 ## 0.1.2
 
 ### Patch Changes
