@@ -7,7 +7,7 @@
     "dev": "emberkit dev",
     "build": "emberkit build",
     "preview": "emberkit preview",
-    "deploy": "wrangler deploy",
+    "deploy": "pnpm --filter @emberkit/cli build && wrangler deploy",
     "deploy:preview": "wrangler deploy --preview"
   },
   "dependencies": {

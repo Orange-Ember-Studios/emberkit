@@ -58,9 +58,9 @@ const Alert: FC<AlertProps> = ({
   return (
     <div class={cls} role="alert">
       <Icon name={iconName(variant)} size={20} className={`mt-0.5 shrink-0 ${textCls}`} />
-      <div class={`flex-1 ${textCls}`}>
-        {title && <p class="text-sm font-semibold">{title}</p>}
-        {children && <p class="text-sm">{children}</p>}
+      <div class="flex-1">
+        {title && <p class={`text-sm font-semibold ${textCls}`}>{title}</p>}
+        {children && <p class={`text-sm ${textCls}`}>{children}</p>}
       </div>
       {dismissible && (
         <button
