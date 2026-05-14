@@ -1,5 +1,11 @@
 # @emberkit/ui
 
+## 0.2.2
+
+### Patch Changes
+
+- f871c4b: fix: apply text color class directly to Alert p elements to avoid .md-content override
+
 ## 0.2.1
 
 ### Patch Changes
