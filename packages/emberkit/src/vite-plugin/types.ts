@@ -10,6 +10,10 @@ export interface EmberKitPluginOptions {
   jsx?: 'automatic' | 'classic';
   markdown?: Partial<MarkdownConfig>;
   mdx?: MDXConfig;
+  compression?: {
+    gzip?: boolean;
+    brotli?: boolean;
+  };
 }
 
 export interface MarkdownConfig {
@@ -38,6 +42,10 @@ export const DEFAULT_CONFIG = {
     tables: true,
   },
   mdx: {},
+  compression: {
+    gzip: true,
+    brotli: true,
+  },
 } as const;
 
 export type ResolvedConfig = typeof DEFAULT_CONFIG & EmberKitPluginOptions;

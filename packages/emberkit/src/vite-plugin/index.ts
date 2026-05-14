@@ -6,6 +6,7 @@ import { join, relative, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { compile } from '@mdx-js/mdx';
 import remarkGfm from 'remark-gfm';
+import { compression } from 'vite-plugin-compression2';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -32,7 +33,16 @@ export function emberkitVitePlugin(userOptions: EmberKitPluginOptions = {}): Plu
       const pkgRoot = resolve(__dirname, '..', '..');
       const srcDir = join(pkgRoot, 'src');
 
+      const plugins: Plugin[] = [];
+      if (options.compression?.gzip) {
+        plugins.push(compression({ algorithm: 'gzip' } as any));
+      }
+      if (options.compression?.brotli) {
+        plugins.push(compression({ algorithm: 'brotliCompress' } as any));
+      }
+
       return {
+        plugins,
         resolve: {
           alias: {
             '@emberkit/core': srcDir,
@@ -181,7 +191,7 @@ async function transformMDX(
 
   // Extract code blocks before MDX compilation to preserve syntax
   const codeBlocks: { html: string; index: number }[] = [];
-  let processedContent = content.replace(/```(\w*)\n([\s\S]*?)```/g, (_match, lang, blockCode) => {
+  const processedContent = content.replace(/```(\w*)\n([\s\S]*?)```/g, (_match, lang, blockCode) => {
     const html = renderCodeBlock(lang, blockCode);
     codeBlocks.push({ html, index: codeBlocks.length });
     return `<CodeBlock_${codeBlocks.length - 1} />`;

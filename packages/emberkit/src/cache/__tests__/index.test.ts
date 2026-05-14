@@ -1,16 +1,15 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import {
   DataCache,
-  createCache,
+  // createCache,
   getCached,
   setCache,
   invalidateCache,
   clearAllCache,
-  buildCacheHeader,
-  parseCacheHeader,
-  prefetch,
+  // prefetch,
   staleWhileRevalidate,
 } from '../index.js';
+
 
 describe('Cache', () => {
   describe('DataCache', () => {
