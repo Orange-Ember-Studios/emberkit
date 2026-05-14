@@ -40,10 +40,9 @@ describe('Mutations', () => {
     it('should call onMutate', async () => {
       const onMutate = vi.fn().mockResolvedValue({ temp: true });
 
-      const action = createAction(
-        async (vars: { value: number }) => ({ result: vars.value * 2 }),
-        { onMutate },
-      );
+      const action = createAction(async (vars: { value: number }) => ({ result: vars.value * 2 }), {
+        onMutate,
+      });
 
       await action({ value: 5 });
 
@@ -66,16 +65,16 @@ describe('Mutations', () => {
     it('should call onError', async () => {
       const onError = vi.fn();
 
-      const action = createAction(async (_vars: unknown) => {
-        throw new Error('Test error');
-      }, { onError });
+      const action = createAction(
+        async (_vars: unknown) => {
+          throw new Error('Test error');
+        },
+        { onError },
+      );
 
       await action({});
 
-      expect(onError).toHaveBeenCalledWith(
-        expect.any(Error),
-        {},
-      );
+      expect(onError).toHaveBeenCalledWith(expect.any(Error), {});
     });
   });
 
@@ -126,7 +125,9 @@ describe('Mutations', () => {
 
   describe('handleAction', () => {
     it('should handle POST with JSON', async () => {
-      const action: ActionHandler<{ created: boolean; name: string }, { name: string }> = async (vars) => ({
+      const action: ActionHandler<{ created: boolean; name: string }, { name: string }> = async (
+        vars,
+      ) => ({
         created: true,
         name: vars.name,
       });
@@ -144,7 +145,9 @@ describe('Mutations', () => {
     });
 
     it('should handle GET with query params', async () => {
-      const action: ActionHandler<{ found: boolean; id: string }, { id: string }> = async (vars) => ({
+      const action: ActionHandler<{ found: boolean; id: string }, { id: string }> = async (
+        vars,
+      ) => ({
         found: true,
         id: vars.id,
       });
@@ -212,7 +215,14 @@ describe('Mutations', () => {
     });
 
     it('should invalidate cache', () => {
-      setCachedMutation('key1', { data: 1, error: null, status: 'success', isPending: false, isSuccess: true, isError: false } as any);
+      setCachedMutation('key1', {
+        data: 1,
+        error: null,
+        status: 'success',
+        isPending: false,
+        isSuccess: true,
+        isError: false,
+      } as any);
 
       invalidateMutation('key1');
 

@@ -15,7 +15,10 @@ const contextValues = new Map<symbol, unknown>();
 export interface ContextBridge<T> {
   id: symbol;
   defaultValue: T | undefined;
-  Provider: (props: { value: T; children?: unknown }) => { type: string; props: Record<string, unknown> };
+  Provider: (props: { value: T; children?: unknown }) => {
+    type: string;
+    props: Record<string, unknown>;
+  };
   use: () => T;
 }
 
@@ -68,7 +71,10 @@ export function useContext<T>(context: Context<T>): T {
 }
 
 export function createContextProvider<T>(context: Context<T>) {
-  return function Provider(props: { value: T; children?: unknown }): { type: string; props: Record<string, unknown> } {
+  return function Provider(props: { value: T; children?: unknown }): {
+    type: string;
+    props: Record<string, unknown>;
+  } {
     setContextValue(context, props.value);
     return {
       type: 'Fragment',

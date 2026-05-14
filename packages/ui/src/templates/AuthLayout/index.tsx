@@ -10,8 +10,8 @@ export interface AuthLayoutProps {
 
 const AuthLayout: FC<AuthLayoutProps> = ({
   children,
-  title = 'Welcome back',
-  subtitle = 'Sign in to your account to continue',
+  title = "Welcome back",
+  subtitle = "Sign in to your account to continue",
   logo,
 }) => {
   return (

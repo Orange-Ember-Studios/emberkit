@@ -71,15 +71,25 @@ function hydrateSignalBindings(container: Element): void {
     sig.subscribe((val: unknown) => {
       if (activeWhen != null && activeClass != null && activeClass.length > 0) {
         const isActive = String(val) === activeWhen;
-        activeClass.split(' ').forEach((c) => { if (c) el.classList.toggle(c, isActive); });
+        activeClass.split(' ').forEach((c) => {
+          if (c) el.classList.toggle(c, isActive);
+        });
         if (inactiveClassAttr && inactiveClassAttr.length > 0) {
-          inactiveClassAttr.split(' ').forEach((c) => { if (c) el.classList.toggle(c, !isActive); });
+          inactiveClassAttr.split(' ').forEach((c) => {
+            if (c) el.classList.toggle(c, !isActive);
+          });
         }
         return;
       }
-      if (activeClass != null && activeClass.length > 0 && (!inactiveClassAttr || inactiveClassAttr.length === 0)) {
+      if (
+        activeClass != null &&
+        activeClass.length > 0 &&
+        (!inactiveClassAttr || inactiveClassAttr.length === 0)
+      ) {
         const isVisible = !!val;
-        activeClass.split(' ').forEach((c) => { if (c) el.classList.toggle(c, isVisible); });
+        activeClass.split(' ').forEach((c) => {
+          if (c) el.classList.toggle(c, isVisible);
+        });
         return;
       }
       if (showWhen != null) {
@@ -104,20 +114,24 @@ function hydrateSignalBindings(container: Element): void {
 export function render(
   element: JSXElement | string | null | ((props: Record<string, unknown>) => JSXNode),
   container: Element | string,
-  options?: { hydrate?: boolean; routes?: Array<{ path: string; component: () => Promise<{ default: (props: Record<string, unknown>) => JSXNode }> }> },
+  options?: {
+    hydrate?: boolean;
+    routes?: Array<{
+      path: string;
+      component: () => Promise<{ default: (props: Record<string, unknown>) => JSXNode }>;
+    }>;
+  },
 ): void {
   if (!element) return;
 
-  const target =
-    typeof container === 'string' ? document.querySelector(container) : container;
+  const target = typeof container === 'string' ? document.querySelector(container) : container;
 
   if (!target) {
     throw new Error(`Container element not found: ${container}`);
   }
 
-  const layout = typeof element === 'function'
-    ? element as (props: Record<string, unknown>) => JSXNode
-    : null;
+  const layout =
+    typeof element === 'function' ? (element as (props: Record<string, unknown>) => JSXNode) : null;
 
   if (!layout) {
     const html = renderToString(element as JSXElement);
@@ -132,7 +146,7 @@ export function render(
     return;
   }
 
-  function matchRoute(pathname: string): typeof routes[number] | undefined {
+  function matchRoute(pathname: string): (typeof routes)[number] | undefined {
     const normalized = pathname === '/' ? '/' : pathname.replace(/\/$/, '');
     for (const route of routes) {
       const routePath = route.path === '/' ? '/' : route.path.replace(/\/$/, '');
@@ -145,7 +159,10 @@ export function render(
           let match = true;
           for (let i = 0; i < routeParts.length; i++) {
             if (routeParts[i].startsWith(':')) continue;
-            if (routeParts[i] !== pathParts[i]) { match = false; break; }
+            if (routeParts[i] !== pathParts[i]) {
+              match = false;
+              break;
+            }
           }
           if (match) return route;
         }
@@ -171,7 +188,8 @@ export function render(
     const link = (e.target as HTMLElement).closest('a');
     if (!link) return;
     const href = link.getAttribute('href');
-    if (!href || href.startsWith('http') || href.startsWith('#') || link.target === '_blank') return;
+    if (!href || href.startsWith('http') || href.startsWith('#') || link.target === '_blank')
+      return;
     e.preventDefault();
     history.pushState(null, '', href);
     renderCurrentRoute();
@@ -194,10 +212,7 @@ export function render(
   };
 }
 
-export function hydrate(
-  element: JSXElement | string | null,
-  container: Element | string,
-): void {
+export function hydrate(element: JSXElement | string | null, container: Element | string): void {
   render(element, container, { hydrate: true });
 }
 
@@ -206,12 +221,7 @@ export function flushSync(fn: () => void): void {
 }
 
 export function isElement(element: unknown): element is JSXElement {
-  return (
-    typeof element === 'object' &&
-    element !== null &&
-    'type' in element &&
-    'props' in element
-  );
+  return typeof element === 'object' && element !== null && 'type' in element && 'props' in element;
 }
 
 export { type JSXElement, type JSXNode };

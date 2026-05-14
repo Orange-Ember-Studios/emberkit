@@ -15,7 +15,13 @@ export function renderSSR(
   const collectedHead = drainHeadContent();
   const allHeadExtra = [headExtra, collectedHead].filter(Boolean).join('\n');
 
-  const docOptions: { title?: string; lang?: string; doctype?: string; baseUrl?: string; headExtra?: string } = {};
+  const docOptions: {
+    title?: string;
+    lang?: string;
+    doctype?: string;
+    baseUrl?: string;
+    headExtra?: string;
+  } = {};
   if (title !== undefined) docOptions.title = title;
   if (lang !== undefined) docOptions.lang = lang;
   if (doctype !== undefined) docOptions.doctype = doctype;
@@ -40,7 +46,9 @@ export function renderSSRWithError(
   const status = error && 'error' in error ? error.error.status : 500;
   const message = error && 'error' in error ? error.error.message : 'Internal Server Error';
 
-  const errorHtml = error ? `<div class="error"><h1>Error ${status}</h1><p>${message}</p></div>` : '';
+  const errorHtml = error
+    ? `<div class="error"><h1>Error ${status}</h1><p>${message}</p></div>`
+    : '';
 
   const html = renderToHTMLString(element) + errorHtml;
   const collectedHead = drainHeadContent();

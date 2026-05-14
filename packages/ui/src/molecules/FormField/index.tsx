@@ -1,5 +1,10 @@
 type FC<P> = (props: P) => unknown;
-import { Text, Input, type InputSize, type InputProps } from '../../atoms/index.js';
+import {
+  Text,
+  Input,
+  type InputSize,
+  type InputProps,
+} from "../../atoms/index.js";
 
 export interface FormFieldProps {
   label: string;
@@ -10,7 +15,7 @@ export interface FormFieldProps {
   size?: InputSize;
   children?: unknown;
   [key: string]: unknown;
-  inputProps?: Omit<InputProps, 'name' | 'size'>;
+  inputProps?: Omit<InputProps, "name" | "size">;
 }
 
 const FormField: FC<FormFieldProps> = ({
@@ -19,7 +24,7 @@ const FormField: FC<FormFieldProps> = ({
   error,
   hint,
   required = false,
-  size = 'md',
+  size = "md",
   inputProps,
 }) => {
   return (
@@ -36,10 +41,14 @@ const FormField: FC<FormFieldProps> = ({
         {...inputProps}
       />
       {hint && !error && (
-        <Text size="xs" color="muted">{hint}</Text>
+        <Text size="xs" color="muted">
+          {hint}
+        </Text>
       )}
       {error && (
-        <Text size="xs" color="error">{error}</Text>
+        <Text size="xs" color="error">
+          {error}
+        </Text>
       )}
     </div>
   );

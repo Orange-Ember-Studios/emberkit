@@ -74,6 +74,29 @@ class MarkdownParser {
     return { html, frontmatter, headings, links, images, codeBlocks };
   }
 
+  private escapeHtml(text: string): string {
+    return text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  private extractCodeBlocks(content: string): CodeBlock[] {
+    const blocks: CodeBlock[] = [];
+    const regex = /```(\w*)\n([\s\S]*?)```/g;
+    let match;
+
+    while ((match = regex.exec(content)) !== null) {
+      blocks.push({
+        lang: match[1],
+        code: match[2].trim(),
+      });
+    }
+
+    return blocks;
+  }
+
   private extractFrontmatter(markdown: string): Record<string, unknown> | undefined {
     const match = markdown.match(/^---\n([\s\S]*?)\n---/);
 
@@ -94,7 +117,10 @@ class MarkdownParser {
       else if (value === 'false') value = false;
       else if (!isNaN(Number(value))) value = Number(value);
       else if (typeof value === 'string' && value.startsWith('[')) {
-        value = value.replace(/[\[\]]/g, '').split(',').map((s) => s.trim());
+        value = value
+          .replace(/[\[\]]/g, '')
+          .split(',')
+          .map((s) => s.trim());
       }
 
       result[key] = value;
@@ -103,153 +129,52 @@ class MarkdownParser {
     return result;
   }
 
-  private removeFrontmatter(markdown: string): string {
-    return markdown.replace(/^---\n[\s\S]*?\n---\n?/, '');
+  private extractHeadings(html: string): Heading[] {
+    const headings: Heading[] = [];
+    const regex = /<h(\d) id="([^"]+)">([^<]+)<\/h\1>/g;
+    let match;
+
+    while ((match = regex.exec(html)) !== null) {
+      headings.push({
+        level: parseInt(match[1]),
+        text: match[3],
+        id: match[2],
+      });
+    }
+
+    return headings;
   }
 
-  private renderMarkdown(content: string): string {
-    // Step 1: Extract all fenced code blocks before any markdown processing
-    const codeBlocks: string[] = [];
-    let html = content.replace(/```(\w*)\n([\s\S]*?)```/g, (_match, lang, code) => {
-      const escaped = this.escapeHtml(code.trim());
-      codeBlocks.push(`<pre><code class="language-${lang}">${escaped}</code></pre>`);
-      return `\n__CODE_BLOCK_${codeBlocks.length - 1}__\n`;
-    });
+  private extractImages(content: string): ImageInfo[] {
+    const images: ImageInfo[] = [];
+    const regex = /!\[([^\]]*)\]\(([^)]+)\)/g;
+    let match;
 
-    // Step 2: Process all other markdown
-    html = this.processHeadings(html);
-    html = this.processHorizontalRules(html);
-    html = this.processLists(html);
-    html = this.processTaskLists(html);
-    html = this.processTables(html);
-    html = this.processImages(html);
-    html = this.processLinks(html);
-    html = this.processBlockquotes(html);
-    html = this.processEmphasis(html);
-    html = this.processLineBreaks(html);
-    html = this.processComponents(html);
+    while ((match = regex.exec(content)) !== null) {
+      const src = match[2];
+      const alt = match[1];
+      const titleMatch = src.match(/"([^"]+)"/);
+      const title = titleMatch ? titleMatch[1] : undefined;
 
-    // Step 3: Restore code blocks
-    html = html.replace(/__CODE_BLOCK_(\d+)__/g, (_, index) => codeBlocks[Number(index)]);
+      images.push({ src, alt, title });
+    }
 
-    return html;
+    return images;
   }
 
-  private processHeadings(html: string): string {
-    return html.replace(/^(#{1,6})\s+(.+)$/gm, (_match, hashes, text) => {
-      const level = hashes.length;
-      const id = this.slugify(text);
-      return `<h${level} id="${id}">${text}</h${level}>`;
-    });
-  }
+  private extractLinks(content: string): string[] {
+    const links: string[] = [];
+    const regex = /\[([^\]]+)\]\(([^)]+)\)/g;
+    let match;
 
-  private processLists(html: string): string {
-    const lines = html.split('\n');
-    const result: string[] = [];
-    let inList = false;
-
-    for (const line of lines) {
-      const orderedMatch = line.match(/^(\d+)\.\s+(.+)/);
-      const unorderedMatch = line.match(/^[-*+]\s+(.+)/);
-
-      if (orderedMatch || unorderedMatch) {
-        const tag = orderedMatch ? 'ol' : 'ul';
-        const content = orderedMatch ? orderedMatch[2] : unorderedMatch[2];
-
-        if (!inList) {
-          result.push(`<${tag}>`);
-          inList = true;
-        }
-
-        result.push(`<li>${content}</li>`);
-      } else {
-        if (inList) {
-          const lastTag = result[result.length - 1]?.startsWith('<ol') ? 'ol' : 'ul';
-          result.push(`</${lastTag}>`);
-          inList = false;
-        }
-        result.push(line);
+    while ((match = regex.exec(content)) !== null) {
+      const href = match[2];
+      if (!href.startsWith('#') && !links.includes(href)) {
+        links.push(href);
       }
     }
 
-    if (inList) {
-      const lastTag = result[result.length - 1]?.startsWith('<ol') ? 'ol' : 'ul';
-      result.push(`</${lastTag}>`);
-    }
-
-    return result.join('\n');
-  }
-
-  private processTaskLists(html: string): string {
-    return html.replace(/^- \[([ x])\]\s+(.+)/gm, (_match, checked, text) => {
-      const isChecked = checked === 'x';
-      return `<li class="task"><input type="checkbox" ${isChecked ? 'checked' : ''} disabled>${text}</li>`;
-    });
-  }
-
-  private processTables(html: string): string {
-    const rows = html.split('\n');
-    let inTable = false;
-    const result: string[] = [];
-    let headerProcessed = false;
-
-    for (const row of rows) {
-      if (row.match(/^\|.*\|$/)) {
-        if (!inTable) {
-          result.push('<table><thead><tr>');
-          inTable = true;
-          headerProcessed = false;
-        }
-
-        const cells = row.split('|').filter((c) => c.trim()).map((c) => c.trim());
-
-        if (row.match(/^\|[\s-:]+\|$/)) {
-          continue;
-        }
-
-        if (!headerProcessed) {
-          for (const cell of cells) {
-            result.push(`<th>${cell}</th>`);
-          }
-          result.push('</tr></thead><tbody>');
-          headerProcessed = true;
-        } else {
-          result.push('<tr>');
-          for (const cell of cells) {
-            result.push(`<td>${cell}</td>`);
-          }
-          result.push('</tr>');
-        }
-      } else {
-        if (inTable) {
-          result.push('</tbody></table>');
-          inTable = false;
-        }
-        result.push(row);
-      }
-    }
-
-    if (inTable) {
-      result.push('</tbody></table>');
-    }
-
-    return result.join('\n');
-  }
-
-  private processLinks(html: string): string {
-    return html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_match, text, href) => {
-      const titleMatch = href.match(/^([^"]+)"([^"]+)"/);
-      if (titleMatch) {
-        return `<a href="${titleMatch[1]}" title="${titleMatch[2]}">${text}</a>`;
-      }
-      return `<a href="${href}">${text}</a>`;
-    });
-  }
-
-  private processImages(html: string): string {
-    return html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_match, alt, src) => {
-      return `<img src="${src}" alt="${alt}" loading="lazy">`;
-    });
+    return links;
   }
 
   private processBlockquotes(html: string): string {
@@ -305,6 +230,14 @@ class MarkdownParser {
     return result.join('\n');
   }
 
+  private processComponents(html: string): string {
+    for (const [component, tag] of Object.entries(this.config.components)) {
+      html = html.replace(new RegExp(`<${component}>`, 'g'), `<${tag}>`);
+      html = html.replace(new RegExp(`</${component}>`, 'g'), `</${tag}>`);
+    }
+    return html;
+  }
+
   private processEmphasis(html: string): string {
     return html
       .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
@@ -314,8 +247,22 @@ class MarkdownParser {
       .replace(/`([^`]+)`/g, (_match, code) => `<code>${this.escapeHtml(code)}</code>`);
   }
 
+  private processHeadings(html: string): string {
+    return html.replace(/^(#{1,6})\s+(.+)$/gm, (_match, hashes, text) => {
+      const level = hashes.length;
+      const id = this.slugify(text);
+      return `<h${level} id="${id}">${text}</h${level}>`;
+    });
+  }
+
   private processHorizontalRules(html: string): string {
     return html.replace(/^([-*_])\s*\1\s*\1[\s-]*$/gm, '<hr>');
+  }
+
+  private processImages(html: string): string {
+    return html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_match, alt, src) => {
+      return `<img src="${src}" alt="${alt}" loading="lazy">`;
+    });
   }
 
   private processLineBreaks(html: string): string {
@@ -325,75 +272,142 @@ class MarkdownParser {
     return html.replace(/\n\n/g, '</p><p>').replace(/\n/g, ' ');
   }
 
-  private processComponents(html: string): string {
-    for (const [component, tag] of Object.entries(this.config.components)) {
-      html = html.replace(new RegExp(`<${component}>`, 'g'), `<${tag}>`);
-      html = html.replace(new RegExp(`</${component}>`, 'g'), `</${tag}>`);
-    }
-    return html;
+  private processLinks(html: string): string {
+    return html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_match, text, href) => {
+      const titleMatch = href.match(/^([^"]+)"([^"]+)"/);
+      if (titleMatch) {
+        return `<a href="${titleMatch[1]}" title="${titleMatch[2]}">${text}</a>`;
+      }
+      return `<a href="${href}">${text}</a>`;
+    });
   }
 
-  private extractHeadings(html: string): Heading[] {
-    const headings: Heading[] = [];
-    const regex = /<h(\d) id="([^"]+)">([^<]+)<\/h\1>/g;
-    let match;
+  private processLists(html: string): string {
+    const lines = html.split('\n');
+    const result: string[] = [];
+    let inList = false;
 
-    while ((match = regex.exec(html)) !== null) {
-      headings.push({
-        level: parseInt(match[1]),
-        text: match[3],
-        id: match[2],
-      });
-    }
+    for (const line of lines) {
+      const orderedMatch = line.match(/^(\d+)\.\s+(.+)/);
+      const unorderedMatch = line.match(/^[-*+]\s+(.+)/);
 
-    return headings;
-  }
+      if (orderedMatch || unorderedMatch) {
+        const tag = orderedMatch ? 'ol' : 'ul';
+        const content = orderedMatch ? orderedMatch[2] : unorderedMatch[2];
 
-  private extractLinks(content: string): string[] {
-    const links: string[] = [];
-    const regex = /\[([^\]]+)\]\(([^)]+)\)/g;
-    let match;
+        if (!inList) {
+          result.push(`<${tag}>`);
+          inList = true;
+        }
 
-    while ((match = regex.exec(content)) !== null) {
-      const href = match[2];
-      if (!href.startsWith('#') && !links.includes(href)) {
-        links.push(href);
+        result.push(`<li>${content}</li>`);
+      } else {
+        if (inList) {
+          const lastTag = result[result.length - 1]?.startsWith('<ol') ? 'ol' : 'ul';
+          result.push(`</${lastTag}>`);
+          inList = false;
+        }
+        result.push(line);
       }
     }
 
-    return links;
-  }
-
-  private extractImages(content: string): ImageInfo[] {
-    const images: ImageInfo[] = [];
-    const regex = /!\[([^\]]*)\]\(([^)]+)\)/g;
-    let match;
-
-    while ((match = regex.exec(content)) !== null) {
-      const src = match[2];
-      const alt = match[1];
-      const titleMatch = src.match(/"([^"]+)"/);
-      const title = titleMatch ? titleMatch[1] : undefined;
-
-      images.push({ src, alt, title });
+    if (inList) {
+      const lastTag = result[result.length - 1]?.startsWith('<ol') ? 'ol' : 'ul';
+      result.push(`</${lastTag}>`);
     }
 
-    return images;
+    return result.join('\n');
   }
 
-  private extractCodeBlocks(content: string): CodeBlock[] {
-    const blocks: CodeBlock[] = [];
-    const regex = /```(\w*)\n([\s\S]*?)```/g;
-    let match;
+  private processTables(html: string): string {
+    const rows = html.split('\n');
+    let inTable = false;
+    const result: string[] = [];
+    let headerProcessed = false;
 
-    while ((match = regex.exec(content)) !== null) {
-      blocks.push({
-        lang: match[1],
-        code: match[2].trim(),
-      });
+    for (const row of rows) {
+      if (row.match(/^\|.*\|$/)) {
+        if (!inTable) {
+          result.push('<table><thead><tr>');
+          inTable = true;
+          headerProcessed = false;
+        }
+
+        const cells = row
+          .split('|')
+          .filter((c) => c.trim())
+          .map((c) => c.trim());
+
+        if (row.match(/^\|[\s-:]+\|$/)) {
+          continue;
+        }
+
+        if (!headerProcessed) {
+          for (const cell of cells) {
+            result.push(`<th>${cell}</th>`);
+          }
+          result.push('</tr></thead><tbody>');
+          headerProcessed = true;
+        } else {
+          result.push('<tr>');
+          for (const cell of cells) {
+            result.push(`<td>${cell}</td>`);
+          }
+          result.push('</tr>');
+        }
+      } else {
+        if (inTable) {
+          result.push('</tbody></table>');
+          inTable = false;
+        }
+        result.push(row);
+      }
     }
 
-    return blocks;
+    if (inTable) {
+      result.push('</tbody></table>');
+    }
+
+    return result.join('\n');
+  }
+
+  private processTaskLists(html: string): string {
+    return html.replace(/^- \[([ x])\]\s+(.+)/gm, (_match, checked, text) => {
+      const isChecked = checked === 'x';
+      return `<li class="task"><input type="checkbox" ${isChecked ? 'checked' : ''} disabled>${text}</li>`;
+    });
+  }
+
+  private removeFrontmatter(markdown: string): string {
+    return markdown.replace(/^---\n[\s\S]*?\n---\n?/, '');
+  }
+
+  private renderMarkdown(content: string): string {
+    // Step 1: Extract all fenced code blocks before any markdown processing
+    const codeBlocks: string[] = [];
+    let html = content.replace(/```(\w*)\n([\s\S]*?)```/g, (_match, lang, code) => {
+      const escaped = this.escapeHtml(code.trim());
+      codeBlocks.push(`<pre><code class="language-${lang}">${escaped}</code></pre>`);
+      return `\n__CODE_BLOCK_${codeBlocks.length - 1}__\n`;
+    });
+
+    // Step 2: Process all other markdown
+    html = this.processHeadings(html);
+    html = this.processHorizontalRules(html);
+    html = this.processLists(html);
+    html = this.processTaskLists(html);
+    html = this.processTables(html);
+    html = this.processImages(html);
+    html = this.processLinks(html);
+    html = this.processBlockquotes(html);
+    html = this.processEmphasis(html);
+    html = this.processLineBreaks(html);
+    html = this.processComponents(html);
+
+    // Step 3: Restore code blocks
+    html = html.replace(/__CODE_BLOCK_(\d+)__/g, (_, index) => codeBlocks[Number(index)]);
+
+    return html;
   }
 
   private slugify(text: string): string {
@@ -404,24 +418,13 @@ class MarkdownParser {
       .replace(/-+/g, '-')
       .trim();
   }
-
-  private escapeHtml(text: string): string {
-    return text
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-  }
 }
 
 export function createMarkdownParser(options?: MarkdownOptions): MarkdownParser {
   return new MarkdownParser(options);
 }
 
-export function parseMarkdown(
-  content: string,
-  options?: MarkdownOptions,
-): ParsedMarkdown {
+export function parseMarkdown(content: string, options?: MarkdownOptions): ParsedMarkdown {
   const parser = new MarkdownParser(options);
   return parser.parse(content);
 }

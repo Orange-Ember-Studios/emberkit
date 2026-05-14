@@ -39,15 +39,31 @@ export class ImageProcessor {
     };
   }
 
-  transform(src: string, options: {
-    width?: number;
-    height?: number;
-    format?: string;
-    quality?: number;
-  } = {}): TransformedImage {
+  analyze(stats: ImageStats): void {
+    const savingsPercent = parseFloat(((stats.savings / stats.originalSize) * 100).toFixed(1));
+
+    if (savingsPercent > 50) {
+      console.log(`[Image] Significant savings: ${savingsPercent}% reduction`);
+    }
+  }
+
+  transform(
+    src: string,
+    options: {
+      width?: number;
+      height?: number;
+      format?: string;
+      quality?: number;
+    } = {},
+  ): TransformedImage {
     const { width = 800, height, format = 'webp', quality } = options;
 
-    const url = this.buildUrl(src, { width, height, format, quality: quality ?? this.config.quality });
+    const url = this.buildUrl(src, {
+      width,
+      height,
+      format,
+      quality: quality ?? this.config.quality,
+    });
 
     const srcset = this.buildSrcset(src, {
       format,
@@ -64,6 +80,15 @@ export class ImageProcessor {
     };
   }
 
+  private buildSrcset(src: string, params: { format: string; quality?: number }): string {
+    return this.config.sizes
+      .map((size) => {
+        const url = this.buildUrl(src, { width: size, ...params });
+        return `${url} ${size}w`;
+      })
+      .join(', ');
+  }
+
   private buildUrl(
     src: string,
     params: { width?: number; height?: number; format?: string; quality?: number },
@@ -78,25 +103,8 @@ export class ImageProcessor {
     return url.toString();
   }
 
-  private buildSrcset(src: string, params: { format: string; quality?: number }): string {
-    return this.config.sizes
-      .map((size) => {
-        const url = this.buildUrl(src, { width: size, ...params });
-        return `${url} ${size}w`;
-      })
-      .join(', ');
-  }
-
   private generatePlaceholder(): string {
     return 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMjAwIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZmZmIj48L3JlY3Q+PC9zdmc+';
-  }
-
-  analyze(stats: ImageStats): void {
-    const savingsPercent = parseFloat(((stats.savings / stats.originalSize) * 100).toFixed(1));
-
-    if (savingsPercent > 50) {
-      console.log(`[Image] Significant savings: ${savingsPercent}% reduction`);
-    }
   }
 }
 
@@ -141,11 +149,7 @@ export function calculateDimensions(
 
 export const LOW_QUALITY_IMAGE_SIZES = [20, 40, 80];
 
-export function generatePlaceholderSVG(
-  width: number,
-  height: number,
-  color = '#e0e0e0',
-): string {
+export function generatePlaceholderSVG(width: number, height: number, color = '#e0e0e0'): string {
   return `data:image/svg+xml;base64,${btoa(
     `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
       <rect width="100%" height="100%" fill="${color}"/>
@@ -157,17 +161,23 @@ export function generatePlaceholderSVG(
 export function createPictureElement(
   image: TransformedImage,
   alt: string,
-  options: { lazy?: boolean; loading?: 'lazy' | 'eager'; fetchpriority?: 'high' | 'low' | 'auto' } = {},
+  options: {
+    lazy?: boolean;
+    loading?: 'lazy' | 'eager';
+    fetchpriority?: 'high' | 'low' | 'auto';
+  } = {},
 ): string {
   const { lazy = true, loading = 'lazy', fetchpriority = 'auto' } = options;
 
-  const sources = image.format !== 'avif'
-    ? `<source type="image/avif" srcset="${image.srcset.replace(/f=webp/g, 'f=avif')}">`
-    : '';
+  const sources =
+    image.format !== 'avif'
+      ? `<source type="image/avif" srcset="${image.srcset.replace(/f=webp/g, 'f=avif')}">`
+      : '';
 
-  const webpSource = image.format !== 'webp'
-    ? `<source type="image/webp" srcset="${image.srcset.replace(/f=[\w]+/g, 'f=webp')}">`
-    : '';
+  const webpSource =
+    image.format !== 'webp'
+      ? `<source type="image/webp" srcset="${image.srcset.replace(/f=[\w]+/g, 'f=webp')}">`
+      : '';
 
   return `<picture>
   ${sources}
@@ -186,13 +196,17 @@ export function createPictureElement(
 }
 
 function escapeHtml(str: string): string {
-  return str.replace(/[<>&"']/g, (c) => ({
-    '<': '&lt;',
-    '>': '&gt;',
-    '&': '&amp;',
-    '"': '&quot;',
-    "'": '&#39;',
-  })[c] ?? c);
+  return str.replace(
+    /[<>&"']/g,
+    (c) =>
+      ({
+        '<': '&lt;',
+        '>': '&gt;',
+        '&': '&amp;',
+        '"': '&quot;',
+        "'": '&#39;',
+      })[c] ?? c,
+  );
 }
 
 export function parseImageSrc(src: string): {

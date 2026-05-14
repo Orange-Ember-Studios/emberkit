@@ -29,9 +29,7 @@ export interface RouteParams<T extends Record<string, string> = Record<string, s
 
 export type RouteHandler = (params: RouteParams) => Promise<unknown> | unknown;
 
-export const SPECIAL_FILES = new Set([
-  '_layout', '_error', '_loading', 'index',
-]);
+export const SPECIAL_FILES = new Set(['_layout', '_error', '_loading', 'index']);
 
 export const PARAM_REGEX = /\[([^\]]+)\]/g;
 export const CATCH_ALL_REGEX = /\[\.\.\.(\w+)\]/g;

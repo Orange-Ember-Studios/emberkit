@@ -1,7 +1,19 @@
 import type { DOMElement, JSXElement, JSXElementProps, JSXNode } from '../types.js';
 
 const SELF_CLOSING_TAGS = new Set([
-  'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'source', 'track', 'wbr',
+  'area',
+  'base',
+  'br',
+  'col',
+  'embed',
+  'hr',
+  'img',
+  'input',
+  'link',
+  'meta',
+  'source',
+  'track',
+  'wbr',
 ]);
 
 let handlerCounter = 0;
@@ -25,7 +37,7 @@ export function renderElementToHTML(element: JSXElement): string {
     return '';
   }
   renderDepth++;
-  
+
   let currentType: string | ((props: Record<string, unknown>) => unknown) = element.type;
   let props = element.props ?? {};
   let depth = 0;
@@ -57,9 +69,7 @@ export function renderElementToHTML(element: JSXElement): string {
 
   const rawChildren = props.children ?? [];
   const children = Array.isArray(rawChildren) ? rawChildren : [rawChildren];
-  const childHtml = children
-    .map((child) => renderToString(child as JSXElement | string))
-    .join('');
+  const childHtml = children.map((child) => renderToString(child as JSXElement | string)).join('');
 
   if (currentType === 'Fragment' || currentType === 'React.Fragment') {
     return childHtml;
@@ -68,7 +78,11 @@ export function renderElementToHTML(element: JSXElement): string {
   // Handle dangerouslySetInnerHTML
   let innerHtml = childHtml;
   for (const [, value] of Object.entries(props)) {
-    if (typeof value === 'object' && value !== null && '__html' in (value as Record<string, unknown>)) {
+    if (
+      typeof value === 'object' &&
+      value !== null &&
+      '__html' in (value as Record<string, unknown>)
+    ) {
       innerHtml = String((value as { __html: unknown }).__html);
       break;
     }
@@ -77,7 +91,12 @@ export function renderElementToHTML(element: JSXElement): string {
   const attributes = Object.entries(props)
     .filter(([key, value]) => {
       if (key === 'children' || key === 'key') return false;
-      if (typeof value === 'object' && value !== null && '__html' in (value as Record<string, unknown>)) return false;
+      if (
+        typeof value === 'object' &&
+        value !== null &&
+        '__html' in (value as Record<string, unknown>)
+      )
+        return false;
       if (value == null) return false;
       if (typeof value === 'function' && key !== 'data-ek-bind') return false;
       return true;
@@ -128,13 +147,12 @@ export function renderToString(element: JSXElement | string | null | number | un
   if (!element && element !== 0) return '';
   if (typeof element === 'string') return element;
   if (typeof element === 'number') return String(element);
-  if (Array.isArray(element)) return element.map((item) => renderToString(item as JSXElement | string)).join('');
+  if (Array.isArray(element))
+    return element.map((item) => renderToString(item as JSXElement | string)).join('');
   return renderElementToHTML(element as JSXElement);
 }
 
-export function getComponentName(
-  type: string | ((props: JSXElementProps) => JSXNode),
-): string {
+export function getComponentName(type: string | ((props: JSXElementProps) => JSXNode)): string {
   if (typeof type === 'function') {
     const fn = type as { displayName?: string; name?: string };
     return fn.displayName ?? fn.name ?? 'Anonymous';

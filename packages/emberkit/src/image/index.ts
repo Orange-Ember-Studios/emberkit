@@ -44,4 +44,9 @@ export function createImageVitePlugin(config?: ImagePluginConfig): Plugin {
   return imagePlugin(config);
 }
 
-export { createImageProcessor, type ImageConfig, type ImageStats, type TransformedImage } from './processor.js';
+export {
+  createImageProcessor,
+  type ImageConfig,
+  type ImageStats,
+  type TransformedImage,
+} from './processor.js';

@@ -23,11 +23,19 @@ export interface TypographyToken {
   fontWeight?: string;
 }
 
-export type SpacingToken = `spacing-${0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16 | 20 | 24}`;
+export type SpacingToken =
+  `spacing-${0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16 | 20 | 24}`;
 
-export type BorderRadiusToken = 'none' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full';
+export type BorderRadiusToken =
+  | "none"
+  | "sm"
+  | "md"
+  | "lg"
+  | "xl"
+  | "2xl"
+  | "full";
 
-export type ShadowToken = 'sm' | 'md' | 'lg' | 'xl';
+export type ShadowToken = "sm" | "md" | "lg" | "xl";
 
 export interface DesignTokens {
   primary: ColorScale;

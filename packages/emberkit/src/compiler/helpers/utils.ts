@@ -4,9 +4,10 @@ export function escapeString(str: string): string {
   return str.replace(/[`\\${}]/g, '\\$&');
 }
 
-export function generateTemplateParts(
-  parts: TemplatePart[],
-): { template: string; expressions: string[] } {
+export function generateTemplateParts(parts: TemplatePart[]): {
+  template: string;
+  expressions: string[];
+} {
   const templateParts: string[] = [];
   const expressions: string[] = [];
 

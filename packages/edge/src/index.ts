@@ -1,6 +1,6 @@
-export * from './adapters/core.js';
-export * from './adapters/cloudflare.js';
-export * from './adapters/deno.js';
+export * from "./adapters/core.js";
+export * from "./adapters/cloudflare.js";
+export * from "./adapters/deno.js";
 
 export const EDGE_BUNDLE_SIZE_WARNING = 1024;
 export const MAX_BUNDLE_SIZE = 8 * 1024;
@@ -26,23 +26,20 @@ export function analyzeBundle(code: string): BundleStats {
 }
 
 export function treeShake(code: string): string {
-  const lines = code.split('\n');
+  const lines = code.split("\n");
   const pruned: string[] = [];
 
   for (const line of lines) {
-    if (!line.includes('__DEV__') || line.includes('if (true)')) {
+    if (!line.includes("__DEV__") || line.includes("if (true)")) {
       pruned.push(line);
     }
   }
 
-  return pruned.join('\n');
+  return pruned.join("\n");
 }
 
 export function minifyHTML(html: string): string {
-  return html
-    .replace(/\s+/g, ' ')
-    .replace(/>\s+</g, '><')
-    .trim();
+  return html.replace(/\s+/g, " ").replace(/>\s+</g, "><").trim();
 }
 
 export function inlineCriticalCSS(css: string, maxSize = 512): string {
@@ -50,5 +47,5 @@ export function inlineCriticalCSS(css: string, maxSize = 512): string {
     return css;
   }
 
-  return css.slice(0, maxSize) + '...';
+  return css.slice(0, maxSize) + "...";
 }

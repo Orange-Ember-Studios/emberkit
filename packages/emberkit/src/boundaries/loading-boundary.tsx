@@ -125,7 +125,7 @@ export function createAsyncBoundary<T>(
   render: () => JSXElement | null;
   reset: () => void;
 } {
-  const boundaryOptions: LoadingBoundaryProps = { };
+  const boundaryOptions: LoadingBoundaryProps = {};
   if (options.fallback !== undefined) {
     boundaryOptions.fallback = options.fallback;
   }

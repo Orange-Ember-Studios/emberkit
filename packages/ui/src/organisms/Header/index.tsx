@@ -1,5 +1,5 @@
-import type { FC } from '@emberkit/core';
-import { Icon, type IconName } from '../../atoms/Icon/index.js';
+import type { FC } from "@emberkit/core";
+import { Icon, type IconName } from "../../atoms/Icon/index.js";
 
 export interface NavItem {
   label: string;
@@ -21,12 +21,13 @@ export interface HeaderProps {
 const Header: FC<HeaderProps> = ({
   title,
   navItems = [],
-  className = '',
+  className = "",
   onNavClick,
   logo,
   actions,
 }) => {
-  const cls = `sticky top-0 z-40 w-full bg-surface-100 border-b border-surface-300 ${className}`.trim();
+  const cls =
+    `sticky top-0 z-40 w-full bg-surface-100 border-b border-surface-300 ${className}`.trim();
 
   return (
     <header class={cls}>
@@ -41,11 +42,11 @@ const Header: FC<HeaderProps> = ({
             <nav class="hidden md:flex items-center gap-1">
               {navItems.map((item) => {
                 const linkCls = [
-                  'flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-150',
+                  "flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-150",
                   item.active
-                    ? 'bg-primary-500/15 text-primary-400'
-                    : 'text-surface-700 hover:text-surface-900 hover:bg-surface-200',
-                ].join(' ');
+                    ? "bg-primary-500/15 text-primary-400"
+                    : "text-surface-700 hover:text-surface-900 hover:bg-surface-200",
+                ].join(" ");
 
                 return (
                   <a
@@ -67,11 +68,7 @@ const Header: FC<HeaderProps> = ({
             </nav>
           )}
         </div>
-        {actions && (
-          <div class="flex items-center gap-3">
-            {actions}
-          </div>
-        )}
+        {actions && <div class="flex items-center gap-3">{actions}</div>}
       </div>
     </header>
   );

@@ -25,9 +25,17 @@ export function createHtmlDocument(
     headExtra?: string;
   } = {},
 ): string {
-  const { title = '', lang = 'en', doctype = '<!DOCTYPE html>', baseUrl = '', headExtra = '' } = options;
+  const {
+    title = '',
+    lang = 'en',
+    doctype = '<!DOCTYPE html>',
+    baseUrl = '',
+    headExtra = '',
+  } = options;
 
-  const fullHtml = doctype + '\n' +
+  const fullHtml =
+    doctype +
+    '\n' +
     `<html${lang ? ` lang="${lang}"` : ''}>\n` +
     '<head>\n' +
     `<meta charset="utf-8">\n` +

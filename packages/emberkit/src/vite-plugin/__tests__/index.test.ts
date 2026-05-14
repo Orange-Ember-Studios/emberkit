@@ -75,7 +75,7 @@ describe('emberkitVitePlugin', () => {
   it('should preserve backticks inside code blocks', async () => {
     const plugin = emberkitVitePlugin() as Plugin;
     const transform = plugin.transform as (code: string, id: string) => { code: string } | null;
-    
+
     const markdownContent = `---
 title: Test
 ---
@@ -92,28 +92,25 @@ function Button({ children, variant = 'primary' }: { children: unknown; variant?
 
 Use \`console.log()\` for debugging.
 `;
-    
+
     const result = transform(markdownContent, '/test.md');
     expect(result).not.toBeNull();
-    
+
     // Extract the defaultContent string from the result
     const contentMatch = result!.code.match(/const defaultContent = "([\s\S]*?)";/);
     expect(contentMatch).not.toBeNull();
-    const html = contentMatch![1]
-      .replace(/\\"/g, '"')
-      .replace(/\\n/g, '\n')
-      .replace(/\\\\/g, '\\');
-    
+    const html = contentMatch![1].replace(/\\"/g, '"').replace(/\\n/g, '\n').replace(/\\\\/g, '\\');
+
     console.log('=== HTML around template literal ===');
     const idx = html.indexOf('btn btn-');
     if (idx !== -1) {
       console.log(html.substring(idx - 100, idx + 100));
     }
     console.log('=== END ===');
-    
+
     // Backticks in code blocks should be preserved as literal text
     expect(html).toContain('`btn btn-${variant}`');
-    
+
     // Inline code outside code blocks should still be processed
     expect(html).toContain('<code>console.log()</code>');
   });
@@ -121,7 +118,7 @@ Use \`console.log()\` for debugging.
   it('should ignore all markdown tags inside code blocks', async () => {
     const plugin = emberkitVitePlugin() as Plugin;
     const transform = plugin.transform as (code: string, id: string) => { code: string } | null;
-    
+
     const markdownContent = `---
 title: Test
 ---
@@ -146,41 +143,38 @@ title: Test
 
 This text after code block **should be processed** as markdown.
 `;
-    
+
     const result = transform(markdownContent, '/test.md');
     expect(result).not.toBeNull();
-    
+
     // Extract the defaultContent string from the result
     const contentMatch = result!.code.match(/const defaultContent = "([\s\S]*?)";/);
     expect(contentMatch).not.toBeNull();
-    const html = contentMatch![1]
-      .replace(/\\"/g, '"')
-      .replace(/\\n/g, '\n')
-      .replace(/\\\\/g, '\\');
-    
+    const html = contentMatch![1].replace(/\\"/g, '"').replace(/\\n/g, '\n').replace(/\\\\/g, '\\');
+
     // Headings outside code blocks should be processed
     expect(html).toContain('<h1 id="this-heading-should-be-processed">');
-    
+
     // Text after code block should be processed
     expect(html).toContain('<strong>should be processed</strong>');
-    
+
     // Inside code block: headings should NOT be processed
     expect(html).toContain('# This heading should NOT be processed');
     expect(html).toContain('## Nor this');
-    
+
     // Inside code block: bold/italic should NOT be processed
     expect(html).toContain('**This bold should NOT be processed**');
     expect(html).toContain('*This italic should NOT be processed*');
-    
+
     // Inside code block: lists should NOT be processed
     expect(html).toContain('- This list should NOT be processed');
-    
+
     // Inside code block: links should NOT be processed
     expect(html).toContain('[This link should NOT be processed](https://example.com)');
-    
+
     // Inside code block: blockquotes should NOT be processed
     expect(html).toContain('&gt; This blockquote should NOT be processed');
-    
+
     // Inside code block: backticks should NOT be processed as inline code
     expect(html).toContain('`This inline code should NOT be processed`');
   });

@@ -36,7 +36,11 @@ describe('compileToTemplate', () => {
   });
 
   it('should compile a self-closing input with boolean attributes', () => {
-    const result = compileSelfClosing('input', { type: 'checkbox', checked: true, disabled: false });
+    const result = compileSelfClosing('input', {
+      type: 'checkbox',
+      checked: true,
+      disabled: false,
+    });
     const assembled = assembleTemplate(result.parts);
 
     expect(assembled).toBe('<input type="checkbox" checked/>');

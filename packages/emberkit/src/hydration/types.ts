@@ -25,17 +25,41 @@ export interface HydrationManifest {
 }
 
 export const INTERACTIVE_ATTRIBUTES = new Set([
-  'onClick', 'onMouseDown', 'onMouseUp', 'onMouseEnter', 'onMouseLeave',
-  'onFocus', 'onBlur', 'onChange', 'onInput', 'onSubmit',
-  'onKeyDown', 'onKeyUp', 'onKeyPress', 'onScroll',
-  'onTouchStart', 'onTouchEnd', 'onTouchMove',
-  'onDragStart', 'onDrag', 'onDragEnd',
-  'onWheel', 'onAnimationStart', 'onAnimationEnd',
+  'onClick',
+  'onMouseDown',
+  'onMouseUp',
+  'onMouseEnter',
+  'onMouseLeave',
+  'onFocus',
+  'onBlur',
+  'onChange',
+  'onInput',
+  'onSubmit',
+  'onKeyDown',
+  'onKeyUp',
+  'onKeyPress',
+  'onScroll',
+  'onTouchStart',
+  'onTouchEnd',
+  'onTouchMove',
+  'onDragStart',
+  'onDrag',
+  'onDragEnd',
+  'onWheel',
+  'onAnimationStart',
+  'onAnimationEnd',
 ]);
 
 export const HYDRATABLE_TAGS = new Set([
-  'button', 'a', 'input', 'select', 'textarea',
-  'form', 'details', 'dialog', 'summary',
+  'button',
+  'a',
+  'input',
+  'select',
+  'textarea',
+  'form',
+  'details',
+  'dialog',
+  'summary',
 ]);
 
 export function isInteractiveTag(tagName: string): boolean {

@@ -1,10 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import {
-  createLoadingBoundary,
-  LoadingBoundary,
-  Skeleton,
-  createAsyncBoundary,
-} from '../index.js';
+import { createLoadingBoundary, LoadingBoundary, Skeleton, createAsyncBoundary } from '../index.js';
 import type { JSXElement } from '../index.js';
 
 describe('LoadingBoundary', () => {
@@ -131,10 +126,9 @@ describe('LoadingBoundary', () => {
 
     it('should call onError callback on failure', async () => {
       const onError = vi.fn();
-      const asyncBoundary = createAsyncBoundary(
-        () => Promise.reject(new Error('Load failed')),
-        { onError },
-      );
+      const asyncBoundary = createAsyncBoundary(() => Promise.reject(new Error('Load failed')), {
+        onError,
+      });
 
       await expect(asyncBoundary.load()).rejects.toThrow('Load failed');
       expect(onError).toHaveBeenCalled();

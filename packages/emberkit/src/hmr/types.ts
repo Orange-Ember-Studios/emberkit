@@ -28,11 +28,15 @@ export interface HMREvent {
 }
 
 export class HMRConnection {
-  private ws: WebSocket | null = null;
   private readonly url: string;
+  private ws: WebSocket | null = null;
 
   constructor(url: string) {
     this.url = url;
+  }
+
+  close(): void {
+    this.ws?.close();
   }
 
   connect(onMessage: (data: unknown) => void): void {
@@ -66,19 +70,15 @@ export class HMRConnection {
     }
   }
 
-  private reconnect(onMessage: (data: unknown) => void): void {
-    console.log('[HMR] Attempting to reconnect...');
-    this.connect(onMessage);
-  }
-
   send(data: unknown): void {
     if (this.ws?.readyState === WebSocket.OPEN) {
       this.ws.send(JSON.stringify(data));
     }
   }
 
-  close(): void {
-    this.ws?.close();
+  private reconnect(onMessage: (data: unknown) => void): void {
+    console.log('[HMR] Attempting to reconnect...');
+    this.connect(onMessage);
   }
 }
 
@@ -104,10 +104,7 @@ export function subscribeToHMR(
   };
 }
 
-export function emitHMREvent(
-  context: HMRContext,
-  event: HMREvent,
-): void {
+export function emitHMREvent(context: HMRContext, event: HMREvent): void {
   for (const listener of context.listeners) {
     listener(event);
   }
@@ -131,10 +128,7 @@ export async function handleHMRMessage(
   }
 }
 
-async function handleHotUpdate(
-  context: HMRContext,
-  data: Record<string, unknown>,
-): Promise<void> {
+async function handleHotUpdate(context: HMRContext, data: Record<string, unknown>): Promise<void> {
   const moduleId = data.moduleId as string;
 
   const hotModule = context.modules.get(moduleId);
@@ -175,17 +169,11 @@ export function getHotModule(context: HMRContext, id: string): HotModule | undef
   return context.modules.get(id);
 }
 
-export function registerHotModule(
-  context: HMRContext,
-  module: HotModule,
-): void {
+export function registerHotModule(context: HMRContext, module: HotModule): void {
   context.modules.set(module.id, module);
 }
 
-export function disposeHotModule(
-  context: HMRContext,
-  id: string,
-): void {
+export function disposeHotModule(context: HMRContext, id: string): void {
   const module = context.modules.get(id);
   if (module) {
     for (const callback of module.disposeCallbacks) {

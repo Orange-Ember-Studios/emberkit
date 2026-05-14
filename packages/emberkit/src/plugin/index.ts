@@ -75,12 +75,16 @@ export type HookName =
   | 'configResolved';
 
 export class PluginPipeline {
-  private plugins: Plugin[] = [];
   private hookCache = new Map<HookName, HookCallback[]>();
+  private plugins: Plugin[] = [];
 
   addPlugin(plugin: Plugin): void {
     this.plugins.push(plugin);
     this.invalidateCache();
+  }
+
+  getPlugins(): Plugin[] {
+    return [...this.plugins];
   }
 
   removePlugin(name: string): void {
@@ -99,16 +103,9 @@ export class PluginPipeline {
   private invalidateCache(): void {
     this.hookCache.clear();
   }
-
-  getPlugins(): Plugin[] {
-    return [...this.plugins];
-  }
 }
 
-export function createPluginContext(
-  config: ResolvedConfig,
-  api: PluginAPI,
-): PluginContext {
+export function createPluginContext(config: ResolvedConfig, api: PluginAPI): PluginContext {
   const hooks = new Map<string, HookCallback[]>();
 
   return {

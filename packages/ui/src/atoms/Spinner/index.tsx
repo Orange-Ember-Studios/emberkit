@@ -1,6 +1,6 @@
-import type { FC } from '@emberkit/core';
+import type { FC } from "@emberkit/core";
 
-export type SpinnerSize = 'sm' | 'md' | 'lg';
+export type SpinnerSize = "sm" | "md" | "lg";
 
 export interface SpinnerProps {
   [key: string]: unknown;
@@ -12,25 +12,30 @@ export interface SpinnerProps {
 
 function sizeClass(size: SpinnerSize): string {
   const map: Record<SpinnerSize, string> = {
-    sm: 'w-4 h-4',
-    md: 'w-6 h-6',
-    lg: 'w-8 h-8',
+    sm: "w-4 h-4",
+    md: "w-6 h-6",
+    lg: "w-8 h-8",
   };
   return map[size];
 }
 
 const Spinner: FC<SpinnerProps> = ({
-  size = 'md',
-  className = '',
+  size = "md",
+  className = "",
   color,
   gradient = false,
 }) => {
   const cls = `animate-spin ${sizeClass(size)} ${className}`.trim();
-  const strokeColor = color ?? 'currentColor';
+  const strokeColor = color ?? "currentColor";
 
   if (gradient) {
     return (
-      <svg class={cls} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg
+        class={cls}
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
         <defs>
           <linearGradient id="spinner-grad" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stop-color={strokeColor} stop-opacity="1" />
@@ -39,7 +44,9 @@ const Spinner: FC<SpinnerProps> = ({
           </linearGradient>
         </defs>
         <circle
-          cx="12" cy="12" r="10"
+          cx="12"
+          cy="12"
+          r="10"
           stroke="url(#spinner-grad)"
           stroke-width="3"
           stroke-dasharray="62.8"
@@ -51,9 +58,16 @@ const Spinner: FC<SpinnerProps> = ({
   }
 
   return (
-    <svg class={cls} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      class={cls}
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <circle
-        cx="12" cy="12" r="10"
+        cx="12"
+        cy="12"
+        r="10"
         stroke={strokeColor}
         stroke-width="3"
         stroke-dasharray="62.8"
@@ -62,7 +76,9 @@ const Spinner: FC<SpinnerProps> = ({
         class="opacity-20"
       />
       <circle
-        cx="12" cy="12" r="10"
+        cx="12"
+        cy="12"
+        r="10"
         stroke={strokeColor}
         stroke-width="3"
         stroke-dasharray="62.8"

@@ -21,15 +21,9 @@ export interface FieldValidator {
   custom?: (value: unknown) => string | null;
 }
 
-export type FormSubmitHandler = (
-  data: FormData,
-  event: SubmitEvent,
-) => Promise<void> | void;
+export type FormSubmitHandler = (data: FormData, event: SubmitEvent) => Promise<void> | void;
 
-export type FormErrorHandler = (
-  errors: FormErrors,
-  event: SubmitEvent,
-) => void;
+export type FormErrorHandler = (errors: FormErrors, event: SubmitEvent) => void;
 
 export interface FormErrors {
   [field: string]: string | undefined;
@@ -66,11 +60,7 @@ export class FormValidator {
     return errors;
   }
 
-  validateField(
-    name: string,
-    value: unknown,
-    validator: FieldValidator,
-  ): string | undefined {
+  validateField(name: string, value: unknown, validator: FieldValidator): string | undefined {
     if (validator.required && (value === undefined || value === null || value === '')) {
       return `${name} is required`;
     }
@@ -142,25 +132,15 @@ export function createFormState(initial: Record<string, unknown> = {}): FormStat
   };
 }
 
-export function updateFormState(
-  state: FormState,
-  updates: Partial<FormState>,
-): FormState {
+export function updateFormState(state: FormState, updates: Partial<FormState>): FormState {
   return { ...state, ...updates };
 }
 
-export function getFieldValue(
-  state: FormState,
-  name: string,
-): unknown {
+export function getFieldValue(state: FormState, name: string): unknown {
   return state.values[name];
 }
 
-export function setFieldValue(
-  state: FormState,
-  name: string,
-  value: unknown,
-): FormState {
+export function setFieldValue(state: FormState, name: string, value: unknown): FormState {
   return {
     ...state,
     values: { ...state.values, [name]: value },
@@ -190,10 +170,7 @@ export function clearFormState(state: FormState): FormState {
   };
 }
 
-export async function handleFormSubmit(
-  event: SubmitEvent,
-  config: FormConfig,
-): Promise<boolean> {
+export async function handleFormSubmit(event: SubmitEvent, config: FormConfig): Promise<boolean> {
   event.preventDefault();
 
   const form = event.target as HTMLFormElement;
@@ -226,7 +203,7 @@ export async function handleFormSubmit(
 export const DEFAULT_VALIDATORS: Record<string, FieldValidator> = {
   email: {
     pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-    custom: (v) => typeof v === 'string' && !v.includes('@') ? 'Invalid email' : null,
+    custom: (v) => (typeof v === 'string' && !v.includes('@') ? 'Invalid email' : null),
   },
   url: {
     pattern: /^https?:\/\/.+/,
@@ -236,10 +213,7 @@ export const DEFAULT_VALIDATORS: Record<string, FieldValidator> = {
   },
 };
 
-export function applyDefaultValidator(
-  field: string,
-  validator: FieldValidator,
-): FieldValidator {
+export function applyDefaultValidator(field: string, validator: FieldValidator): FieldValidator {
   const defaultValidator = DEFAULT_VALIDATORS[field];
 
   if (!defaultValidator) return validator;

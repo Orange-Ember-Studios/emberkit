@@ -174,10 +174,7 @@ export default function MDComponent(props) {
   return { code: componentCode };
 }
 
-async function transformMDX(
-  code: string,
-  id: string,
-): Promise<{ code: string } | null> {
+async function transformMDX(code: string, id: string): Promise<{ code: string } | null> {
   const frontmatterMatch = code.match(/^---\n([\s\S]*?)\n---\n?/);
 
   let frontmatter: Record<string, unknown> = {};
@@ -191,11 +188,14 @@ async function transformMDX(
 
   // Extract code blocks before MDX compilation to preserve syntax
   const codeBlocks: { html: string; index: number }[] = [];
-  const processedContent = content.replace(/```(\w*)\n([\s\S]*?)```/g, (_match, lang, blockCode) => {
-    const html = renderCodeBlock(lang, blockCode);
-    codeBlocks.push({ html, index: codeBlocks.length });
-    return `<CodeBlock_${codeBlocks.length - 1} />`;
-  });
+  const processedContent = content.replace(
+    /```(\w*)\n([\s\S]*?)```/g,
+    (_match, lang, blockCode) => {
+      const html = renderCodeBlock(lang, blockCode);
+      codeBlocks.push({ html, index: codeBlocks.length });
+      return `<CodeBlock_${codeBlocks.length - 1} />`;
+    },
+  );
 
   const compiled = await compile(processedContent, {
     outputFormat: 'program',
@@ -220,10 +220,7 @@ async function transformMDX(
     .join('\n\n');
 
   // Rename the MDX default export so we can wrap it
-  compiledCode = compiledCode.replace(
-    'export default function MDXContent',
-    'function _MDXContent',
-  );
+  compiledCode = compiledCode.replace('export default function MDXContent', 'function _MDXContent');
 
   const exportLines: string[] = [];
 
@@ -243,13 +240,14 @@ async function transformMDX(
   exportLines.push(`export const metadata = ${JSON.stringify(frontmatter)};`);
 
   // Build components override object
-  const componentsOverride = codeBlocks.length > 0
-    ? `
+  const componentsOverride =
+    codeBlocks.length > 0
+      ? `
 const _codeBlockComponents = {
-  ${codeBlocks.map(b => `CodeBlock_${b.index}`).join(', ')}
+  ${codeBlocks.map((b) => `CodeBlock_${b.index}`).join(', ')}
 };
 `
-    : '';
+      : '';
 
   const componentCode = `
 import { createElement } from '@emberkit/core';
@@ -286,7 +284,7 @@ function _GfmSup(props) {
 export default function MDXComponent(props) {
   const components = {
     ...(props.components || {}),
-    ${codeBlocks.map(b => `CodeBlock_${b.index}`).join(', ')}
+    ${codeBlocks.map((b) => `CodeBlock_${b.index}`).join(', ')}
   };
   
   return createElement('div', {
@@ -325,7 +323,10 @@ function parseFrontmatter(content: string): Record<string, unknown> {
     else if (value === 'false') value = false;
     else if (!isNaN(Number(value))) value = Number(value);
     else if (typeof value === 'string' && value.startsWith('[')) {
-      value = value.replace(/[\[\]]/g, '').split(',').map((s) => s.trim());
+      value = value
+        .replace(/[\[\]]/g, '')
+        .split(',')
+        .map((s) => s.trim());
     }
 
     result[key] = value;
@@ -372,16 +373,20 @@ function processHeadings(html: string): string {
 function renderCodeBlock(lang: string, code: string): string {
   let highlighted = code.trim();
 
-  if (lang === 'ts' || lang === 'tsx' || lang === 'js' || lang === 'jsx' || lang === 'typescript' || lang === 'javascript') {
+  if (
+    lang === 'ts' ||
+    lang === 'tsx' ||
+    lang === 'js' ||
+    lang === 'jsx' ||
+    lang === 'typescript' ||
+    lang === 'javascript'
+  ) {
     highlighted = highlightTS(highlighted);
-  }
-  else if (lang === 'bash' || lang === 'sh' || lang === 'shell') {
+  } else if (lang === 'bash' || lang === 'sh' || lang === 'shell') {
     highlighted = highlightBash(highlighted);
-  }
-  else if (lang === 'json') {
+  } else if (lang === 'json') {
     highlighted = highlightJSON(highlighted);
-  }
-  else {
+  } else {
     highlighted = escapeHtml(highlighted);
   }
 
@@ -390,32 +395,130 @@ function renderCodeBlock(lang: string, code: string): string {
 }
 
 function escapeHtml(text: string): string {
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
 function highlightTS(code: string): string {
   const tokens: string[] = [];
   let remaining = code;
 
-  const controlFlow = new Set(['if','else','for','while','do','switch','case','break','continue','return','throw','try','catch','finally']);
-  const declarations = new Set(['import','export','from','const','let','var','function','class','extends','super','enum','type','interface','module','namespace','declare','new','delete','typeof','instanceof','in','of','default','as','satisfies','keyof','infer','is','asserts','abstract','implements']);
-  const modifiers = new Set(['readonly','public','private','protected','static','abstract','async','override']);
-  const literals = new Set(['true','false','null','undefined','this']);
-  const builtins = new Set(['console','document','window','Math','JSON','Array','Object','String','Number','Boolean','Promise','Map','Set','RegExp','Date','Error','Symbol','Record','Partial','Required','Pick','Omit','Exclude','Extract','ReturnType','Parameters','JSX','FC','Props','State','Effect','Memo','Signal','Ref','Context','React']);
+  const controlFlow = new Set([
+    'if',
+    'else',
+    'for',
+    'while',
+    'do',
+    'switch',
+    'case',
+    'break',
+    'continue',
+    'return',
+    'throw',
+    'try',
+    'catch',
+    'finally',
+  ]);
+  const declarations = new Set([
+    'import',
+    'export',
+    'from',
+    'const',
+    'let',
+    'var',
+    'function',
+    'class',
+    'extends',
+    'super',
+    'enum',
+    'type',
+    'interface',
+    'module',
+    'namespace',
+    'declare',
+    'new',
+    'delete',
+    'typeof',
+    'instanceof',
+    'in',
+    'of',
+    'default',
+    'as',
+    'satisfies',
+    'keyof',
+    'infer',
+    'is',
+    'asserts',
+    'abstract',
+    'implements',
+  ]);
+  const modifiers = new Set([
+    'readonly',
+    'public',
+    'private',
+    'protected',
+    'static',
+    'abstract',
+    'async',
+    'override',
+  ]);
+  const literals = new Set(['true', 'false', 'null', 'undefined', 'this']);
+  const builtins = new Set([
+    'console',
+    'document',
+    'window',
+    'Math',
+    'JSON',
+    'Array',
+    'Object',
+    'String',
+    'Number',
+    'Boolean',
+    'Promise',
+    'Map',
+    'Set',
+    'RegExp',
+    'Date',
+    'Error',
+    'Symbol',
+    'Record',
+    'Partial',
+    'Required',
+    'Pick',
+    'Omit',
+    'Exclude',
+    'Extract',
+    'ReturnType',
+    'Parameters',
+    'JSX',
+    'FC',
+    'Props',
+    'State',
+    'Effect',
+    'Memo',
+    'Signal',
+    'Ref',
+    'Context',
+    'React',
+  ]);
 
   while (remaining.length > 0) {
     let m: RegExpMatchArray | null;
 
     // Multi-line comment
     m = remaining.match(/^\/\*[\s\S]*?\*\//);
-    if (m) { tokens.push(`<span class="cm">${escapeHtml(m[0])}</span>`); remaining = remaining.slice(m[0].length); continue; }
+    if (m) {
+      tokens.push(`<span class="cm">${escapeHtml(m[0])}</span>`);
+      remaining = remaining.slice(m[0].length);
+      continue;
+    }
 
     // Single-line comment
     m = remaining.match(/^\/\/.*/);
-    if (m) { tokens.push(`<span class="cm">${escapeHtml(m[0])}</span>`); remaining = remaining.slice(m[0].length); continue; }
+    if (m) {
+      tokens.push(`<span class="cm">${escapeHtml(m[0])}</span>`);
+      remaining = remaining.slice(m[0].length);
+      continue;
+    }
 
     // Template literal with interpolations
     m = remaining.match(/^`/);
@@ -423,8 +526,16 @@ function highlightTS(code: string): string {
       let tmpl = '`';
       remaining = remaining.slice(1);
       while (remaining.length > 0) {
-        if (remaining[0] === '`') { tmpl += '`'; remaining = remaining.slice(1); break; }
-        if (remaining.startsWith('\\')) { tmpl += remaining.slice(0, 2); remaining = remaining.slice(2); continue; }
+        if (remaining[0] === '`') {
+          tmpl += '`';
+          remaining = remaining.slice(1);
+          break;
+        }
+        if (remaining.startsWith('\\')) {
+          tmpl += remaining.slice(0, 2);
+          remaining = remaining.slice(2);
+          continue;
+        }
         if (remaining.startsWith('${')) {
           tmpl += '${';
           remaining = remaining.slice(2);
@@ -433,7 +544,13 @@ function highlightTS(code: string): string {
           let expr = '';
           while (remaining.length > 0 && depth > 0) {
             if (remaining[0] === '{') depth++;
-            if (remaining[0] === '}') { depth--; if (depth === 0) { remaining = remaining.slice(1); break; } }
+            if (remaining[0] === '}') {
+              depth--;
+              if (depth === 0) {
+                remaining = remaining.slice(1);
+                break;
+              }
+            }
             expr += remaining[0];
             remaining = remaining.slice(1);
           }
@@ -449,11 +566,19 @@ function highlightTS(code: string): string {
 
     // String (single, double)
     m = remaining.match(/^('[^']*'|"[^"]*")/);
-    if (m) { tokens.push(`<span class="str">${escapeHtml(m[0])}</span>`); remaining = remaining.slice(m[0].length); continue; }
+    if (m) {
+      tokens.push(`<span class="str">${escapeHtml(m[0])}</span>`);
+      remaining = remaining.slice(m[0].length);
+      continue;
+    }
 
     // Arrow function =>
     m = remaining.match(/^=>/);
-    if (m) { tokens.push(`<span class="op">=&gt;</span>`); remaining = remaining.slice(2); continue; }
+    if (m) {
+      tokens.push(`<span class="op">=&gt;</span>`);
+      remaining = remaining.slice(2);
+      continue;
+    }
 
     // JSX closing tag </Component>
     m = remaining.match(/^(<\/)([A-Za-z][\w.]*)(>)/);
@@ -473,7 +598,35 @@ function highlightTS(code: string): string {
 
     // JSX prop name (word followed by =)
     m = remaining.match(/^([a-zA-Z_][\w.]*)\s*(?==)/);
-    if (m && !['if','else','for','while','switch','case','return','import','export','from','const','let','var','function','class','new','typeof','instanceof','void','null','undefined','true','false','this'].includes(m[1])) {
+    if (
+      m &&
+      ![
+        'if',
+        'else',
+        'for',
+        'while',
+        'switch',
+        'case',
+        'return',
+        'import',
+        'export',
+        'from',
+        'const',
+        'let',
+        'var',
+        'function',
+        'class',
+        'new',
+        'typeof',
+        'instanceof',
+        'void',
+        'null',
+        'undefined',
+        'true',
+        'false',
+        'this',
+      ].includes(m[1])
+    ) {
       tokens.push(`<span class="attr">${escapeHtml(m[1])}</span>`);
       remaining = remaining.slice(m[1].length);
       continue;
@@ -481,15 +634,27 @@ function highlightTS(code: string): string {
 
     // Decorator @Decorator
     m = remaining.match(/^@([A-Za-z_]\w*)/);
-    if (m) { tokens.push(`<span class="dec">${m[0]}</span>`); remaining = remaining.slice(m[0].length); continue; }
+    if (m) {
+      tokens.push(`<span class="dec">${m[0]}</span>`);
+      remaining = remaining.slice(m[0].length);
+      continue;
+    }
 
     // Number (with underscores and scientific notation)
     m = remaining.match(/^(\d[\d_]*\.?[\d_]*([eE][+-]?\d+)?)/);
-    if (m) { tokens.push(`<span class="num">${m[0]}</span>`); remaining = remaining.slice(m[0].length); continue; }
+    if (m) {
+      tokens.push(`<span class="num">${m[0]}</span>`);
+      remaining = remaining.slice(m[0].length);
+      continue;
+    }
 
     // Multi-char operators (check before single-char)
     m = remaining.match(/^(&&|\|\||===|!==|==|!=|<=|>=|\+\+|--|\*\*|=>|\.\.\.)/);
-    if (m) { tokens.push(`<span class="op">${escapeHtml(m[0])}</span>`); remaining = remaining.slice(m[0].length); continue; }
+    if (m) {
+      tokens.push(`<span class="op">${escapeHtml(m[0])}</span>`);
+      remaining = remaining.slice(m[0].length);
+      continue;
+    }
 
     // Word (keyword, type, builtin, function, identifier)
     m = remaining.match(/^([A-Za-z_$][\w$]*)/);
@@ -514,11 +679,19 @@ function highlightTS(code: string): string {
 
     // Single-char operators and punctuation
     m = remaining.match(/^([{}()\[\];:,.=<>\-*/|!?~^%])/);
-    if (m) { tokens.push(`<span class="op">${escapeHtml(m[0])}</span>`); remaining = remaining.slice(m[0].length); continue; }
+    if (m) {
+      tokens.push(`<span class="op">${escapeHtml(m[0])}</span>`);
+      remaining = remaining.slice(m[0].length);
+      continue;
+    }
 
     // Whitespace
     m = remaining.match(/^(\s+)/);
-    if (m) { tokens.push(m[0]); remaining = remaining.slice(m[0].length); continue; }
+    if (m) {
+      tokens.push(m[0]);
+      remaining = remaining.slice(m[0].length);
+      continue;
+    }
 
     // Anything else
     tokens.push(escapeHtml(remaining[0]));
@@ -531,7 +704,10 @@ function highlightTS(code: string): string {
 // Highlight a short inline expression (for template literal interpolations)
 function highlightInlineExpr(code: string): string {
   return escapeHtml(code)
-    .replace(/\b(const|let|var|return|if|else|new|typeof|instanceof|async|await|function|import|from|export)\b/g, '<span class="kw">$1</span>')
+    .replace(
+      /\b(const|let|var|return|if|else|new|typeof|instanceof|async|await|function|import|from|export)\b/g,
+      '<span class="kw">$1</span>',
+    )
     .replace(/\b(true|false|null|undefined|this)\b/g, '<span class="val">$1</span>')
     .replace(/(\d+)/g, '<span class="num">$1</span>')
     .replace(/([A-Z][\w]+)/g, '<span class="type">$1</span>');
@@ -539,40 +715,82 @@ function highlightInlineExpr(code: string): string {
 
 function highlightBash(code: string): string {
   const lines = code.split('\n');
-  return lines.map(line => {
-    const trimmed = line.trimStart();
-    // Comment
-    if (trimmed.startsWith('#')) {
-      return `<span class="cm">${line}</span>`;
-    }
-    // Content is already HTML-escaped by processCodeBlocks
-    // Tokenize directly without double-escaping
-    const tokens: string[] = [];
-    let remaining = line;
-    while (remaining.length > 0) {
-      // HTML entity — pass through
-      let m = remaining.match(/^(&\w+;)/);
-      if (m) { tokens.push(m[1]); remaining = remaining.slice(m[1].length); continue; }
-      // Quoted string
-      m = remaining.match(/^(&quot;[^&]*?&quot;|&apos;[^&]*?&apos;)/);
-      if (m) { tokens.push(`<span class="str">${m[1]}</span>`); remaining = remaining.slice(m[1].length); continue; }
-      // Flag
-      m = remaining.match(/^(\s+)(--?[\w-]+)/);
-      if (m) { tokens.push(`${m[1]}<span class="attr">${m[2]}</span>`); remaining = remaining.slice(m[0].length); continue; }
-      // Word (potential command)
-      m = remaining.match(/^([a-zA-Z][\w-]*)/);
-      if (m) {
-        const cmds = new Set(['sudo','cd','mkdir','rm','cp','mv','ls','cat','echo','npm','pnpm','yarn','git','curl','chmod','export','source','node','npx','bun','deno','grep','awk','sed','find','docker','kubectl']);
-        tokens.push(cmds.has(m[1]) ? `<span class="kw">${m[1]}</span>` : m[1]);
-        remaining = remaining.slice(m[1].length);
-        continue;
+  return lines
+    .map((line) => {
+      const trimmed = line.trimStart();
+      // Comment
+      if (trimmed.startsWith('#')) {
+        return `<span class="cm">${line}</span>`;
       }
-      // Anything else
-      tokens.push(remaining[0]);
-      remaining = remaining.slice(1);
-    }
-    return tokens.join('');
-  }).join('\n');
+      // Content is already HTML-escaped by processCodeBlocks
+      // Tokenize directly without double-escaping
+      const tokens: string[] = [];
+      let remaining = line;
+      while (remaining.length > 0) {
+        // HTML entity — pass through
+        let m = remaining.match(/^(&\w+;)/);
+        if (m) {
+          tokens.push(m[1]);
+          remaining = remaining.slice(m[1].length);
+          continue;
+        }
+        // Quoted string
+        m = remaining.match(/^(&quot;[^&]*?&quot;|&apos;[^&]*?&apos;)/);
+        if (m) {
+          tokens.push(`<span class="str">${m[1]}</span>`);
+          remaining = remaining.slice(m[1].length);
+          continue;
+        }
+        // Flag
+        m = remaining.match(/^(\s+)(--?[\w-]+)/);
+        if (m) {
+          tokens.push(`${m[1]}<span class="attr">${m[2]}</span>`);
+          remaining = remaining.slice(m[0].length);
+          continue;
+        }
+        // Word (potential command)
+        m = remaining.match(/^([a-zA-Z][\w-]*)/);
+        if (m) {
+          const cmds = new Set([
+            'sudo',
+            'cd',
+            'mkdir',
+            'rm',
+            'cp',
+            'mv',
+            'ls',
+            'cat',
+            'echo',
+            'npm',
+            'pnpm',
+            'yarn',
+            'git',
+            'curl',
+            'chmod',
+            'export',
+            'source',
+            'node',
+            'npx',
+            'bun',
+            'deno',
+            'grep',
+            'awk',
+            'sed',
+            'find',
+            'docker',
+            'kubectl',
+          ]);
+          tokens.push(cmds.has(m[1]) ? `<span class="kw">${m[1]}</span>` : m[1]);
+          remaining = remaining.slice(m[1].length);
+          continue;
+        }
+        // Anything else
+        tokens.push(remaining[0]);
+        remaining = remaining.slice(1);
+      }
+      return tokens.join('');
+    })
+    .join('\n');
 }
 
 function highlightJSON(code: string): string {
@@ -595,12 +813,17 @@ function processTables(html: string): string {
 
   while (i < lines.length) {
     // Check if this line and the next look like a table
-    if (i + 1 < lines.length &&
-        lines[i].trim().startsWith('|') && lines[i].trim().endsWith('|') &&
-        lines[i + 1].trim().match(/^\|[\s\-:|]+\|$/)) {
-
+    if (
+      i + 1 < lines.length &&
+      lines[i].trim().startsWith('|') &&
+      lines[i].trim().endsWith('|') &&
+      lines[i + 1].trim().match(/^\|[\s\-:|]+\|$/)
+    ) {
       // Parse header row
-      const headerCells = lines[i].trim().split('|').filter(c => c.trim() !== '');
+      const headerCells = lines[i]
+        .trim()
+        .split('|')
+        .filter((c) => c.trim() !== '');
       result.push('<table>');
       result.push('<thead><tr>');
       for (const cell of headerCells) {
@@ -614,7 +837,10 @@ function processTables(html: string): string {
 
       // Parse data rows
       while (i < lines.length && lines[i].trim().startsWith('|') && lines[i].trim().endsWith('|')) {
-        const cells = lines[i].trim().split('|').filter(c => c.trim() !== '');
+        const cells = lines[i]
+          .trim()
+          .split('|')
+          .filter((c) => c.trim() !== '');
         result.push('<tr>');
         for (const cell of cells) {
           result.push(`<td>${cell.trim()}</td>`);
@@ -732,29 +958,37 @@ function processParagraphs(html: string, breaks?: boolean): string {
   // Split on pre blocks to avoid processing code content
   const parts = html.split(/(<pre[\s\S]*?<\/pre>)/);
 
-  return parts.map((part) => {
-    // Don't process content inside pre tags
-    if (part.startsWith('<pre')) return part;
+  return parts
+    .map((part) => {
+      // Don't process content inside pre tags
+      if (part.startsWith('<pre')) return part;
 
-    const paragraphs = part.split('\n\n');
+      const paragraphs = part.split('\n\n');
 
-    return paragraphs
-      .map((p) => {
-        p = p.trim();
-        if (!p) return '';
+      return paragraphs
+        .map((p) => {
+          p = p.trim();
+          if (!p) return '';
 
-        if (p.startsWith('<h') || p.startsWith('<ul') || p.startsWith('<ol') ||
-            p.startsWith('<pre') || p.startsWith('<blockquote') || p.startsWith('<table') ||
-            p.startsWith('<hr')) {
-          return p;
-        }
+          if (
+            p.startsWith('<h') ||
+            p.startsWith('<ul') ||
+            p.startsWith('<ol') ||
+            p.startsWith('<pre') ||
+            p.startsWith('<blockquote') ||
+            p.startsWith('<table') ||
+            p.startsWith('<hr')
+          ) {
+            return p;
+          }
 
-        p = p.replace(/\n/g, breaks ? '<br>' : ' ');
+          p = p.replace(/\n/g, breaks ? '<br>' : ' ');
 
-        return `<p>${p}</p>`;
-      })
-      .join('\n');
-  }).join('');
+          return `<p>${p}</p>`;
+        })
+        .join('\n');
+    })
+    .join('');
 }
 
 export type { EmberKitPluginOptions, EmberKitMode };
@@ -799,7 +1033,11 @@ function generateRoutesCode(files: string[], routeDir: string): string {
     const isMarkdown = ext === 'md' || ext === 'mdx';
 
     // Skip special files
-    if (relativePath.includes('_layout') || relativePath.includes('_error') || relativePath.includes('_loading')) {
+    if (
+      relativePath.includes('_layout') ||
+      relativePath.includes('_error') ||
+      relativePath.includes('_loading')
+    ) {
       continue;
     }
     // Skip API routes
@@ -822,9 +1060,13 @@ function generateRoutesCode(files: string[], routeDir: string): string {
     const importPath = file.replace(/\\/g, '/');
 
     if (isMarkdown) {
-      routeEntries.push(`  { path: ${JSON.stringify(routePath)}, component: () => import(${JSON.stringify(importPath)}), isMarkdown: true }`);
+      routeEntries.push(
+        `  { path: ${JSON.stringify(routePath)}, component: () => import(${JSON.stringify(importPath)}), isMarkdown: true }`,
+      );
     } else {
-      routeEntries.push(`  { path: ${JSON.stringify(routePath)}, component: () => import(${JSON.stringify(importPath)}) }`);
+      routeEntries.push(
+        `  { path: ${JSON.stringify(routePath)}, component: () => import(${JSON.stringify(importPath)}) }`,
+      );
     }
   }
 

@@ -40,10 +40,14 @@ function buildShorthandTags(props: HeadProps): string {
     tags.push(`<meta ${MANAGED_ATTR} name="title" content="${escapeHtml(props.title)}">`);
   }
   if (props.description) {
-    tags.push(`<meta ${MANAGED_ATTR} name="description" content="${escapeHtml(props.description)}">`);
+    tags.push(
+      `<meta ${MANAGED_ATTR} name="description" content="${escapeHtml(props.description)}">`,
+    );
   }
   if (props.keywords?.length) {
-    tags.push(`<meta ${MANAGED_ATTR} name="keywords" content="${escapeHtml(props.keywords.join(', '))}">`);
+    tags.push(
+      `<meta ${MANAGED_ATTR} name="keywords" content="${escapeHtml(props.keywords.join(', '))}">`,
+    );
   }
   if (props.author) {
     tags.push(`<meta ${MANAGED_ATTR} name="author" content="${escapeHtml(props.author)}">`);
@@ -56,22 +60,43 @@ function buildShorthandTags(props: HeadProps): string {
   }
   if (props.og) {
     const og = props.og;
-    if (og.type) tags.push(`<meta ${MANAGED_ATTR} property="og:type" content="${escapeHtml(og.type)}">`);
-    if (og.title) tags.push(`<meta ${MANAGED_ATTR} property="og:title" content="${escapeHtml(og.title)}">`);
-    if (og.description) tags.push(`<meta ${MANAGED_ATTR} property="og:description" content="${escapeHtml(og.description)}">`);
-    if (og.url) tags.push(`<meta ${MANAGED_ATTR} property="og:url" content="${escapeHtml(og.url)}">`);
-    if (og.image) tags.push(`<meta ${MANAGED_ATTR} property="og:image" content="${escapeHtml(og.image)}">`);
-    if (og.locale) tags.push(`<meta ${MANAGED_ATTR} property="og:locale" content="${escapeHtml(og.locale)}">`);
-    if (og.siteName) tags.push(`<meta ${MANAGED_ATTR} property="og:site_name" content="${escapeHtml(og.siteName)}">`);
+    if (og.type)
+      tags.push(`<meta ${MANAGED_ATTR} property="og:type" content="${escapeHtml(og.type)}">`);
+    if (og.title)
+      tags.push(`<meta ${MANAGED_ATTR} property="og:title" content="${escapeHtml(og.title)}">`);
+    if (og.description)
+      tags.push(
+        `<meta ${MANAGED_ATTR} property="og:description" content="${escapeHtml(og.description)}">`,
+      );
+    if (og.url)
+      tags.push(`<meta ${MANAGED_ATTR} property="og:url" content="${escapeHtml(og.url)}">`);
+    if (og.image)
+      tags.push(`<meta ${MANAGED_ATTR} property="og:image" content="${escapeHtml(og.image)}">`);
+    if (og.locale)
+      tags.push(`<meta ${MANAGED_ATTR} property="og:locale" content="${escapeHtml(og.locale)}">`);
+    if (og.siteName)
+      tags.push(
+        `<meta ${MANAGED_ATTR} property="og:site_name" content="${escapeHtml(og.siteName)}">`,
+      );
   }
   if (props.twitter) {
     const tc = props.twitter;
-    if (tc.card) tags.push(`<meta ${MANAGED_ATTR} name="twitter:card" content="${escapeHtml(tc.card)}">`);
-    if (tc.site) tags.push(`<meta ${MANAGED_ATTR} name="twitter:site" content="${escapeHtml(tc.site)}">`);
-    if (tc.creator) tags.push(`<meta ${MANAGED_ATTR} name="twitter:creator" content="${escapeHtml(tc.creator)}">`);
-    if (tc.title) tags.push(`<meta ${MANAGED_ATTR} name="twitter:title" content="${escapeHtml(tc.title)}">`);
-    if (tc.description) tags.push(`<meta ${MANAGED_ATTR} name="twitter:description" content="${escapeHtml(tc.description)}">`);
-    if (tc.image) tags.push(`<meta ${MANAGED_ATTR} name="twitter:image" content="${escapeHtml(tc.image)}">`);
+    if (tc.card)
+      tags.push(`<meta ${MANAGED_ATTR} name="twitter:card" content="${escapeHtml(tc.card)}">`);
+    if (tc.site)
+      tags.push(`<meta ${MANAGED_ATTR} name="twitter:site" content="${escapeHtml(tc.site)}">`);
+    if (tc.creator)
+      tags.push(
+        `<meta ${MANAGED_ATTR} name="twitter:creator" content="${escapeHtml(tc.creator)}">`,
+      );
+    if (tc.title)
+      tags.push(`<meta ${MANAGED_ATTR} name="twitter:title" content="${escapeHtml(tc.title)}">`);
+    if (tc.description)
+      tags.push(
+        `<meta ${MANAGED_ATTR} name="twitter:description" content="${escapeHtml(tc.description)}">`,
+      );
+    if (tc.image)
+      tags.push(`<meta ${MANAGED_ATTR} name="twitter:image" content="${escapeHtml(tc.image)}">`);
   }
 
   return tags.join('\n');
@@ -80,10 +105,7 @@ function buildShorthandTags(props: HeadProps): string {
 function updateClientHead(html: string): void {
   if (typeof document === 'undefined') return;
 
-  const parsed = new DOMParser().parseFromString(
-    `<root>${html}</root>`,
-    'text/html',
-  );
+  const parsed = new DOMParser().parseFromString(`<root>${html}</root>`, 'text/html');
   const newTags = parsed.body.firstChild?.childNodes ?? [];
 
   const existing = document.querySelectorAll(`[${MANAGED_ATTR}]`);

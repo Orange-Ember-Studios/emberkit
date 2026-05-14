@@ -25,5 +25,5 @@ export interface NavigationTrigger {
   delta?: number;
 }
 
-export const VIEW_TRANSITION_API_SUPPORTED = typeof document !== 'undefined' &&
-  'startViewTransition' in document;
+export const VIEW_TRANSITION_API_SUPPORTED =
+  typeof document !== 'undefined' && 'startViewTransition' in document;

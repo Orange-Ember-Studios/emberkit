@@ -1,5 +1,5 @@
-import type { FC } from '@emberkit/core';
-import { Text } from '../../atoms/index.js';
+import type { FC } from "@emberkit/core";
+import { Text } from "../../atoms/index.js";
 
 export interface Tab {
   id: string;
@@ -16,29 +16,26 @@ export interface TabsProps {
 }
 
 function isSignal(val: unknown): val is (() => string) & { __idx: number } {
-  return typeof val === 'function' && (val as any).__idx != null;
+  return typeof val === "function" && (val as any).__idx != null;
 }
 
-const Tabs: FC<TabsProps> = ({
-  tabs,
-  activeTab,
-  onChange,
-  className = '',
-}) => {
+const Tabs: FC<TabsProps> = ({ tabs, activeTab, onChange, className = "" }) => {
   const signalTab = isSignal(activeTab) ? activeTab : null;
   const activeVal = signalTab ? signalTab() : (activeTab as string);
-  const base = 'flex border-b border-white/10';
+  const base = "flex border-b border-white/10";
   const cls = `${base} ${className}`.trim();
 
   return (
     <div class={cls} role="tablist">
-      {  tabs.map((tab) => {
+      {tabs.map((tab) => {
         const isActive = tab.id === activeVal;
-        const sharedCls = 'px-4 py-2.5 text-sm font-medium transition-colors duration-150 border-b-2 -mb-px';
-        const activeCls = 'border-primary-500 text-primary-400';
-        const inactiveCls = 'border-transparent text-surface-700 hover:text-surface-800 hover:border-surface-400';
-        const hoverCls = tab.disabled ? '' : 'cursor-pointer';
-        const disabledCls = tab.disabled ? 'opacity-50 cursor-not-allowed' : '';
+        const sharedCls =
+          "px-4 py-2.5 text-sm font-medium transition-colors duration-150 border-b-2 -mb-px";
+        const activeCls = "border-primary-500 text-primary-400";
+        const inactiveCls =
+          "border-transparent text-surface-700 hover:text-surface-800 hover:border-surface-400";
+        const hoverCls = tab.disabled ? "" : "cursor-pointer";
+        const disabledCls = tab.disabled ? "opacity-50 cursor-not-allowed" : "";
 
         return (
           <button

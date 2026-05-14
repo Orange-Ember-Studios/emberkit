@@ -48,8 +48,8 @@ export interface TwitterCardData {
 
 export class MetaGenerator {
   private baseUrl: string;
-  private defaultTitle = 'EmberKit App';
   private defaultDescription = 'Built with EmberKit';
+  private defaultTitle = 'EmberKit App';
   private siteName = 'EmberKit';
 
   constructor(baseUrl = 'https://example.com') {
@@ -93,6 +93,18 @@ export class MetaGenerator {
     return tags;
   }
 
+  private generateCanonical(data: MetaData): string[] {
+    if (!data.canonical && this.baseUrl) {
+      return [`<link rel="canonical" href="${escapeHtml(this.baseUrl)}">`];
+    }
+
+    if (data.canonical) {
+      return [`<link rel="canonical" href="${escapeHtml(data.canonical)}">`];
+    }
+
+    return [];
+  }
+
   private generateOpenGraph(data: MetaData): string[] {
     if (!data.openGraph) return [];
 
@@ -101,7 +113,9 @@ export class MetaGenerator {
 
     tags.push(`<meta property="og:type" content="${og.type ?? 'website'}">`);
     tags.push(`<meta property="og:title" content="${escapeHtml(og.title ?? data.title ?? '')}">`);
-    tags.push(`<meta property="og:description" content="${escapeHtml(og.description ?? data.description ?? '')}">`);
+    tags.push(
+      `<meta property="og:description" content="${escapeHtml(og.description ?? data.description ?? '')}">`,
+    );
 
     if (og.url) {
       tags.push(`<meta property="og:url" content="${escapeHtml(og.url)}">`);
@@ -127,6 +141,14 @@ export class MetaGenerator {
     return tags;
   }
 
+  private generateStructuredData(data: MetaData): string[] {
+    if (!data.structuredData) return [];
+
+    const json = JSON.stringify(data.structuredData);
+
+    return [`<script type="application/ld+json">${json}</script>`];
+  }
+
   private generateTwitter(data: MetaData): string[] {
     if (!data.twitter) return [];
 
@@ -136,33 +158,15 @@ export class MetaGenerator {
     tags.push(`<meta name="twitter:card" content="${tc.card}">`);
 
     if (tc.title) tags.push(`<meta name="twitter:title" content="${escapeHtml(tc.title)}">`);
-    if (tc.description) tags.push(`<meta name="twitter:description" content="${escapeHtml(tc.description)}">`);
+    if (tc.description)
+      tags.push(`<meta name="twitter:description" content="${escapeHtml(tc.description)}">`);
     if (tc.image) tags.push(`<meta name="twitter:image" content="${escapeHtml(tc.image)}">`);
-    if (tc.imageAlt) tags.push(`<meta name="twitter:image:alt" content="${escapeHtml(tc.imageAlt)}">`);
+    if (tc.imageAlt)
+      tags.push(`<meta name="twitter:image:alt" content="${escapeHtml(tc.imageAlt)}">`);
     if (tc.site) tags.push(`<meta name="twitter:site" content="${escapeHtml(tc.site)}">`);
     if (tc.creator) tags.push(`<meta name="twitter:creator" content="${escapeHtml(tc.creator)}">`);
 
     return tags;
-  }
-
-  private generateCanonical(data: MetaData): string[] {
-    if (!data.canonical && this.baseUrl) {
-      return [`<link rel="canonical" href="${escapeHtml(this.baseUrl)}">`];
-    }
-
-    if (data.canonical) {
-      return [`<link rel="canonical" href="${escapeHtml(data.canonical)}">`];
-    }
-
-    return [];
-  }
-
-  private generateStructuredData(data: MetaData): string[] {
-    if (!data.structuredData) return [];
-
-    const json = JSON.stringify(data.structuredData);
-
-    return [`<script type="application/ld+json">${json}</script>`];
   }
 }
 
@@ -175,9 +179,7 @@ export function generateMeta(data: MetaData, baseUrl?: string): string {
   return generator.generate(data);
 }
 
-export function generateBreadcrumbs(
-  items: Array<{ name: string; url: string }>,
-): string {
+export function generateBreadcrumbs(items: Array<{ name: string; url: string }>): string {
   const json = JSON.stringify({
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -192,16 +194,14 @@ export function generateBreadcrumbs(
   return `<script type="application/ld+json">${json}</script>`;
 }
 
-export function generateArticleSchema(
-  data: {
-    title: string;
-    description: string;
-    author: string;
-    publishedAt: string;
-    url: string;
-    image?: string;
-  },
-): string {
+export function generateArticleSchema(data: {
+  title: string;
+  description: string;
+  author: string;
+  publishedAt: string;
+  url: string;
+  image?: string;
+}): string {
   return JSON.stringify({
     '@context': 'https://schema.org',
     '@type': 'Article',
@@ -217,16 +217,14 @@ export function generateArticleSchema(
   });
 }
 
-export function generateProductSchema(
-  data: {
-    name: string;
-    description: string;
-    price: string;
-    currency?: string;
-    availability?: string;
-    image?: string;
-  },
-): string {
+export function generateProductSchema(data: {
+  name: string;
+  description: string;
+  price: string;
+  currency?: string;
+  availability?: string;
+  image?: string;
+}): string {
   return JSON.stringify({
     '@context': 'https://schema.org',
     '@type': 'Product',

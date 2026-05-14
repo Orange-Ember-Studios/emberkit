@@ -1,5 +1,5 @@
 type FC<P> = (props: P) => unknown;
-import { Heading, Text, Badge, type BadgeVariant } from '../../atoms/index.js';
+import { Heading, Text, Badge, type BadgeVariant } from "../../atoms/index.js";
 
 export interface CardProps {
   title?: string;
@@ -17,19 +17,24 @@ const Card: FC<CardProps> = ({
   description,
   badge,
   children,
-  className = '',
+  className = "",
   footer,
   onClick,
 }) => {
-  const base = 'glass-card rounded-2xl border border-white/10 shadow-lg overflow-hidden transition-all duration-300';
-  const hover = onClick ? 'cursor-pointer hover:shadow-xl hover:border-primary-500/30 hover:scale-[1.01] hover:-translate-y-0.5' : '';
+  const base =
+    "glass-card rounded-2xl border border-white/10 shadow-lg overflow-hidden transition-all duration-300";
+  const hover = onClick
+    ? "cursor-pointer hover:shadow-xl hover:border-primary-500/30 hover:scale-[1.01] hover:-translate-y-0.5"
+    : "";
   const cls = `${base} ${hover} ${className}`.trim();
 
   return (
     <div class={cls} onClick={onClick}>
       {(title || description || badge) && (
         <div class="p-8 pb-0">
-          {badge && <Badge variant={badge.variant}>{badge.text}</Badge>}
+          {badge && (
+            <Badge variant={badge.variant ?? "default"}>{badge.text}</Badge>
+          )}
           {title && <Heading level={3}>{title}</Heading>}
           {description && <Text color="muted">{description}</Text>}
         </div>

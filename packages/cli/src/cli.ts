@@ -1,7 +1,7 @@
-import { dev } from './commands/dev.js';
-import { build } from './commands/build.js';
-import { preview } from './commands/preview.js';
-import { create } from './commands/create.js';
+import { dev } from "./commands/dev.js";
+import { build } from "./commands/build.js";
+import { preview } from "./commands/preview.js";
+import { create } from "./commands/create.js";
 
 export interface CLIConfig {
   version: string;
@@ -17,27 +17,27 @@ export async function runCLI(args: string[]): Promise<void> {
   }
 
   switch (command) {
-    case 'dev':
+    case "dev":
       await dev(restArgs);
       break;
-    case 'build':
+    case "build":
       await build(restArgs);
       break;
-    case 'preview':
+    case "preview":
       await preview(restArgs);
       break;
-    case 'create':
+    case "create":
       await handleCreate(restArgs);
       break;
-    case 'generate':
+    case "generate":
       await runGenerate(restArgs);
       break;
-    case '--version':
-    case '-v':
-      console.log('EmberKit CLI v0.1.0');
+    case "--version":
+    case "-v":
+      console.log("EmberKit CLI v0.1.0");
       break;
-    case '--help':
-    case '-h':
+    case "--help":
+    case "-h":
       showHelp();
       break;
     default:
@@ -75,12 +75,12 @@ Examples:
 async function handleCreate(args: string[]): Promise<void> {
   const name = args[0];
   if (!name) {
-    console.error('Error: Project name is required.');
-    console.error('Usage: emberkit create <project-name>');
+    console.error("Error: Project name is required.");
+    console.error("Usage: emberkit create <project-name>");
     process.exit(1);
   }
 
-  const noInstall = args.includes('--no-install');
+  const noInstall = args.includes("--no-install");
 
   await create({
     name,
@@ -91,9 +91,9 @@ async function handleCreate(args: string[]): Promise<void> {
 async function runGenerate(args: string[]): Promise<void> {
   const [type, name] = args;
   if (!type || !name) {
-    console.error('Usage: emberkit generate <type> <name>');
+    console.error("Usage: emberkit generate <type> <name>");
     process.exit(1);
   }
   console.log(`🎨 Generating ${type}: ${name}`);
-  console.log('(Not yet implemented)');
+  console.log("(Not yet implemented)");
 }

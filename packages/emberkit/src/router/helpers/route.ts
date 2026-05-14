@@ -1,13 +1,17 @@
 import type { Route, RouteMatch } from '../types.js';
 import { normalizePath, matchPath, scoreRoute, extractSegments } from './path.js';
 
-export function createRoute(
-  filePath: string,
-  routeDir: string = 'src/routes',
-): Route | null {
-  const relativePath = filePath.replace(/\\/g, '/').replace(routeDir, '').replace(/\.(tsx|ts|jsx|js|md|mdx)$/, '');
+export function createRoute(filePath: string, routeDir: string = 'src/routes'): Route | null {
+  const relativePath = filePath
+    .replace(/\\/g, '/')
+    .replace(routeDir, '')
+    .replace(/\.(tsx|ts|jsx|js|md|mdx)$/, '');
 
-  if (relativePath.startsWith('/_api/') || relativePath.startsWith('_api/') || relativePath.includes('/_api/')) {
+  if (
+    relativePath.startsWith('/_api/') ||
+    relativePath.startsWith('_api/') ||
+    relativePath.includes('/_api/')
+  ) {
     return null;
   }
 
@@ -122,7 +126,9 @@ export function findLayoutChain(routes: Route[], pathname: string): Route[] {
     const layout = routes.find(
       (r) =>
         r.isLayout &&
-        (r.path === pathPrefix || r.path === pathPrefix + '/_layout' || r.path === pathPrefix + '/index'),
+        (r.path === pathPrefix ||
+          r.path === pathPrefix + '/_layout' ||
+          r.path === pathPrefix + '/index'),
     );
 
     if (layout) {

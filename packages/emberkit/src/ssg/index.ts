@@ -59,18 +59,11 @@ export class SSGBuilder {
     for (let i = 0; i < pages.length; i++) {
       const result = pages[i];
       if (result.status === 'rejected') {
-        this.manifest.errors.set(
-          this.config.routes[i],
-          result.reason,
-        );
+        this.manifest.errors.set(this.config.routes[i], result.reason);
       }
     }
 
     this.manifest.buildTime = Date.now() - start;
-    return this.manifest;
-  }
-
-  getManifest(): SSGManifest {
     return this.manifest;
   }
 
@@ -80,6 +73,10 @@ export class SSGBuilder {
       errors: this.manifest.errors.size,
       time: this.manifest.buildTime,
     };
+  }
+
+  getManifest(): SSGManifest {
+    return this.manifest;
   }
 }
 
@@ -123,20 +120,11 @@ export function deserializeManifest(json: string): SSGManifest {
   };
 }
 
-export const STATIC_ROUTE_PATTERNS = [
-  '/',
-  '/about',
-  '/contact',
-  '/blog',
-  '/pricing',
-];
+export const STATIC_ROUTE_PATTERNS = ['/', '/about', '/contact', '/blog', '/pricing'];
 
 export function isStaticRoute(path: string): boolean {
   return (
-    !path.includes('[') &&
-    !path.includes(':') &&
-    !path.startsWith('/api/') &&
-    !path.includes('...')
+    !path.includes('[') && !path.includes(':') && !path.startsWith('/api/') && !path.includes('...')
   );
 }
 
@@ -158,7 +146,9 @@ export async function crawlRoutes(
     visited.add(path);
 
     if (await shouldCrawl(path)) {
-      const html = await fetch(path).then((r) => r.text()).catch(() => '');
+      const html = await fetch(path)
+        .then((r) => r.text())
+        .catch(() => '');
       const links = getLinks(html);
 
       for (const link of links) {

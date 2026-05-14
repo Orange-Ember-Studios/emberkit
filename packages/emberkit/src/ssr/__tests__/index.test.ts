@@ -159,9 +159,7 @@ describe('createHtmlDocument', () => {
 
 describe('escapeHtml', () => {
   it('should escape HTML special characters', () => {
-    expect(escapeHtml('<div>"test"&</div>')).toBe(
-      '&lt;div&gt;&quot;test&quot;&amp;&lt;/div&gt;',
-    );
+    expect(escapeHtml('<div>"test"&</div>')).toBe('&lt;div&gt;&quot;test&quot;&amp;&lt;/div&gt;');
   });
 
   it('should handle normal text', () => {

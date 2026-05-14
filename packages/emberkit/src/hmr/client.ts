@@ -1,9 +1,5 @@
 import type { HMRContext, HotModule } from './types.js';
-import {
-  registerHotModule,
-  disposeHotModule,
-  getHotModule,
-} from './types.js';
+import { registerHotModule, disposeHotModule, getHotModule } from './types.js';
 
 declare global {
   interface ImportMeta {

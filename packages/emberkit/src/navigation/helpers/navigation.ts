@@ -1,9 +1,6 @@
 import type { NavigationOptions, ViewTransitionOptions } from '../types.js';
 
-export async function navigate(
-  to: string,
-  options: NavigationOptions = {},
-): Promise<void> {
+export async function navigate(to: string, options: NavigationOptions = {}): Promise<void> {
   const { replace = false, state, viewTransition } = options;
 
   if (replace) {
@@ -13,9 +10,7 @@ export async function navigate(
   }
 
   if (viewTransition) {
-    const viewTransitionOptions = typeof viewTransition === 'boolean'
-      ? {}
-      : viewTransition;
+    const viewTransitionOptions = typeof viewTransition === 'boolean' ? {} : viewTransition;
 
     await startViewTransition(viewTransitionOptions);
   }
@@ -41,19 +36,23 @@ export function preload(path: string): void {
   document.head.appendChild(link);
 }
 
-export async function startViewTransition(
-  options: ViewTransitionOptions = {},
-): Promise<void> {
+export async function startViewTransition(options: ViewTransitionOptions = {}): Promise<void> {
   const { skipTransition = false, documentViewTransition = true } = options;
 
   if (skipTransition) {
     return;
   }
 
-  if (documentViewTransition && typeof document !== 'undefined' && 'startViewTransition' in document) {
-    const transition = (document as unknown as {
-      startViewTransition: (callback: () => void | Promise<void>) => ViewTransition
-    }).startViewTransition(async () => {
+  if (
+    documentViewTransition &&
+    typeof document !== 'undefined' &&
+    'startViewTransition' in document
+  ) {
+    const transition = (
+      document as unknown as {
+        startViewTransition: (callback: () => void | Promise<void>) => ViewTransition;
+      }
+    ).startViewTransition(async () => {
       await Promise.resolve();
     });
 

@@ -61,7 +61,8 @@
     "build": "tsc && cp src/tokens/tokens.css dist/tokens/tokens.css",
     "dev": "tsc --watch",
     "lint": "eslint src --ext .ts,.tsx",
-    "format": "prettier --write \"src/**/*.{ts,tsx,css}\""
+    "format": "prettier --write \"src/**/*.{ts,tsx,css}\"",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@emberkit/core": "^0.2.1",

@@ -1,11 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import {
-  createSignal,
-  createMemo,
-  createEffect,
-  batch,
-  untrack,
-} from '../index.js';
+import { createSignal, createMemo, createEffect, batch, untrack } from '../index.js';
 
 describe('createSignal', () => {
   it('should create a signal with initial value', () => {
@@ -33,9 +27,12 @@ describe('createSignal', () => {
   });
 
   it('should use custom equals function', () => {
-    const obj = createSignal({ count: 0 }, {
-      equals: (prev, next) => prev.count === next.count,
-    });
+    const obj = createSignal(
+      { count: 0 },
+      {
+        equals: (prev, next) => prev.count === next.count,
+      },
+    );
 
     obj.value = { count: 0 };
     const prev = obj.value;

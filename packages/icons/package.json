@@ -33,9 +33,9 @@
   },
   "scripts": {
     "build": "tsc",
-    "dev": "tsc --watch",
-    "lint": "eslint src --ext .ts,.tsx",
-    "format": "prettier --write \"src/**/*.{ts,tsx}\""
+    "lint": "eslint src --ext .ts",
+    "format": "prettier --write \"src/**/*.{ts,tsx}\"",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {},
   "peerDependencies": {

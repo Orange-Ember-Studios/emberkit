@@ -5,7 +5,7 @@ export type {
   SpacingToken,
   BorderRadiusToken,
   ShadowToken,
-} from './types.js';
+} from "./types.js";
 
 export {
   tokens,
@@ -16,4 +16,4 @@ export {
   shadow,
   color,
   semanticColor,
-} from './helpers.js';
+} from "./helpers.js";

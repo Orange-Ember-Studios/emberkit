@@ -25,8 +25,8 @@ export interface MDXMetadata {
 }
 
 class MDXCompiler {
-  private config: MDXConfig;
   private components: Map<string, (props: Record<string, unknown>) => JSXElement>;
+  private config: MDXConfig;
 
   constructor(config: MDXConfig = {}) {
     this.config = config;
@@ -34,12 +34,63 @@ class MDXCompiler {
   }
 
   compile(source: string): (props: Record<string, unknown>) => JSXElement {
-    const parsed = parseMarkdown(source, { gfm: this.config.gfm, breaks: this.config.breaks, tables: this.config.tables });
+    const parsed = parseMarkdown(source, {
+      gfm: this.config.gfm,
+      breaks: this.config.breaks,
+      tables: this.config.tables,
+    });
     const { html, frontmatter } = parsed;
 
     const componentCode = this.generateComponent(html);
 
     return this.createComponent(componentCode, frontmatter);
+  }
+
+  getComponent(name: string): ((props: Record<string, unknown>) => JSXElement) | undefined {
+    return this.components.get(name);
+  }
+
+  registerComponent(name: string, component: (props: Record<string, unknown>) => JSXElement): void {
+    this.components.set(name, component);
+  }
+
+  unregisterComponent(name: string): void {
+    this.components.delete(name);
+  }
+
+  private createComponent(
+    code: string,
+    frontmatter?: Record<string, unknown>,
+  ): (props: Record<string, unknown>) => JSXElement {
+    try {
+      const fn = new Function('createElement', code);
+
+      const component = (props: Record<string, unknown>) => {
+        const element = fn(createElementProxy);
+        return element;
+      };
+
+      if (frontmatter) {
+        (component as MDXComponent).frontmatter = frontmatter;
+      }
+
+      return component as MDXComponent;
+    } catch (error) {
+      console.error('MDX compilation error:', error);
+      return () => ({ type: 'div', props: { children: 'MDX Error' } }) as unknown as JSXElement;
+    }
+  }
+
+  private extractHeadingIds(html: string): string[] {
+    const ids: string[] = [];
+    const regex = /id="([^"]+)"/g;
+    let match;
+
+    while ((match = regex.exec(html)) !== null) {
+      ids.push(match[1]);
+    }
+
+    return ids;
   }
 
   private generateComponent(html: string): string {
@@ -69,58 +120,11 @@ class MDXCompiler {
     return code;
   }
 
-  private extractHeadingIds(html: string): string[] {
-    const ids: string[] = [];
-    const regex = /id="([^"]+)"/g;
-    let match;
-
-    while ((match = regex.exec(html)) !== null) {
-      ids.push(match[1]);
-    }
-
-    return ids;
-  }
-
   private splitParagraphs(html: string): string[] {
     return html
       .split(/\n\n+/)
       .map((p) => p.trim())
       .filter(Boolean);
-  }
-
-  private createComponent(
-    code: string,
-    frontmatter?: Record<string, unknown>,
-  ): (props: Record<string, unknown>) => JSXElement {
-    try {
-      const fn = new Function('createElement', code);
-
-      const component = (props: Record<string, unknown>) => {
-        const element = fn(createElementProxy);
-        return element;
-      };
-
-      if (frontmatter) {
-        (component as MDXComponent).frontmatter = frontmatter;
-      }
-
-      return component as MDXComponent;
-    } catch (error) {
-      console.error('MDX compilation error:', error);
-      return () => ({ type: 'div', props: { children: 'MDX Error' } } as unknown as JSXElement);
-    }
-  }
-
-  registerComponent(name: string, component: (props: Record<string, unknown>) => JSXElement): void {
-    this.components.set(name, component);
-  }
-
-  unregisterComponent(name: string): void {
-    this.components.delete(name);
-  }
-
-  getComponent(name: string): ((props: Record<string, unknown>) => JSXElement) | undefined {
-    return this.components.get(name);
   }
 }
 
@@ -140,10 +144,7 @@ export function createMDXCompiler(config?: MDXConfig): MDXCompiler {
   return new MDXCompiler(config);
 }
 
-export async function compileMDX(
-  source: string,
-  options?: MDXConfig,
-): Promise<MDXComponent> {
+export async function compileMDX(source: string, options?: MDXConfig): Promise<MDXComponent> {
   const compiler = createMDXCompiler(options);
   return compiler.compile(source);
 }
@@ -191,12 +192,14 @@ export const DEFAULT_COMPONENTS: Record<string, (props: Record<string, unknown>)
   table: (props) => {
     return {
       type: 'div',
-      props: { 
-        className: 'table-wrapper', 
-        children: [{ 
-          type: 'table', 
-          props: { children: [props.children] } 
-        }] 
+      props: {
+        className: 'table-wrapper',
+        children: [
+          {
+            type: 'table',
+            props: { children: [props.children] },
+          },
+        ],
       },
     } as unknown as JSXElement;
   },

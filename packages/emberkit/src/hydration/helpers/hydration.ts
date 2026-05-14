@@ -21,11 +21,7 @@ export async function hydrateSelective(
   const root = typeof container === 'string' ? document.querySelector(container) : container;
   if (!root || !element) return;
 
-  const {
-    hydrateInteractive = true,
-    onHydrated,
-    onError,
-  } = options;
+  const { hydrateInteractive = true, onHydrated, onError } = options;
 
   const manifest = analyzeTree(element);
 
@@ -36,9 +32,7 @@ export async function hydrateSelective(
   const candidates = getHydrationCandidates(manifest, 'eager');
 
   await Promise.allSettled(
-    candidates.map((candidate) =>
-      hydrateElement(root, candidate, element, onHydrated, onError),
-    ),
+    candidates.map((candidate) => hydrateElement(root, candidate, element, onHydrated, onError)),
   );
 }
 
@@ -84,10 +78,7 @@ async function hydrateElement(
   await promise;
 }
 
-export function attachEventHandlers(
-  element: Element,
-  handlers: Set<string>,
-): void {
+export function attachEventHandlers(element: Element, handlers: Set<string>): void {
   for (const handler of handlers) {
     const attribute = handler.toLowerCase();
     const attrValue = element.getAttribute(attribute);
@@ -149,10 +140,14 @@ export function createLazyHydration<T>(
     onError,
   } = options;
 
-  const container = createElement('div', {
-    'data-lazy': '',
-    'data-loader': loader.toString(),
-  }, fallback);
+  const container = createElement(
+    'div',
+    {
+      'data-lazy': '',
+      'data-loader': loader.toString(),
+    },
+    fallback,
+  );
 
   if (typeof IntersectionObserver !== 'undefined') {
     requestAnimationFrame(() => {

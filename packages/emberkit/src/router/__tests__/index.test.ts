@@ -1,6 +1,13 @@
 import { describe, it, expect } from 'vitest';
 import { createRoute, matchRoute, sortRoutes, findLayoutChain } from '../index.js';
-import { normalizePath, pathToRegex, matchPath, scoreRoute, isDynamicSegment, isCatchAll } from '../helpers/path.js';
+import {
+  normalizePath,
+  pathToRegex,
+  matchPath,
+  scoreRoute,
+  isDynamicSegment,
+  isCatchAll,
+} from '../helpers/path.js';
 import type { Route } from '../types.js';
 
 describe('normalizePath', () => {
@@ -132,9 +139,7 @@ describe('matchRoute', () => {
   });
 
   it('should match and extract params', () => {
-    const routes: Route[] = [
-      createRoute('src/routes/users/[id].tsx', 'src/routes')!,
-    ];
+    const routes: Route[] = [createRoute('src/routes/users/[id].tsx', 'src/routes')!];
 
     const match = matchRoute(routes, '/users/123');
     expect(match).not.toBeNull();

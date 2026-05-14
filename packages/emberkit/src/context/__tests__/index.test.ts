@@ -1,5 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { createContext, getContextValue, hasContext, clearAllContexts, useContext } from '../index.js';
+import {
+  createContext,
+  getContextValue,
+  hasContext,
+  clearAllContexts,
+  useContext,
+} from '../index.js';
 
 describe('createContext', () => {
   it('should create a context with undefined default', () => {

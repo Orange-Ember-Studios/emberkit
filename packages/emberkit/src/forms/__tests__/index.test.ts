@@ -64,7 +64,7 @@ describe('Forms', () => {
       const validator = new FormValidator({
         fields: {
           age: {
-            custom: (v) => (typeof v === 'number' && v < 0) ? 'Age cannot be negative' : null,
+            custom: (v) => (typeof v === 'number' && v < 0 ? 'Age cannot be negative' : null),
           },
         },
       });

@@ -1,5 +1,5 @@
-import type { FC } from '@emberkit/core';
-import { Text, Spinner } from '../../atoms/index.js';
+import type { FC } from "@emberkit/core";
+import { Text, Spinner } from "../../atoms/index.js";
 
 export interface Column<T = Record<string, unknown>> {
   key: string;
@@ -18,7 +18,7 @@ export interface DataTableProps<T = Record<string, unknown>> {
   className?: string;
   onRowClick?: (row: T) => void;
   sortKey?: string;
-  sortDirection?: 'asc' | 'desc';
+  sortDirection?: "asc" | "desc";
   onSort?: (key: string) => void;
 }
 
@@ -26,8 +26,8 @@ function DataTable<T extends Record<string, unknown>>({
   columns,
   rows,
   loading = false,
-  emptyMessage = 'No data available',
-  className = '',
+  emptyMessage = "No data available",
+  className = "",
   onRowClick,
   sortKey,
   sortDirection,
@@ -42,10 +42,12 @@ function DataTable<T extends Record<string, unknown>>({
           <tr class="border-b border-white/10 bg-white/5">
             {columns.map((col) => {
               const thCls = [
-                'px-4 py-3 text-left text-xs font-medium text-surface-800 uppercase tracking-wider',
-                col.sortable ? 'cursor-pointer hover:text-surface-900 select-none' : '',
-                col.className ?? '',
-              ].join(' ');
+                "px-4 py-3 text-left text-xs font-medium text-surface-800 uppercase tracking-wider",
+                col.sortable
+                  ? "cursor-pointer hover:text-surface-900 select-none"
+                  : "",
+                col.className ?? "",
+              ].join(" ");
 
               return (
                 <th
@@ -57,7 +59,7 @@ function DataTable<T extends Record<string, unknown>>({
                     {col.label}
                     {col.sortable && sortKey === col.key && (
                       <span class="text-primary-400">
-                        {sortDirection === 'asc' ? '↑' : '↓'}
+                        {sortDirection === "asc" ? "↑" : "↓"}
                       </span>
                     )}
                   </div>
@@ -84,14 +86,19 @@ function DataTable<T extends Record<string, unknown>>({
               <tr
                 key={i}
                 class={[
-                  'transition-colors duration-150',
-                  onRowClick ? 'cursor-pointer hover:bg-primary-500/10' : 'hover:bg-surface-200',
-                ].join(' ')}
+                  "transition-colors duration-150",
+                  onRowClick
+                    ? "cursor-pointer hover:bg-primary-500/10"
+                    : "hover:bg-surface-200",
+                ].join(" ")}
                 onClick={() => onRowClick?.(row)}
               >
                 {columns.map((col) => (
-                  <td key={col.key} class={`px-4 py-3 text-sm text-surface-800 ${col.className ?? ''}`}>
-                    {col.render ? col.render(row) : String(row[col.key] ?? '')}
+                  <td
+                    key={col.key}
+                    class={`px-4 py-3 text-sm text-surface-800 ${col.className ?? ""}`}
+                  >
+                    {col.render ? col.render(row) : String(row[col.key] ?? "")}
                   </td>
                 ))}
               </tr>

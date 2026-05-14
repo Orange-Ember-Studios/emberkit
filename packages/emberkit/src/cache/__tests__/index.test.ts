@@ -10,7 +10,6 @@ import {
   staleWhileRevalidate,
 } from '../index.js';
 
-
 describe('Cache', () => {
   describe('DataCache', () => {
     let cache: DataCache<string>;

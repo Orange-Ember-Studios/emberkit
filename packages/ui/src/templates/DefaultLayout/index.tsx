@@ -1,13 +1,13 @@
 type FC<P> = (props: P) => unknown;
-import type { NavItem } from '../../organisms/Header/index.js';
-import { Header, Sidebar } from '../../organisms/index.js';
+import type { NavItem } from "../../organisms/Header/index.js";
+import { Header, Sidebar } from "../../organisms/index.js";
 
 export interface DefaultLayoutProps {
   children?: unknown;
   [key: string]: unknown;
   title?: string;
   navItems?: NavItem[];
-  sidebarItems?: import('../../organisms/Sidebar/index.js').SidebarItem[];
+  sidebarItems?: import("../../organisms/Sidebar/index.js").SidebarItem[];
   logo?: unknown;
   headerActions?: unknown;
   sidebarCollapsed?: boolean;
@@ -15,7 +15,7 @@ export interface DefaultLayoutProps {
 
 const DefaultLayout: FC<DefaultLayoutProps> = ({
   children,
-  title = 'EmberKit',
+  title = "EmberKit",
   navItems = [],
   sidebarItems = [],
   logo,
@@ -28,7 +28,9 @@ const DefaultLayout: FC<DefaultLayoutProps> = ({
         <Sidebar
           items={sidebarItems}
           collapsed={sidebarCollapsed}
-          header={<span class="text-lg font-semibold text-surface-900">App</span>}
+          header={
+            <span class="text-lg font-semibold text-surface-900">App</span>
+          }
         />
       )}
       <div class="flex-1 flex flex-col overflow-hidden">
@@ -38,9 +40,7 @@ const DefaultLayout: FC<DefaultLayoutProps> = ({
           logo={logo}
           actions={headerActions}
         />
-        <main class="flex-1 overflow-y-auto p-6">
-          {children}
-        </main>
+        <main class="flex-1 overflow-y-auto p-6">{children}</main>
       </div>
     </div>
   );

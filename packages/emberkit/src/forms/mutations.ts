@@ -41,7 +41,7 @@ export function createAction<TData, TVariables>(
     context?: Partial<ActionContext>,
   ): Promise<ActionResult<TData>> => {
     let optimisticData: TData | undefined;
-    
+
     try {
       if (options?.onMutate) {
         optimisticData = await options.onMutate(variables);
@@ -177,10 +177,7 @@ export function createMutation<TData, TVariables>(
   return { mutate, subscribe, getState, reset };
 }
 
-export async function handleAction(
-  handler: ActionHandler,
-  request: Request,
-): Promise<Response> {
+export async function handleAction(handler: ActionHandler, request: Request): Promise<Response> {
   let variables: Record<string, unknown> = {};
 
   if (request.method === 'POST' || request.method === 'PUT' || request.method === 'PATCH') {
@@ -194,7 +191,10 @@ export async function handleAction(
         variables[key] = value;
       }
     } else {
-      variables = await request.text().then((t) => JSON.parse(t)).catch(() => ({}));
+      variables = await request
+        .text()
+        .then((t) => JSON.parse(t))
+        .catch(() => ({}));
     }
   } else if (request.method === 'GET') {
     const url = new URL(request.url);
@@ -224,23 +224,27 @@ export async function handleAction(
   try {
     const data = await handler(variables as Record<string, unknown>, context);
 
-    return Response.json({ data }, {
-      status: 200,
-      headers: { 'X-Action': 'success' },
-    });
+    return Response.json(
+      { data },
+      {
+        status: 200,
+        headers: { 'X-Action': 'success' },
+      },
+    );
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Action failed';
 
-    return Response.json({ error: message }, {
-      status: 500,
-      headers: { 'X-Action': 'error' },
-    });
+    return Response.json(
+      { error: message },
+      {
+        status: 500,
+        headers: { 'X-Action': 'error' },
+      },
+    );
   }
 }
 
-export function createActionHandler(
-  handler: ActionHandler,
-) {
+export function createActionHandler(handler: ActionHandler) {
   return async (request: Request): Promise<Response> => {
     return handleAction(handler, request);
   };

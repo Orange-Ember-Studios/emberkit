@@ -24,29 +24,21 @@ export interface CacheStrategy {
 }
 
 export class DataCache<T = unknown> {
-  private store = new Map<string, CacheEntry<T>>();
-  private maxSize: number;
   private defaultTTL: number;
+  private maxSize: number;
+  private store = new Map<string, CacheEntry<T>>();
 
   constructor(maxSize = 100, defaultTTL = 60000) {
     this.maxSize = maxSize;
     this.defaultTTL = defaultTTL;
   }
 
-  set(key: string, data: T, ttl?: number): void {
-    if (this.store.size >= this.maxSize) {
-      const oldest = this.findOldest();
-      if (oldest) this.store.delete(oldest);
-    }
+  clear(): void {
+    this.store.clear();
+  }
 
-    const now = Date.now();
-
-    this.store.set(key, {
-      data,
-      timestamp: now,
-      expiresAt: now + (ttl ?? this.defaultTTL),
-      headers: {},
-    });
+  delete(key: string): void {
+    this.store.delete(key);
   }
 
   get(key: string): T | null {
@@ -72,12 +64,20 @@ export class DataCache<T = unknown> {
     return true;
   }
 
-  delete(key: string): void {
-    this.store.delete(key);
-  }
+  set(key: string, data: T, ttl?: number): void {
+    if (this.store.size >= this.maxSize) {
+      const oldest = this.findOldest();
+      if (oldest) this.store.delete(oldest);
+    }
 
-  clear(): void {
-    this.store.clear();
+    const now = Date.now();
+
+    this.store.set(key, {
+      data,
+      timestamp: now,
+      expiresAt: now + (ttl ?? this.defaultTTL),
+      headers: {},
+    });
   }
 
   size(): number {
@@ -132,7 +132,11 @@ export async function fetchWithCache(
   const cached = globalCache.get(cacheKey);
 
   if (cached) {
-    const cachedResponse = cached as unknown as { body: string; status: number; headers: Record<string, string> };
+    const cachedResponse = cached as unknown as {
+      body: string;
+      status: number;
+      headers: Record<string, string>;
+    };
     return new Response(cachedResponse.body, {
       status: cachedResponse.status,
       headers: cachedResponse.headers,
@@ -308,9 +312,11 @@ export async function staleWhileRevalidate<T>(
   }
 
   if (cached) {
-    fetcher().then((data) => {
-      globalCache.set(cacheKey, { data, timestamp: Date.now() }, options.ttl);
-    }).catch(() => {});
+    fetcher()
+      .then((data) => {
+        globalCache.set(cacheKey, { data, timestamp: Date.now() }, options.ttl);
+      })
+      .catch(() => {});
     return cached.data;
   }
 

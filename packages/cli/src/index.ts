@@ -1,4 +1,4 @@
-import { runCLI } from './cli.js';
+import { runCLI } from "./cli.js";
 
 export { runCLI };
 

@@ -3,9 +3,13 @@ import type { Signal, SignalOptions } from '../types.js';
 let sigIndex = 0;
 const sigRegistry = new Map<number, { subscribe: (fn: (v: unknown) => void) => () => void }>();
 
-export function resetSigIndex(): void { sigIndex = 0; }
+export function resetSigIndex(): void {
+  sigIndex = 0;
+}
 
-export function getSignalByIndex(idx: number): { subscribe: (fn: (v: unknown) => void) => () => void } | undefined {
+export function getSignalByIndex(
+  idx: number,
+): { subscribe: (fn: (v: unknown) => void) => () => void } | undefined {
   return sigRegistry.get(idx);
 }
 
@@ -81,10 +85,7 @@ export function createSignal<T>(
   return signal;
 }
 
-export function createMemo<T>(
-  computation: () => T,
-  _options?: SignalOptions<T>,
-): Signal<T> {
+export function createMemo<T>(computation: () => T, _options?: SignalOptions<T>): Signal<T> {
   void _options;
   let value: T;
   let isStale = true;

@@ -1,8 +1,8 @@
-import { existsSync, mkdirSync, writeFileSync } from 'fs';
-import { join, resolve } from 'path';
-import { execSync } from 'child_process';
-import { starterFiles } from '../templates/starter.js';
-import { getPackageManager, getInstallCommand } from '../utils/filesystem.js';
+import { existsSync, mkdirSync, writeFileSync } from "fs";
+import { join, resolve } from "path";
+import { execSync } from "child_process";
+import { starterFiles } from "../templates/starter.js";
+import { getPackageManager, getInstallCommand } from "../utils/filesystem.js";
 
 export interface CreateOptions {
   name: string;
@@ -11,24 +11,27 @@ export interface CreateOptions {
   noInstall?: boolean;
 }
 
-function formatTemplate(template: string, vars: Record<string, string>): string {
+function formatTemplate(
+  template: string,
+  vars: Record<string, string>,
+): string {
   let result = template;
   for (const [key, value] of Object.entries(vars)) {
-    result = result.replace(new RegExp(`\\{\\{${key}\\}\\}`, 'g'), value);
+    result = result.replace(new RegExp(`\\{\\{${key}\\}\\}`, "g"), value);
   }
   return result;
 }
 
 function toKebabCase(str: string): string {
   return str
-    .replace(/([a-z])([A-Z])/g, '$1-$2')
-    .replace(/[\s_]+/g, '-')
+    .replace(/([a-z])([A-Z])/g, "$1-$2")
+    .replace(/[\s_]+/g, "-")
     .toLowerCase();
 }
 
 function getNpmPackageName(name: string): string {
   const kebab = toKebabCase(name);
-  return kebab.startsWith('@') ? kebab : kebab.replace(/^emberkit-/, '');
+  return kebab.startsWith("@") ? kebab : kebab.replace(/^emberkit-/, "");
 }
 
 export async function create(options: CreateOptions): Promise<void> {
@@ -55,13 +58,13 @@ export async function create(options: CreateOptions): Promise<void> {
 
   for (const [filePath, content] of Object.entries(starterFiles)) {
     const fullPath = join(targetDir, filePath);
-    const dir = join(targetDir, filePath.split('/').slice(0, -1).join('/'));
+    const dir = join(targetDir, filePath.split("/").slice(0, -1).join("/"));
 
     if (!existsSync(dir)) {
       mkdirSync(dir, { recursive: true });
     }
 
-    writeFileSync(fullPath, formatTemplate(content, templateVars), 'utf-8');
+    writeFileSync(fullPath, formatTemplate(content, templateVars), "utf-8");
   }
 
   console.log(`  Project created successfully!\n`);
@@ -72,10 +75,12 @@ export async function create(options: CreateOptions): Promise<void> {
 
     console.log(`  Installing dependencies with ${pm}...`);
     try {
-      execSync(installCmd, { cwd: targetDir, stdio: 'inherit' });
+      execSync(installCmd, { cwd: targetDir, stdio: "inherit" });
       console.log(`\n  Dependencies installed!\n`);
     } catch {
-      console.log(`\n  Failed to install dependencies. Run "${installCmd}" manually.\n`);
+      console.log(
+        `\n  Failed to install dependencies. Run "${installCmd}" manually.\n`,
+      );
     }
   }
 

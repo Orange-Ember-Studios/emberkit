@@ -110,7 +110,9 @@ describe('Hydration Analyzer', () => {
 
   describe('analyzeTree', () => {
     it('should analyze nested elements', () => {
-      const element = createElement('div', null,
+      const element = createElement(
+        'div',
+        null,
         createElement('button', { onClick: () => {} }),
         createElement('p', null, 'Static text'),
       ) as DOMElement;
@@ -131,7 +133,9 @@ describe('Hydration Analyzer', () => {
 
   describe('getHydrationCandidates', () => {
     it('should filter by strategy type', () => {
-      const element = createElement('div', null,
+      const element = createElement(
+        'div',
+        null,
         createElement('button', { onClick: () => {} }),
         createElement('p', { 'data-hydrate': 'lazy' }, 'Lazy'),
         createElement('span', null, 'Static'),

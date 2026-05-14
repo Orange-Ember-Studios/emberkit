@@ -1,10 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import {
-  isLoaderError,
-  isLoaderData,
-  createLoaderError,
-  createLoaderData,
-} from '../index.js';
+import { isLoaderError, isLoaderData, createLoaderError, createLoaderData } from '../index.js';
 import {
   runLoader,
   extractLoaderData,
@@ -139,10 +134,7 @@ describe('mergeLoaderResults', () => {
   });
 
   it('should return error if any loader failed', () => {
-    const results = [
-      { data: { a: 1 } },
-      { error: { code: 'ERR', message: 'Error', status: 500 } },
-    ];
+    const results = [{ data: { a: 1 } }, { error: { code: 'ERR', message: 'Error', status: 500 } }];
     const merged = mergeLoaderResults(results);
     expect('error' in merged).toBe(true);
     if ('error' in merged) {

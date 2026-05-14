@@ -61,7 +61,9 @@ export class ErrorBoundary {
         return this.props.fallback(info);
       }
 
-      return createElement('div', { class: 'error-boundary' },
+      return createElement(
+        'div',
+        { class: 'error-boundary' },
         createElement('h2', null, 'Something went wrong'),
         createElement('p', null, this.state.error.message),
       );

@@ -26,10 +26,7 @@ export function compileToTemplate(
   };
 }
 
-export function compileSelfClosing(
-  tag: string,
-  props: Record<string, unknown>,
-): CompiledTemplate {
+export function compileSelfClosing(tag: string, props: Record<string, unknown>): CompiledTemplate {
   const parts: TemplatePart[] = [];
 
   parts.push({ type: 'string', value: `<${tag}` });

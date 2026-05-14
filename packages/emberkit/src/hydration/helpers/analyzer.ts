@@ -40,10 +40,7 @@ export function extractEventHandlers(props: Record<string, unknown>): Set<string
   return handlers;
 }
 
-export function buildSelector(
-  tagName: string,
-  props: Record<string, unknown>,
-): string {
+export function buildSelector(tagName: string, props: Record<string, unknown>): string {
   let selector = tagName.toLowerCase();
 
   if (props.id && typeof props.id === 'string') {
@@ -87,9 +84,7 @@ export function determineHydrationStrategy(
   return { type: 'none' };
 }
 
-export function analyzeTree(
-  element: DOMElement | null,
-): HydrationManifest {
+export function analyzeTree(element: DOMElement | null): HydrationManifest {
   const elements: InteractiveElement[] = [];
   let hydrationRequired = 0;
   let hydrationSkipped = 0;

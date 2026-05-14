@@ -9,4 +9,4 @@ export type {
   SelectHTMLAttributes,
   ButtonHTMLAttributes,
   TextareaHTMLAttributes,
-} from './attributes.js';
+} from "./attributes.js";

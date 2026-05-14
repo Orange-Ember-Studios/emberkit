@@ -19,7 +19,7 @@ export interface CommandOption {
   name: string;
   short?: string;
   description: string;
-  type: 'boolean' | 'string' | 'number';
+  type: "boolean" | "string" | "number";
   default?: unknown;
   required?: boolean;
 }

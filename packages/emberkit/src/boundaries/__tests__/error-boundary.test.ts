@@ -21,7 +21,11 @@ describe('ErrorBoundary', () => {
     it('should render fallback on error', () => {
       const boundary = createErrorBoundary({
         fallback: (error: ErrorInfo) =>
-          ({ type: 'div', props: { class: 'error' }, children: [error.message] }) as unknown as JSXElement,
+          ({
+            type: 'div',
+            props: { class: 'error' },
+            children: [error.message],
+          }) as unknown as JSXElement,
       });
 
       ErrorBoundary.getDerivedStateFromError(new Error('Test error'));

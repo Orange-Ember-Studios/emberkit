@@ -86,51 +86,50 @@ export interface AriaAttributes {
   ariaExpanded?: boolean;
   ariaPressed?: boolean;
   ariaCurrent?: string | boolean;
-  ariaChecked?: boolean | 'mixed';
+  ariaChecked?: boolean | "mixed";
   ariaSelected?: boolean;
   ariaActiveDescendant?: string;
-  ariaAutocomplete?: 'none' | 'inline' | 'list' | 'both';
+  ariaAutocomplete?: "none" | "inline" | "list" | "both";
   ariaBusy?: boolean;
   ariaColCount?: number;
   ariaColIndex?: number;
   ariaColSpan?: number;
   ariaControls?: string;
-  ariaDropEffect?: 'none' | 'copy' | 'execute' | 'link' | 'move' | 'popup';
-  ariaHasPopup?: boolean | 'menu' | 'listbox' | 'tree' | 'grid' | 'dialog';
-  ariaInvalid?: boolean | 'grammar' | 'spelling';
+  ariaDropEffect?: "none" | "copy" | "execute" | "link" | "move" | "popup";
+  ariaHasPopup?: boolean | "menu" | "listbox" | "tree" | "grid" | "dialog";
+  ariaInvalid?: boolean | "grammar" | "spelling";
   ariaKeyShortcuts?: string;
   ariaLevel?: number;
-  ariaLive?: 'off' | 'assertive' | 'polite';
+  ariaLive?: "off" | "assertive" | "polite";
   ariaModal?: boolean;
   ariaMultiLine?: boolean;
   ariaMultiSelectable?: boolean;
-  ariaOrientation?: 'horizontal' | 'vertical';
+  ariaOrientation?: "horizontal" | "vertical";
   ariaOwns?: string;
   ariaPlaceholder?: string;
   ariaPosInSet?: number;
   ariaReadOnly?: boolean;
-  ariaRelevant?: 'additions' | 'additions text' | 'all' | 'removals' | 'text';
+  ariaRelevant?: "additions" | "additions text" | "all" | "removals" | "text";
   ariaRequired?: boolean;
   ariaRoledescription?: string;
   ariaRowCount?: number;
   ariaRowIndex?: number;
   ariaRowSpan?: number;
-  ariaSort?: 'ascending' | 'descending' | 'none' | 'other';
+  ariaSort?: "ascending" | "descending" | "none" | "other";
   ariaValueMax?: number;
   ariaValueMin?: number;
   ariaValueNow?: number;
   ariaValueText?: string;
 }
 
-export interface DataAttributes {
-}
+export interface DataAttributes {}
 
 export interface InputSpecificAttributes {
   accept?: string;
   alt?: string;
   autoComplete?: string;
   autoFocus?: boolean;
-  capture?: boolean | 'user' | 'environment';
+  capture?: boolean | "user" | "environment";
   checked?: boolean;
   crossOrigin?: string;
   disabled?: boolean;
@@ -171,7 +170,17 @@ export interface SelectSpecificAttributes {
   value?: string | readonly string[] | number;
 }
 
-export type InputHTMLAttributes = HTMLAttributes & AriaAttributes & DataAttributes & InputSpecificAttributes;
-export type SelectHTMLAttributes = HTMLAttributes & AriaAttributes & DataAttributes & SelectSpecificAttributes;
-export type ButtonHTMLAttributes = HTMLAttributes & AriaAttributes & DataAttributes;
-export type TextareaHTMLAttributes = HTMLAttributes & AriaAttributes & DataAttributes;
+export type InputHTMLAttributes = HTMLAttributes &
+  AriaAttributes &
+  DataAttributes &
+  InputSpecificAttributes;
+export type SelectHTMLAttributes = HTMLAttributes &
+  AriaAttributes &
+  DataAttributes &
+  SelectSpecificAttributes;
+export type ButtonHTMLAttributes = HTMLAttributes &
+  AriaAttributes &
+  DataAttributes;
+export type TextareaHTMLAttributes = HTMLAttributes &
+  AriaAttributes &
+  DataAttributes;

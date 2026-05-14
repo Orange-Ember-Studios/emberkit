@@ -45,9 +45,7 @@ export function extractLoaderError(result: LoaderResult<unknown>): LoaderError |
   return null;
 }
 
-export function mergeLoaderResults<T>(
-  results: LoaderResult<T>[],
-): LoaderResult<T[]> {
+export function mergeLoaderResults<T>(results: LoaderResult<T>[]): LoaderResult<T[]> {
   const errors: LoaderError[] = [];
   const data: T[] = [];
 

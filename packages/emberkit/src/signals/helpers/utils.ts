@@ -5,9 +5,7 @@ export function isSignal(value: unknown): value is Signal<unknown> {
   return 'value' in value && 'peek' in value;
 }
 
-export function isReadonlySignal<T>(
-  signal: Signal<T>,
-): signal is ReadonlySignal<T> {
+export function isReadonlySignal<T>(signal: Signal<T>): signal is ReadonlySignal<T> {
   return !('value' in signal && Object.getOwnPropertyDescriptor(signal, 'value')?.set);
 }
 

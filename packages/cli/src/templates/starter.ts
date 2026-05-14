@@ -1,5 +1,5 @@
 export const starterFiles: Record<string, string> = {
-  'package.json': `{
+  "package.json": `{
   "name": "{{name}}",
   "version": "0.1.0",
   "private": true,
@@ -21,7 +21,7 @@ export const starterFiles: Record<string, string> = {
   }
 }`,
 
-  'tsconfig.json': `{
+  "tsconfig.json": `{
   "compilerOptions": {
     "target": "ES2022",
     "module": "ESNext",
@@ -44,7 +44,7 @@ export const starterFiles: Record<string, string> = {
   "exclude": ["node_modules", "dist"]
 }`,
 
-  'emberkit.config.ts': `import { defineConfig } from '@emberkit/core';
+  "emberkit.config.ts": `import { defineConfig } from '@emberkit/core';
 
 export default defineConfig({
   mode: 'spa',
@@ -54,7 +54,7 @@ export default defineConfig({
   },
 });`,
 
-  'vite.config.ts': `import { defineConfig } from 'vite';
+  "vite.config.ts": `import { defineConfig } from 'vite';
 import { emberkitVitePlugin } from '@emberkit/core/vite-plugin';
 
 export default defineConfig({
@@ -68,7 +68,7 @@ export default defineConfig({
   },
 });`,
 
-  'index.html': `<!DOCTYPE html>
+  "index.html": `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -81,7 +81,7 @@ export default defineConfig({
 </body>
 </html>`,
 
-  'src/index.tsx': `import { render } from '@emberkit/core';
+  "src/index.tsx": `import { render } from '@emberkit/core';
 import App from './routes/_layout';
 
 const root = document.getElementById('app');
@@ -90,7 +90,7 @@ if (root) {
   render(App, root);
 }`,
 
-  'src/routes/_layout.tsx': `import type { RouteComponent } from '@emberkit/core';
+  "src/routes/_layout.tsx": `import type { RouteComponent } from '@emberkit/core';
 import { Head } from '@emberkit/core';
 
 const Layout: RouteComponent = ({ children }) => {
@@ -118,7 +118,7 @@ const Layout: RouteComponent = ({ children }) => {
 
 export default Layout;`,
 
-  'src/routes/index.tsx': `import type { RouteComponent } from '@emberkit/core';
+  "src/routes/index.tsx": `import type { RouteComponent } from '@emberkit/core';
 
 const HomePage: RouteComponent = () => {
   return (
@@ -166,7 +166,7 @@ const HomePage: RouteComponent = () => {
 
 export default HomePage;`,
 
-  'src/routes/about.tsx': `import type { RouteComponent } from '@emberkit/core';
+  "src/routes/about.tsx": `import type { RouteComponent } from '@emberkit/core';
 import { Head } from '@emberkit/core';
 
 const AboutPage: RouteComponent = () => {

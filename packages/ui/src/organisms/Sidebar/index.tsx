@@ -1,5 +1,5 @@
-import type { FC } from '@emberkit/core';
-import { Icon, Text, type IconName } from '../../atoms/index.js';
+import type { FC } from "@emberkit/core";
+import { Icon, Text, type IconName } from "../../atoms/index.js";
 
 export interface SidebarItem {
   label: string;
@@ -22,28 +22,31 @@ export interface SidebarProps {
 
 const Sidebar: FC<SidebarProps> = ({
   items,
-  className = '',
+  className = "",
   collapsed = false,
   onItemClick,
   header,
   footer,
 }) => {
-  const cls = `flex flex-col h-full bg-surface-50 text-surface-900 border-r border-surface-300 transition-all duration-300 ${collapsed ? 'w-16' : 'w-64'} ${className}`.trim();
+  const cls =
+    `flex flex-col h-full bg-surface-50 text-surface-900 border-r border-surface-300 transition-all duration-300 ${collapsed ? "w-16" : "w-64"} ${className}`.trim();
 
   function renderItem(item: SidebarItem, depth = 0) {
     const itemCls = [
-      'flex items-center gap-3 px-3 py-2 mx-2 text-sm font-medium rounded-lg transition-colors duration-150',
+      "flex items-center gap-3 px-3 py-2 mx-2 text-sm font-medium rounded-lg transition-colors duration-150",
       item.active
-        ? 'bg-primary-800 text-white'
-        : 'text-surface-700 hover:text-surface-900 hover:bg-surface-200',
-    ].join(' ');
+        ? "bg-primary-800 text-white"
+        : "text-surface-700 hover:text-surface-900 hover:bg-surface-200",
+    ].join(" ");
 
     return (
       <div key={item.href}>
         <a
           href={item.href}
           class={itemCls}
-          style={{ paddingLeft: collapsed ? '0.75rem' : `${0.75 + depth * 1.25}rem` }}
+          style={{
+            paddingLeft: collapsed ? "0.75rem" : `${0.75 + depth * 1.25}rem`,
+          }}
           onClick={(e) => {
             if (onItemClick) {
               e.preventDefault();
@@ -52,7 +55,9 @@ const Sidebar: FC<SidebarProps> = ({
           }}
           title={collapsed ? item.label : undefined}
         >
-          {item.icon && <Icon name={item.icon} size={20} className="shrink-0" />}
+          {item.icon && (
+            <Icon name={item.icon} size={20} className="shrink-0" />
+          )}
           {!collapsed && (
             <>
               <span class="flex-1 truncate">{item.label}</span>
@@ -83,11 +88,7 @@ const Sidebar: FC<SidebarProps> = ({
       <nav class="flex-1 overflow-y-auto py-4 space-y-1">
         {items.map((item) => renderItem(item))}
       </nav>
-      {footer && (
-        <div class="p-4 border-t border-surface-300">
-          {footer}
-        </div>
-      )}
+      {footer && <div class="p-4 border-t border-surface-300">{footer}</div>}
     </aside>
   );
 };

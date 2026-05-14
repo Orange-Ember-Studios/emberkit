@@ -1,10 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import {
-  preload,
-  reload,
-  back,
-  forward,
-} from '../index.js';
+import { preload, reload, back, forward } from '../index.js';
 
 describe('Navigation helpers', () => {
   describe('preload', () => {

@@ -33,10 +33,7 @@ describe('createElement', () => {
   });
 
   it('should create element with multiple props', () => {
-    const element = createElement(
-      'input',
-      { type: 'text', name: 'username', disabled: false },
-    );
+    const element = createElement('input', { type: 'text', name: 'username', disabled: false });
 
     expect(element.props.type).toBe('text');
     expect(element.props.name).toBe('username');
@@ -65,7 +62,10 @@ describe('isElement', () => {
 
 describe('flattenChildren', () => {
   it('should flatten nested arrays', () => {
-    const result = flattenChildren([['A', 'B'], ['C', ['D']]]);
+    const result = flattenChildren([
+      ['A', 'B'],
+      ['C', ['D']],
+    ]);
     expect(result).toEqual(['A', 'B', 'C', 'D']);
   });
 
@@ -89,11 +89,7 @@ describe('renderToString', () => {
   });
 
   it('should render nested elements', () => {
-    const element = createElement(
-      'div',
-      null,
-      createElement('span', null, 'Nested'),
-    );
+    const element = createElement('div', null, createElement('span', null, 'Nested'));
     const html = renderToString(element);
 
     expect(html).toBe('<div><span>Nested</span></div>');
@@ -134,7 +130,9 @@ describe('resolveComponent', () => {
     const Component = (props: { name: string }) =>
       createElement('span', null, `Hello ${props.name}`) as unknown;
 
-    const element = resolveComponent(Component as (props: JSXElementProps) => JSXNode, { name: 'World' });
+    const element = resolveComponent(Component as (props: JSXElementProps) => JSXNode, {
+      name: 'World',
+    });
 
     expect(element.type).toBe('span');
     expect(element.props.children).toContain('Hello World');
