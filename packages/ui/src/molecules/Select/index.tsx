@@ -93,13 +93,13 @@ const Select: FC<SelectProps> = ({
           data-ek-bind={open}
           data-ek-active-class="border-primary-500 ring-2 ring-primary-300/30 rounded-b-none bg-surface-200/70"
         >
-          <span class={selectedOption ? 'text-surface-900' : 'text-surface-500'} data-ek-bind={displayLabel}>
+          <span class={selectedOption ? 'text-surface-900' : 'text-surface-700'} data-ek-bind={displayLabel}>
             {selectedOption ? selectedOption.label : (placeholder || 'Select...')}
           </span>
           <Icon
             name="chevron-down"
             size={16}
-            className="text-surface-500 transition-transform duration-200"
+            className="text-surface-700 transition-transform duration-200"
             data-ek-bind={open}
             data-ek-active-class="rotate-180"
           />
@@ -123,7 +123,7 @@ const Select: FC<SelectProps> = ({
             <li
               role="option"
               aria-selected={selectedValue() === ''}
-              class="px-4 py-2.5 text-sm text-surface-500 cursor-default"
+               class="px-4 py-2.5 text-sm text-surface-700 cursor-default"
             >
               {placeholder}
             </li>

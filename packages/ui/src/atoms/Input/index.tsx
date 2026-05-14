@@ -33,7 +33,7 @@ const Input: FC<InputProps> = ({
   onFocus,
   onBlur,
 }) => {
-  const base = 'w-full rounded-lg border bg-surface-100 text-surface-900 placeholder-surface-500 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-0 disabled:bg-surface-200 disabled:cursor-not-allowed';
+  const base = 'w-full rounded-lg border bg-surface-100 text-surface-900 placeholder-surface-700 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-0 disabled:bg-surface-200 disabled:cursor-not-allowed';
   const border = error
     ? 'border-error-500 focus:ring-error-300'
     : 'border-surface-300 focus:border-primary-500 focus:ring-primary-300';

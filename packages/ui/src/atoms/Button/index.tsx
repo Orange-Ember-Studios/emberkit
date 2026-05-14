@@ -20,9 +20,9 @@ export interface ButtonProps {
 function variantClasses(variant: ButtonVariant): string {
   const map: Record<ButtonVariant, string> = {
     primary:
-      'bg-primary-500 text-white shadow-lg shadow-primary-500/25 '
-      + 'hover:bg-primary-400 hover:shadow-xl hover:shadow-primary-500/40 hover:scale-[1.02] '
-      + 'active:scale-[0.98] active:shadow-md active:shadow-primary-500/20',
+      'bg-primary-800 text-white shadow-lg shadow-primary-800/25 '
+      + 'hover:bg-primary-700 hover:shadow-xl hover:shadow-primary-700/40 hover:scale-[1.02] '
+      + 'active:scale-[0.98] active:shadow-md active:shadow-primary-700/20',
     secondary:
       'glass text-surface-900 '
       + 'hover:bg-white/15 hover:border-white/20 hover:scale-[1.02] '
@@ -36,9 +36,9 @@ function variantClasses(variant: ButtonVariant): string {
       + 'hover:text-surface-800 hover:bg-white/8 hover:scale-[1.02] '
       + 'active:scale-[0.98]',
     danger:
-      'bg-error-500 text-white shadow-lg shadow-error-500/25 '
-      + 'hover:bg-error-400 hover:shadow-xl hover:shadow-error-500/40 hover:scale-[1.02] '
-      + 'active:scale-[0.98] active:shadow-md active:shadow-error-500/20',
+      'bg-error-50 text-error-900 ring-1 ring-error-500/40 shadow-lg shadow-error-500/15 '
+      + 'hover:bg-error-900/15 hover:shadow-xl hover:shadow-error-500/25 hover:scale-[1.02] '
+      + 'active:scale-[0.98] active:shadow-md active:shadow-error-500/10',
   };
   return map[variant];
 }

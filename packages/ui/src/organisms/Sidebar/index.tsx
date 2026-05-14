@@ -34,8 +34,8 @@ const Sidebar: FC<SidebarProps> = ({
     const itemCls = [
       'flex items-center gap-3 px-3 py-2 mx-2 text-sm font-medium rounded-lg transition-colors duration-150',
       item.active
-        ? 'bg-primary-500 text-white'
-        : 'text-surface-600 hover:text-surface-900 hover:bg-surface-200',
+        ? 'bg-primary-800 text-white'
+        : 'text-surface-700 hover:text-surface-900 hover:bg-surface-200',
     ].join(' ');
 
     return (
@@ -57,7 +57,7 @@ const Sidebar: FC<SidebarProps> = ({
             <>
               <span class="flex-1 truncate">{item.label}</span>
               {item.badge && (
-                <span class="px-1.5 py-0.5 text-xs font-medium bg-primary-500 text-white rounded-full">
+                <span class="px-1.5 py-0.5 text-xs font-medium bg-primary-800 text-white rounded-full">
                   {item.badge}
                 </span>
               )}

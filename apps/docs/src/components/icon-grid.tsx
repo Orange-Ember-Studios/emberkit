@@ -276,13 +276,13 @@ function IconShowcase() {
               onClick={() => setSelected(isActive ? null : icon.name)}
               className={`group relative flex flex-col items-center justify-center rounded-xl border p-3 transition-all duration-200 cursor-pointer ${
                 isActive
-                  ? 'border-orange-500/50 bg-orange-500/10 text-orange-400 scale-105'
+                  ? 'border-orange-400/60 bg-orange-500/10 text-orange-400 scale-105'
                   : 'border-white/5 bg-white/[0.02] text-gray-400 hover:border-white/10 hover:bg-white/[0.05] hover:text-white hover:scale-105'
               }`}
               title={icon.name}
             >
               <IconComp size={20} />
-              <span className="mt-1.5 truncate text-[9px] leading-tight opacity-50 group-hover:opacity-100 transition-opacity">
+              <span className="mt-1.5 truncate text-[9px] leading-tight opacity-75 group-hover:opacity-100 transition-opacity">
                 {icon.name.replace('Icon', '')}
               </span>
             </button>

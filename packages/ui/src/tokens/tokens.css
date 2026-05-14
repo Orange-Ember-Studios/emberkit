@@ -40,19 +40,19 @@
 
   /* ── Semantic Colors — High Contrast (dark-optimized) ── */
   --color-success-50: #052e16;
-  --color-success-500: #16a34a;
+  --color-success-500: #22c55e;
   --color-success-900: #86efac;
 
   --color-warning-50: #422006;
-  --color-warning-500: #d97706;
+  --color-warning-500: #eab308;
   --color-warning-900: #fde68a;
 
   --color-error-50: #450a0a;
-  --color-error-500: #dc2626;
+  --color-error-500: #f77f7f;
   --color-error-900: #fca5a5;
 
   --color-info-50: #082f49;
-  --color-info-500: #0891b2;
+  --color-info-500: #06b6d4;
   --color-info-900: #67e8f9;
 
   /* ── Dark Surface ── */
@@ -168,19 +168,19 @@
   --color-accent-900: #78350f;
 
   --color-success-50: #052e16;
-  --color-success-500: #16a34a;
+  --color-success-500: #22c55e;
   --color-success-900: #86efac;
 
   --color-warning-50: #422006;
-  --color-warning-500: #d97706;
+  --color-warning-500: #eab308;
   --color-warning-900: #fde68a;
 
   --color-error-50: #450a0a;
-  --color-error-500: #dc2626;
+  --color-error-500: #f77f7f;
   --color-error-900: #fca5a5;
 
   --color-info-50: #082f49;
-  --color-info-500: #0891b2;
+  --color-info-500: #06b6d4;
   --color-info-900: #67e8f9;
 
   --color-surface-50: #0b0f19;

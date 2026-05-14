@@ -44,7 +44,7 @@ const Header: FC<HeaderProps> = ({
                   'flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-150',
                   item.active
                     ? 'bg-primary-500/15 text-primary-400'
-                    : 'text-surface-600 hover:text-surface-900 hover:bg-surface-200',
+                    : 'text-surface-700 hover:text-surface-900 hover:bg-surface-200',
                 ].join(' ');
 
                 return (

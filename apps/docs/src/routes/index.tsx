@@ -25,7 +25,7 @@ const HomePage: RouteComponent = () => {
         </span>
 
         <h1 className="mb-6 text-5xl font-bold tracking-tight md:text-7xl lg:text-8xl animate-fade-in-down" style={{ animationDelay: '200ms', animation: 'fade-in-down 0.6s ease-out 200ms forwards', opacity: 0 }}>
-          <span className="bg-gradient-to-br from-orange-400 via-orange-500 to-orange-700 bg-clip-text text-transparent">EmberKit</span>
+          <span className="bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600 bg-clip-text text-transparent">EmberKit</span>
         </h1>
 
         <p className="mb-10 max-w-2xl text-lg leading-relaxed text-gray-300 md:text-2xl animate-fade-in-down" style={{ animationDelay: '300ms', animation: 'fade-in-down 0.6s ease-out 300ms forwards', opacity: 0 }}>
@@ -34,7 +34,7 @@ const HomePage: RouteComponent = () => {
 
         <div className="flex flex-col gap-4 sm:flex-row animate-fade-in-down" style={{ animationDelay: '400ms', animation: 'fade-in-down 0.6s ease-out 400ms forwards', opacity: 0 }}>
           <button
-            className="inline-flex min-w-[200px] items-center justify-center gap-2 rounded-full bg-gradient-to-r from-orange-500 to-orange-700 px-8 py-4 font-semibold text-white shadow-lg transition-all duration-300 hover:scale-[1.03] hover:from-orange-400 hover:to-orange-500 hover:shadow-[0_0_30px_rgba(249,115,22,0.4)] active:scale-95"
+            className="inline-flex min-w-[200px] items-center justify-center gap-2 rounded-full bg-gradient-to-r from-orange-500 to-orange-700 px-8 py-4 text-xl font-bold text-white shadow-lg transition-all duration-300 hover:scale-[1.03] hover:from-orange-400 hover:to-orange-500 hover:shadow-[0_0_30px_rgba(249,115,22,0.4)] active:scale-95"
             onClick={() => navigate('/docs/introduction')}
           >
             Get Started
@@ -96,7 +96,7 @@ const HomePage: RouteComponent = () => {
               <div className="h-3 w-3 rounded-full bg-red-500/80 transition-all duration-300 hover:scale-125" />
               <div className="h-3 w-3 rounded-full bg-yellow-500/80 transition-all duration-300 hover:scale-125" />
               <div className="h-3 w-3 rounded-full bg-green-500/80 transition-all duration-300 hover:scale-125" />
-              <span className="ml-3 text-xs font-medium text-gray-500 transition-colors duration-300">counter.tsx</span>
+              <span className="ml-3 text-xs font-medium text-gray-400 transition-colors duration-300">counter.tsx</span>
             </div>
             <CodeBlock code={`import { createSignal, render } from '@emberkit/core';
 
@@ -128,7 +128,7 @@ render(<Counter />, document.body);`} language="tsx" />
                 }}
               >
                 <div className={`text-3xl font-bold transition-all duration-300 ${s.color}`}>{s.value}</div>
-                <div className="mt-1 text-sm text-gray-500 transition-colors duration-300">{s.label}</div>
+                <div className="mt-1 text-sm text-gray-400 transition-colors duration-300">{s.label}</div>
               </div>
             ))}
           </div>
@@ -145,7 +145,7 @@ render(<Counter />, document.body);`} language="tsx" />
             Get started in minutes with file-based routing, signals, and zero-config builds.
           </p>
           <button
-            className="rounded-full bg-gradient-to-r from-orange-500 to-orange-700 px-8 py-4 text-lg font-semibold text-white shadow-lg transition-all duration-300 hover:scale-[1.03] hover:from-orange-400 hover:to-orange-500 hover:shadow-[0_0_30px_rgba(249,115,22,0.4)] active:scale-95"
+            className="rounded-full bg-gradient-to-r from-orange-500 to-orange-700 px-8 py-4 text-xl font-bold text-white shadow-lg transition-all duration-300 hover:scale-[1.03] hover:from-orange-400 hover:to-orange-500 hover:shadow-[0_0_30px_rgba(249,115,22,0.4)] active:scale-95"
             onClick={() => navigate('/docs/quick-start')}
           >
             Read the Quick Start →

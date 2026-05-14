@@ -36,7 +36,7 @@ const Tabs: FC<TabsProps> = ({
         const isActive = tab.id === activeVal;
         const sharedCls = 'px-4 py-2.5 text-sm font-medium transition-colors duration-150 border-b-2 -mb-px';
         const activeCls = 'border-primary-500 text-primary-400';
-        const inactiveCls = 'border-transparent text-surface-600 hover:text-surface-800 hover:border-surface-400';
+        const inactiveCls = 'border-transparent text-surface-700 hover:text-surface-800 hover:border-surface-400';
         const hoverCls = tab.disabled ? '' : 'cursor-pointer';
         const disabledCls = tab.disabled ? 'opacity-50 cursor-not-allowed' : '';
 

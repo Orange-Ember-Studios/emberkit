@@ -42,7 +42,7 @@ function DataTable<T extends Record<string, unknown>>({
           <tr class="border-b border-white/10 bg-white/5">
             {columns.map((col) => {
               const thCls = [
-                'px-4 py-3 text-left text-xs font-medium text-surface-500 uppercase tracking-wider',
+                'px-4 py-3 text-left text-xs font-medium text-surface-800 uppercase tracking-wider',
                 col.sortable ? 'cursor-pointer hover:text-surface-900 select-none' : '',
                 col.className ?? '',
               ].join(' ');

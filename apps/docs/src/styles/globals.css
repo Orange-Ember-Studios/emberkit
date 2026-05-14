@@ -184,7 +184,6 @@
   .md-content {
     font-size: 1rem;
     line-height: 1.75;
-    color: #d1d5db;
   }
 
   /* ===== Headings ===== */
@@ -194,7 +193,6 @@
     letter-spacing: -0.025em;
     line-height: 1.2;
     margin: 0 0 1.5rem;
-    color: #f9fafb;
   }
 
   .md-content h2 {
@@ -203,7 +201,6 @@
     letter-spacing: -0.02em;
     line-height: 1.3;
     margin: 3rem 0 1rem;
-    color: #f9fafb;
   }
 
   .md-content h3 {
@@ -211,7 +208,6 @@
     font-weight: 600;
     line-height: 1.4;
     margin: 2rem 0 0.75rem;
-    color: #f3f4f6;
   }
 
   .md-content h4,
@@ -220,7 +216,6 @@
     font-weight: 600;
     line-height: 1.4;
     margin: 1.5rem 0 0.5rem;
-    color: #f3f4f6;
   }
 
   .md-content h4 { font-size: 1.125rem; }
@@ -230,22 +225,28 @@
   /* ===== Paragraphs ===== */
   .md-content p {
     margin: 0 0 1.25rem;
-    color: #9ca3af;
   }
 
   /* ===== Links ===== */
   .md-content a {
-    color: oklch(72% 0.19 50);
-    text-decoration: underline;
-    text-decoration-color: oklch(72% 0.19 50 / 0.3);
-    text-underline-offset: 2px;
     font-weight: 500;
-    transition: all 150ms;
+    position: relative;
+    transition: all 200ms ease-out;
   }
 
-  .md-content a:hover {
-    color: oklch(80% 0.19 50);
-    text-decoration-color: oklch(80% 0.19 50);
+  .md-content a::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: currentColor;
+    transition: width 300ms ease-out;
+  }
+
+  .md-content a:hover::after {
+    width: 100%;
   }
 
   /* ===== Lists ===== */
@@ -253,16 +254,11 @@
   .md-content ol {
     margin: 0.75rem 0 1.25rem;
     padding-left: 1.5rem;
-    color: #9ca3af;
   }
 
   .md-content li {
     margin-bottom: 0.5rem;
     line-height: 1.7;
-  }
-
-  .md-content li::marker {
-    color: oklch(55% 0.1 50);
   }
 
   .md-content ul li {
@@ -290,7 +286,6 @@
     background: rgba(255, 255, 255, 0.06);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 0.375rem;
-    color: oklch(72% 0.19 50);
     font-size: 0.8125em;
     word-break: break-word;
   }
@@ -333,7 +328,7 @@
   .md-content pre > code .num,
   pre code .num { color: #fbbf24; }
   .md-content pre > code .cm,
-  pre code .cm { color: #6b7280; font-style: italic; }
+  pre code .cm { color: #9ca3af; font-style: italic; }
   .md-content pre > code .type,
   pre code .type { color: #38bdf8; }
   .md-content pre > code .op,
@@ -361,7 +356,7 @@
     font-family: var(--font-sans);
     font-size: 0.6875rem;
     font-weight: 500;
-    color: #6b7280;
+    color: #9ca3af;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 0.375rem;
@@ -405,7 +400,7 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: oklch(72% 0.19 50 / 0.8);
+    color: #fb923c;
     background: oklch(249 0.113 22.87 / 0.15);
     border: 1px solid oklch(249 0.113 22.87 / 0.2);
     border-radius: 9999px;
@@ -427,7 +422,6 @@
     border-left: 3px solid oklch(72% 0.19 50);
     background: rgba(255, 255, 255, 0.03);
     border-radius: 0 0.5rem 0.5rem 0;
-    color: #9ca3af;
     font-style: italic;
   }
 
@@ -459,13 +453,11 @@
     padding: 0.75rem 1rem;
     text-align: left;
     font-weight: 600;
-    color: #f3f4f6;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
 
   .md-content td {
     padding: 0.75rem 1rem;
-    color: #9ca3af;
     border-bottom: 1px solid rgba(255, 255, 255, 0.04);
   }
 
@@ -508,7 +500,6 @@
   /* ===== Strong / Emphasis ===== */
   .md-content strong {
     font-weight: 700;
-    color: #f3f4f6;
   }
 
   .md-content em {
@@ -517,13 +508,11 @@
 
   /* ===== Strikethrough ===== */
   .md-content del {
-    color: #6b7280;
     text-decoration: line-through;
     text-decoration-color: rgba(107, 114, 128, 0.5);
   }
 
   .md-content del:hover {
-    color: #9ca3af;
     text-decoration-color: rgba(156, 163, 175, 0.7);
   }
 
@@ -573,27 +562,6 @@
     transition: opacity 400ms ease-out;
   }
 
-  /* ===== Enhanced Link Styles ===== */
-  .md-content a {
-    position: relative;
-    transition: all 200ms ease-out;
-  }
-
-  .md-content a::after {
-    content: '';
-    position: absolute;
-    bottom: -2px;
-    left: 0;
-    width: 0;
-    height: 2px;
-    background: currentColor;
-    transition: width 300ms ease-out;
-  }
-
-  .md-content a:hover::after {
-    width: 100%;
-  }
-
   /* ===== Footnotes ===== */
   .md-content .footnotes {
     margin-top: 3rem;
@@ -612,7 +580,6 @@
   .md-content .footnotes li {
     margin-bottom: 0.5rem;
     font-size: 0.875rem;
-    color: #6b7280;
   }
 
   .md-content sup {
@@ -622,13 +589,8 @@
   }
 
   .md-content sup a {
-    color: oklch(72% 0.19 50);
     text-decoration: none;
     font-weight: 600;
-  }
-
-  .md-content sup a:hover {
-    color: oklch(80% 0.19 50);
   }
 
   /* ===== Definition Lists (GFM) ===== */
@@ -639,13 +601,11 @@
 
   .md-content dt {
     font-weight: 600;
-    color: #f3f4f6;
     margin-bottom: 0.25rem;
   }
 
   .md-content dd {
     margin-left: 1.5rem;
     margin-bottom: 1rem;
-    color: #9ca3af;
   }
 }

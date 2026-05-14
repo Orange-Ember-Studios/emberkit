@@ -66,7 +66,7 @@ const Sidebar: RouteComponent = () => {
     >
       {docs.map((section) => (
         <div key={section.title} className="mb-8">
-          <h3 className="mb-3 px-3 text-xs font-semibold uppercase tracking-widest text-gray-500 transition-colors duration-200">{section.title}</h3>
+          <h3 className="mb-3 px-3 text-xs font-semibold uppercase tracking-widest text-gray-400 transition-colors duration-200">{section.title}</h3>
           <ul className="list-none space-y-1">
             {section.items.map((item) => (
               <li key={item.path}>
@@ -77,7 +77,7 @@ const Sidebar: RouteComponent = () => {
                     closeSidebar();
                     navigate(item.path);
                   }}
-                  className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-400 no-underline transition-all duration-200 hover:bg-white/5 hover:text-orange-400 hover:translate-x-1 cursor-pointer [&_svg]:shrink-0 [&_svg]:transition-all [&_svg]:duration-200 [&_svg]:text-gray-600 hover:[&_svg]:text-orange-400"
+                  className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-400 no-underline transition-all duration-200 hover:bg-white/5 hover:text-orange-400 hover:translate-x-1 cursor-pointer [&_svg]:shrink-0 [&_svg]:transition-all [&_svg]:duration-200 [&_svg]:text-gray-500 hover:[&_svg]:text-orange-400"
                 >
                   <IconChevronRight size={16} />
                   {item.title}
