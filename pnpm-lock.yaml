@@ -122,11 +122,11 @@ importers:
   packages/ui:
     dependencies:
       '@emberkit/core':
-        specifier: ^0.2.0
-        version: 0.2.0(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)
+        specifier: ^0.2.1
+        version: 0.2.1(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)
       '@emberkit/icons':
         specifier: ^0.2.0
-        version: 0.2.0(@emberkit/core@0.2.0(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0))
+        version: 0.2.0(@emberkit/core@0.2.1(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0))
     devDependencies:
       tailwindcss:
         specifier: ^4.0.0
@@ -303,6 +303,9 @@ packages:
 
   '@emberkit/core@0.2.0':
     resolution: {integrity: sha512-wWmzNXMBlok4UTHyFxs11Ftp3TOlcMr0BLcBcbpAdRvf6W0x6ebs8MvNChtck/Gt4RIZFwk+wpgwRNdZhH7fNg==}
+
+  '@emberkit/core@0.2.1':
+    resolution: {integrity: sha512-d86nFSuiENQafZ5i8nFC9+Nb770X7bPSvcmII+djRKIbMndvSYFg98zVcRLnLCeuxincQEimFfUAOS4DJEBF6Q==}
 
   '@emberkit/icons@0.2.0':
     resolution: {integrity: sha512-lFNNwBmsZvSPE8Y3izoH4jozF/OSlS5W7bBzJ2/22IGP55i627jwkJXRTgBdcf8Xyd7Tsyp0UUPZ2tAFMIUVpA==}
@@ -3012,9 +3015,28 @@ snapshots:
       - tsx
       - yaml
 
-  '@emberkit/icons@0.2.0(@emberkit/core@0.2.0(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0))':
+  '@emberkit/core@0.2.1(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)':
     dependencies:
-      '@emberkit/core': 0.2.0(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)
+      '@mdx-js/mdx': 3.1.1
+      remark-gfm: 4.0.1
+      vite: 6.4.2(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)
+    transitivePeerDependencies:
+      - '@types/node'
+      - jiti
+      - less
+      - lightningcss
+      - sass
+      - sass-embedded
+      - stylus
+      - sugarss
+      - supports-color
+      - terser
+      - tsx
+      - yaml
+
+  '@emberkit/icons@0.2.0(@emberkit/core@0.2.1(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0))':
+    dependencies:
+      '@emberkit/core': 0.2.1(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)
 
   '@emnapi/runtime@1.10.0':
     dependencies:

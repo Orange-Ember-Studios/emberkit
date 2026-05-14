@@ -92,6 +92,16 @@ export function renderElementToHTML(element: JSXElement): string {
       }
       if (value === true) return ` ${key}`;
       if (value === false) return '';
+      if (key === 'style' && typeof value === 'object' && value !== null) {
+        const styleStr = Object.entries(value as Record<string, unknown>)
+          .filter(([, v]) => v != null)
+          .map(([prop, val]) => {
+            const cssProp = prop.replace(/([A-Z])/g, '-$1').toLowerCase();
+            return `${cssProp}: ${val}`;
+          })
+          .join('; ');
+        return ` ${key}="${styleStr}"`;
+      }
       return ` ${key}="${value}"`;
     })
     .join('');

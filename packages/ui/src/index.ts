@@ -1,6 +1,17 @@
 export { tokens, spacing, fontSize, fontWeight, borderRadius, shadow, color, semanticColor } from './tokens/index.js';
 export type { ColorScale, SemanticColor, TypographyToken, SpacingToken, BorderRadiusToken, ShadowToken, DesignTokens } from './tokens/types.js';
 
+export type {
+  DOMEvents,
+  HTMLAttributes,
+  AriaAttributes,
+  DataAttributes,
+  InputHTMLAttributes,
+  SelectHTMLAttributes,
+  ButtonHTMLAttributes,
+  TextareaHTMLAttributes,
+} from './types/index.js';
+
 export {
   Button, Icon, Text, Heading, Badge, Input, Spinner,
 } from './atoms/index.js';

@@ -1,23 +1,11 @@
 import type { FC } from '@emberkit/core';
+import type { InputHTMLAttributes } from '../../types/index.js';
 
 export type InputSize = 'sm' | 'md' | 'lg';
 
-export interface InputProps {
-  [key: string]: unknown;
-  name?: string;
-  type?: 'text' | 'email' | 'password' | 'number' | 'tel' | 'url' | 'search' | 'date';
-  placeholder?: string;
-  value?: string;
+export interface InputProps extends Omit<InputHTMLAttributes, 'size'> {
   size?: InputSize;
-  disabled?: boolean;
-  readOnly?: boolean;
-  required?: boolean;
   error?: string;
-  className?: string;
-  onInput?: (event: Event) => void;
-  onChange?: (event: Event) => void;
-  onFocus?: (event: FocusEvent) => void;
-  onBlur?: (event: FocusEvent) => void;
 }
 
 function sizeClass(size: InputSize): string {

@@ -1,6 +1,7 @@
 type FC<P> = (props: P) => unknown;
 import { createSignal } from '@emberkit/core';
 import { Text, Icon } from '../../atoms/index.js';
+import type { SelectHTMLAttributes } from '../../types/index.js';
 
 export interface SelectOption {
   value: string;
@@ -8,16 +9,11 @@ export interface SelectOption {
   disabled?: boolean;
 }
 
-export interface SelectProps {
-  [key: string]: unknown;
-  name?: string;
+export interface SelectProps extends Omit<SelectHTMLAttributes, 'onChange'> {
   options: SelectOption[];
   value?: string;
   placeholder?: string;
-  disabled?: boolean;
-  required?: boolean;
   error?: string;
-  className?: string;
   onChange?: (value: string) => void;
 }
 
@@ -74,7 +70,7 @@ const Select: FC<SelectProps> = ({
     'w-full flex items-center justify-between gap-2 rounded-xl border text-base transition-all duration-200',
     'px-4 py-2.5',
     'bg-surface-100/80 backdrop-blur-sm',
-    disabled ? 'opacity-50 cursor-not-allowed bg-surface-200' : 'cursor-pointer hover:border-primary-500/50 hover:bg-surface-100',
+    disabled ? 'opacity-50 cursor-not-allowed bg-surface-200' : 'cursor-pointer hover:border-primary-500/50 hover:bg-surface-200/50',
     error
       ? 'border-error-500 ring-1 ring-error-500/20'
       : 'border-surface-300 focus-within:border-primary-500 focus-within:ring-2 focus-within:ring-primary-300/30',
@@ -95,7 +91,7 @@ const Select: FC<SelectProps> = ({
           aria-expanded="false"
           aria-haspopup="listbox"
           data-ek-bind={open}
-          data-ek-active-class="border-primary-500 ring-2 ring-primary-300/30 rounded-b-none"
+          data-ek-active-class="border-primary-500 ring-2 ring-primary-300/30 rounded-b-none bg-surface-200/70"
         >
           <span class={selectedOption ? 'text-surface-900' : 'text-surface-500'} data-ek-bind={displayLabel}>
             {selectedOption ? selectedOption.label : (placeholder || 'Select...')}
@@ -139,8 +135,8 @@ const Select: FC<SelectProps> = ({
               opt.disabled
                 ? 'opacity-40 cursor-not-allowed text-surface-500'
                 : isSelected
-                  ? 'bg-primary-500/15 text-primary-400 font-medium'
-                  : 'text-surface-800 hover:bg-white/8 hover:text-surface-900',
+                  ? 'bg-primary-500/30 text-primary-300 font-medium ring-1 ring-primary-500/40'
+                  : 'text-surface-800 hover:bg-surface-200/60 hover:text-surface-900',
             ].join(' ');
             return (
               <li
