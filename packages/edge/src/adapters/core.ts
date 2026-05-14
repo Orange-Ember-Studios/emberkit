@@ -152,8 +152,11 @@ export function isEdgeEnvironment(): boolean {
 }
 
 export function getMemoryUsage(): { heapUsed: number; heapTotal: number } {
-  if (typeof process !== 'undefined' && process.memoryUsage) {
-    const mem = process.memoryUsage();
+  const proc = (globalThis as Record<string, unknown>).process as
+    | { memoryUsage: () => { heapUsed: number; heapTotal: number } }
+    | undefined;
+  if (proc?.memoryUsage) {
+    const mem = proc.memoryUsage();
     return { heapUsed: mem.heapUsed, heapTotal: mem.heapTotal };
   }
 
