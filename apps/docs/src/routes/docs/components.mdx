@@ -1,6 +1,8 @@
+import { Badge, Alert, Card, Text } from '@emberkit/ui';
+
 # Components
 
-EmberKit components are plain functions that return JSX elements. They follow the same mental model as React but with zero runtime overhead by default.
+<Text color="muted" className="mb-6">EmberKit components are plain functions that return JSX elements. They follow the same mental model as React but with zero runtime overhead by default.</Text>
 
 ## Defining a Component
 
@@ -78,8 +80,10 @@ function TodoList({ items }: { items: string[] }) {
 
 EmberKit makes a key distinction:
 
-- **Static components** (no event handlers, no signal bindings) render to pure HTML with zero JavaScript
-- **Interactive components** (with `onClick`, `onChange`, etc. or `data-ek-bind`) receive targeted client-side hydration
+<Alert variant="info" title="Key Concept">
+  <strong>Static components</strong> (no event handlers, no signal bindings) render to pure HTML with zero JavaScript.<br />
+  <strong>Interactive components</strong> (with <code>onClick</code>, <code>onChange</code>, etc. or <code>data-ek-bind</code>) receive targeted client-side hydration.
+</Alert>
 
 ```tsx
 // Static: renders to <h1>Hello</h1>, no JS shipped

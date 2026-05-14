@@ -1,15 +1,24 @@
+import { Badge, Alert, Card, Text } from '@emberkit/ui';
+
 # SSR & SSG
 
-EmberKit supports multiple rendering modes: Server-Side Rendering (SSR), Static Site Generation (SSG), and client-side SPA.
+<Text color="muted" className="mb-6">EmberKit supports multiple rendering modes: Server-Side Rendering (SSR), Static Site Generation (SSG), and client-side SPA.</Text>
 
 ## Rendering Modes
 
-| Mode | Description | Use Case |
-|------|-------------|----------|
-| `static` | Pre-renders all pages at build time | Marketing sites, blogs |
-| `ssr` | Renders on every request | Dynamic pages, APIs |
-| `spa` | Client-side only | Dashboards, admin panels |
-| `hybrid` | Mix of SSR and static (default) | Most apps |
+<Card variant="outline">
+  <table>
+    <thead>
+      <tr><th>Mode</th><th>Description</th><th>Use Case</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>static</code></td><td>Pre-renders all pages at build time</td><td>Marketing sites, blogs</td></tr>
+      <tr><td><code>ssr</code></td><td>Renders on every request</td><td>Dynamic pages, APIs</td></tr>
+      <tr><td><code>spa</code></td><td>Client-side only</td><td>Dashboards, admin panels</td></tr>
+      <tr><td><code>hybrid</code></td><td>Mix of SSR and static (default)</td><td>Most apps</td></tr>
+    </tbody>
+  </table>
+</Card>
 
 ## Configuration
 

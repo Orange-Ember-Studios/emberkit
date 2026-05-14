@@ -2,18 +2,22 @@
 title: Built with EmberKit
 ---
 
+import { Badge, Alert, Card, Text, Heading } from '@emberkit/ui';
+
 # Built with EmberKit
 
-This documentation site is built entirely with EmberKit, showcasing the framework's capabilities in a real-world application.
+<Text color="muted" className="mb-6">This documentation site is built entirely with EmberKit, showcasing the framework's capabilities in a real-world application.</Text>
 
 ## Why We Use EmberKit for Our Docs
+
+<Alert variant="info" title="Real-World Proof">By using EmberKit to build our own documentation, we demonstrate that the framework is production-ready.</Alert>
 
 ### Performance Benefits
 
 | Metric | Result |
 |--------|--------|
-| First Contentful Paint | <50ms |
-| Time to Interactive | <100ms |
+| First Contentful Paint | &lt;50ms |
+| Time to Interactive | &lt;100ms |
 | Total Bundle Size | ~8KB runtime |
 | JavaScript Shipped | Minimal (zero-JS by default) |
 
@@ -121,7 +125,7 @@ Changes reflect instantly during development:
 
 ```bash
 pnpm dev
-# → Changes appear in <100ms
+# → Changes appear in &lt;100ms
 ```
 
 ### Zero Configuration
@@ -152,15 +156,22 @@ function FeatureCard({ title, description }) {
 
 ## Performance Benchmarks
 
-### Before EmberKit (Static Site Generator)
-- First Contentful Paint: 200ms
-- Total Bundle Size: 45KB
-- Time to Interactive: 300ms
-
-### After EmberKit
-- First Contentful Paint: 50ms (75% faster)
-- Total Bundle Size: 8KB (82% smaller)
-- Time to Interactive: 100ms (67% faster)
+<div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-8">
+  <Card title="Before EmberKit" description="Static Site Generator" variant="outline">
+    <ul className="list-disc list-inside text-surface-500 space-y-1">
+      <li>First Contentful Paint: <span className="text-error-500 font-semibold">200ms</span></li>
+      <li>Total Bundle Size: <span className="text-error-500 font-semibold">45KB</span></li>
+      <li>Time to Interactive: <span className="text-error-500 font-semibold">300ms</span></li>
+    </ul>
+  </Card>
+  <Card title="After EmberKit" description="SSR + Selective Hydration" variant="outline">
+    <ul className="list-disc list-inside text-surface-500 space-y-1">
+      <li>First Contentful Paint: <span className="text-success-500 font-semibold">50ms</span> (75% faster)</li>
+      <li>Total Bundle Size: <span className="text-success-500 font-semibold">8KB</span> (82% smaller)</li>
+      <li>Time to Interactive: <span className="text-success-500 font-semibold">100ms</span> (67% faster)</li>
+    </ul>
+  </Card>
+</div>
 
 ## Conclusion
 

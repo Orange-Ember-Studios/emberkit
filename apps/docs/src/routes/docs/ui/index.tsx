@@ -18,7 +18,7 @@ const UIContent: RouteComponent = () => {
   const [page, setPage] = createSignal(1);
   const [count, setCount] = createSignal(0);
   return (
-    <div class="min-h-screen bg-surface-50 text-surface-900">
+    <div class="min-h-screen bg-[#0b0f19] text-surface-900">
       {/* Hero */}
         <div class="relative overflow-hidden border-b border-white/5 glass-card rounded-none">
         <div class="pointer-events-none absolute -top-24 -right-24 h-96 w-96 rounded-full bg-primary-500/15 blur-[120px]" />

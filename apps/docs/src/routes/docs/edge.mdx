@@ -1,15 +1,24 @@
+import { Badge, Alert, Card, Text } from '@emberkit/ui';
+
 # Edge Deployment
 
-EmberKit is designed for edge-first deployment. Your app runs in 300+ locations worldwide with sub-50ms latency.
+<Text color="muted" className="mb-6">EmberKit is designed for edge-first deployment. Your app runs in 300+ locations worldwide with sub-50ms latency.</Text>
 
 ## Supported Platforms
 
-| Platform | Runtime | Status |
-|----------|---------|--------|
-| Cloudflare Workers | V8 isolates | Supported |
-| Deno Deploy | Deno | Supported |
-| Node.js | Node 18+ | Supported |
-| Bun | Bun | Supported |
+<Card variant="outline">
+  <table>
+    <thead>
+      <tr><th>Platform</th><th>Runtime</th><th>Status</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Cloudflare Workers</td><td>V8 isolates</td><td><Badge variant="success">Supported</Badge></td></tr>
+      <tr><td>Deno Deploy</td><td>Deno</td><td><Badge variant="success">Supported</Badge></td></tr>
+      <tr><td>Node.js</td><td>Node 18+</td><td><Badge variant="success">Supported</Badge></td></tr>
+      <tr><td>Bun</td><td>Bun</td><td><Badge variant="success">Supported</Badge></td></tr>
+    </tbody>
+  </table>
+</Card>
 
 ## Cloudflare Workers
 

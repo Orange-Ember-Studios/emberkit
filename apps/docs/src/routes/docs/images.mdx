@@ -1,6 +1,8 @@
+import { Badge, Alert, Card, Text } from '@emberkit/ui';
+
 # Image Optimization
 
-EmberKit provides built-in image optimization with automatic format conversion, responsive sizing, and lazy loading.
+<Text color="muted" className="mb-6">EmberKit provides built-in image optimization with automatic format conversion, responsive sizing, and lazy loading.</Text>
 
 ## Image Plugin
 
@@ -25,13 +27,20 @@ export default defineConfig({
 
 ## Configuration
 
-| Option | Default | Description |
-|--------|---------|-------------|
-| `quality` | 80 | Image quality (1-100) |
-| `formats` | `['webp', 'jpeg']` | Output formats |
-| `sizes` | `[320, 640, 1024, 1920]` | Responsive breakpoints |
-| `lazy` | true | Enable lazy loading |
-| `placeholder` | `'blur'` | Placeholder type |
+<Card title="Plugin Options" variant="outline">
+  <table>
+    <thead>
+      <tr><th>Option</th><th>Default</th><th>Description</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>quality</code></td><td><code>80</code></td><td>Image quality (1-100)</td></tr>
+      <tr><td><code>formats</code></td><td><code>['webp', 'jpeg']</code></td><td>Output formats</td></tr>
+      <tr><td><code>sizes</code></td><td><code>[320, 640, 1024, 1920]</code></td><td>Responsive breakpoints</td></tr>
+      <tr><td><code>lazy</code></td><td><code>true</code></td><td>Enable lazy loading</td></tr>
+      <tr><td><code>placeholder</code></td><td><code>'blur'</code></td><td>Placeholder type</td></tr>
+    </tbody>
+  </table>
+</Card>
 
 ## Lazy Loading
 

@@ -2,9 +2,11 @@
 title: Installation
 ---
 
+import { Badge, Alert, Card, Text } from '@emberkit/ui';
+
 # Installation
 
-Get up and running with EmberKit in minutes.
+<Text color="muted" className="mb-6">Get up and running with EmberKit in minutes.</Text>
 
 ## Requirements
 
@@ -97,17 +99,17 @@ Open http://localhost:3000 in your browser. You should see the EmberKit welcome 
 
 ## Troubleshooting
 
-### Port already in use
-
-Change the port in `emberkit.config.ts`:
+<Alert variant="warning" title="Port already in use">
+  Change the port in <code>emberkit.config.ts</code>.
+</Alert>
 
 ```typescript
 server: { port: 3001 }
 ```
 
-### Module resolution errors
-
-Ensure your `tsconfig.json` includes:
+<Alert variant="warning" title="Module resolution errors">
+  Ensure your <code>tsconfig.json</code> includes the correct <code>jsxImportSource</code> and <code>moduleResolution</code>.
+</Alert>
 
 ```json
 {

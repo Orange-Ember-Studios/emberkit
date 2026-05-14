@@ -1,6 +1,8 @@
+import { Badge, Alert, Card, Text } from '@emberkit/ui';
+
 # Markdown & MDX
 
-EmberKit has built-in Markdown and MDX support. Write content in Markdown, render it as JSX components.
+<Text color="muted" className="mb-6">EmberKit has built-in Markdown and MDX support. Write content in Markdown, render it as JSX components.</Text>
 
 ## Basic Usage
 
@@ -75,18 +77,25 @@ console.log(result.data); // { title: 'My Post', date: '2025-01-15', tags: [...]
 
 ## Markdown Features
 
-| Feature | Syntax | Status |
-|---------|--------|--------|
-| GFM | `~~strikethrough~~`, `==highlight==` | Supported |
-| Tables | Pipe tables | Supported |
-| Task Lists | `- [x] Done` | Supported |
-| Code Blocks | Fenced with language | Supported |
-| Inline Code | Backticks | Supported |
-| Links | `[text](url)` | Supported |
-| Images | `![alt](src)` | Supported |
-| Blockquotes | `> quote` | Supported |
-| Footnotes | `[^1]` | Supported |
-| Definition Lists | `term: definition` | Supported |
+<Card title="Supported Features" variant="outline">
+  <table>
+    <thead>
+      <tr><th>Feature</th><th>Syntax</th><th>Status</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>GFM</td><td><code>~~strikethrough~~</code>, <code>==highlight==</code></td><td><Badge variant="success">Supported</Badge></td></tr>
+      <tr><td>Tables</td><td>Pipe tables</td><td><Badge variant="success">Supported</Badge></td></tr>
+      <tr><td>Task Lists</td><td><code>- [x] Done</code></td><td><Badge variant="success">Supported</Badge></td></tr>
+      <tr><td>Code Blocks</td><td>Fenced with language</td><td><Badge variant="success">Supported</Badge></td></tr>
+      <tr><td>Inline Code</td><td>Backticks</td><td><Badge variant="success">Supported</Badge></td></tr>
+      <tr><td>Links</td><td><code>[text](url)</code></td><td><Badge variant="success">Supported</Badge></td></tr>
+      <tr><td>Images</td><td><code>![alt](src)</code></td><td><Badge variant="success">Supported</Badge></td></tr>
+      <tr><td>Blockquotes</td><td><code>&gt; quote</code></td><td><Badge variant="success">Supported</Badge></td></tr>
+      <tr><td>Footnotes</td><td><code>[^1]</code></td><td><Badge variant="success">Supported</Badge></td></tr>
+      <tr><td>Definition Lists</td><td><code>term: definition</code></td><td><Badge variant="success">Supported</Badge></td></tr>
+    </tbody>
+  </table>
+</Card>
 
 ## MDX Compiler
 

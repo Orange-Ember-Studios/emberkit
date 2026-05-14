@@ -1,6 +1,8 @@
+import { Badge, Alert, Card, Text, Heading } from '@emberkit/ui';
+
 # Head Component
 
-The `<Head>` component lets you manage `<head>` tags declaratively from any component. It renders nothing in the page body — tags are injected into `<head>` during SSR and updated directly in the DOM on the client.
+<Text color="muted" className="mb-6">The <code className="text-primary-400">{'<Head>'}</code> component lets you manage <code className="text-primary-400">{'<head>'}</code> tags declaratively from any component. It renders nothing in the page body — tags are injected into <code className="text-primary-400">{'<head>'}</code> during SSR and updated directly in the DOM on the client.</Text>
 
 ## Basic Usage
 
@@ -54,14 +56,25 @@ For common tags, use props instead of raw JSX:
 
 ### Supported Props
 
-| Prop | Type | HTML Output |
-|------|------|-------------|
-| `title` | `string` | `<title>` + `<meta name="title">` |
-| `description` | `string` | `<meta name="description">` |
-| `keywords` | `string[]` | `<meta name="keywords">` (comma-separated) |
-| `author` | `string` | `<meta name="author">` |
-| `robots` | `string` | `<meta name="robots">` |
-| `canonical` | `string` | `<link rel="canonical">` |
+<Card title="Shorthand Props Reference" variant="outline">
+  <table>
+    <thead>
+      <tr>
+        <th>Prop</th>
+        <th>Type</th>
+        <th>HTML Output</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td><code>title</code></td><td><code>string</code></td><td><code>{'<title>'} + {'<meta name="title">'}</code></td></tr>
+      <tr><td><code>description</code></td><td><code>string</code></td><td><code>{'<meta name="description">'}</code></td></tr>
+      <tr><td><code>keywords</code></td><td><code>string[]</code></td><td><code>{'<meta name="keywords">'}</code> (comma-separated)</td></tr>
+      <tr><td><code>author</code></td><td><code>string</code></td><td><code>{'<meta name="author">'}</code></td></tr>
+      <tr><td><code>robots</code></td><td><code>string</code></td><td><code>{'<meta name="robots">'}</code></td></tr>
+      <tr><td><code>canonical</code></td><td><code>string</code></td><td><code>{'<link rel="canonical">'}</code></td></tr>
+    </tbody>
+  </table>
+</Card>
 
 ## Open Graph
 
@@ -79,18 +92,6 @@ For common tags, use props instead of raw JSX:
 />
 ```
 
-### Open Graph Props
-
-| Prop | Type | HTML Output |
-|------|------|-------------|
-| `og.type` | `string` | `<meta property="og:type">` |
-| `og.title` | `string` | `<meta property="og:title">` |
-| `og.description` | `string` | `<meta property="og:description">` |
-| `og.url` | `string` | `<meta property="og:url">` |
-| `og.image` | `string` | `<meta property="og:image">` |
-| `og.locale` | `string` | `<meta property="og:locale">` |
-| `og.siteName` | `string` | `<meta property="og:site_name">` |
-
 ## Twitter Cards
 
 ```tsx
@@ -105,17 +106,6 @@ For common tags, use props instead of raw JSX:
   }}
 />
 ```
-
-### Twitter Props
-
-| Prop | Type | HTML Output |
-|------|------|-------------|
-| `twitter.card` | `string` | `<meta name="twitter:card">` |
-| `twitter.site` | `string` | `<meta name="twitter:site">` |
-| `twitter.creator` | `string` | `<meta name="twitter:creator">` |
-| `twitter.title` | `string` | `<meta name="twitter:title">` |
-| `twitter.description` | `string` | `<meta name="twitter:description">` |
-| `twitter.image` | `string` | `<meta name="twitter:image">` |
 
 ## Combining Children and Props
 

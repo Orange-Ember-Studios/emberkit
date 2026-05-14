@@ -1,6 +1,8 @@
+import { Badge, Alert, Card, Text } from '@emberkit/ui';
+
 # Forms & Mutations
 
-EmberKit provides built-in form handling with validation, state management, and submission handling.
+<Text color="muted" className="mb-6">EmberKit provides built-in form handling with validation, state management, and submission handling.</Text>
 
 ## Basic Form
 
@@ -136,7 +138,9 @@ export async function POST(request: Request) {
 
 ## Progressive Enhancement
 
-Forms work without JavaScript. The server handles the submission:
+<Alert variant="info" title="Progressive Enhancement">
+Forms work without JavaScript. The server handles the submission when JS is unavailable, then client-side validation takes over once hydrated.
+</Alert>
 
 ```tsx
 <form action="/api/contact" method="POST">

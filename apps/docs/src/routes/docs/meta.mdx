@@ -1,6 +1,8 @@
+import { Badge, Alert, Card, Text } from '@emberkit/ui';
+
 # SEO & Meta
 
-EmberKit provides built-in tools for managing meta tags, Open Graph, Twitter cards, and structured data.
+<Text color="muted" className="mb-6">EmberKit provides built-in tools for managing meta tags, Open Graph, Twitter cards, and structured data.</Text>
 
 ## The `<Head>` Component
 
@@ -140,10 +142,23 @@ function AboutPage() {
 
 ### How It Works
 
-| Context | Behavior |
-|---------|----------|
-| **SSR** | Renders `null` in body, registers tags to an internal registry. `renderSSR()` drains the registry and injects tags into `<head>`. |
-| **Client SPA** | Renders `null` in body, updates `document.head` directly. Uses `data-ek-head` attribute to track managed tags so re-renders replace rather than duplicate. |
+<Card variant="outline">
+  <table>
+    <thead>
+      <tr><th>Context</th><th>Behavior</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>SSR</strong></td>
+        <td>Renders <code>null</code> in body, registers tags to an internal registry. <code>renderSSR()</code> drains the registry and injects tags into <code>{'<head>'}</code>.</td>
+      </tr>
+      <tr>
+        <td><strong>Client SPA</strong></td>
+        <td>Renders <code>null</code> in body, updates <code>document.head</code> directly. Uses <code>data-ek-head</code> attribute to track managed tags so re-renders replace rather than duplicate.</td>
+      </tr>
+    </tbody>
+  </table>
+</Card>
 
 ## Basic Meta Tags
 

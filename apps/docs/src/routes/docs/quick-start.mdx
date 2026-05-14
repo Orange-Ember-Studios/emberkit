@@ -2,9 +2,11 @@
 title: Quick Start
 ---
 
+import { Badge, Alert, Card, Text } from '@emberkit/ui';
+
 # Quick Start
 
-Build your first EmberKit page in 5 minutes.
+<Text color="muted" className="mb-6">Build your first EmberKit page in 5 minutes.</Text>
 
 ## Create Your First Route
 
@@ -64,7 +66,9 @@ function Counter() {
 }
 ```
 
-The `<span>` renders with the initial count value in the HTML. When the button is clicked, `setCount` updates the signal, and only the `<span>`'s `textContent` changes — no re-render of the whole component.
+<Alert variant="info" title="How it works">
+  The <code>{'<span>'}</code> renders with the initial count value in the HTML. When the button is clicked, <code>setCount</code> updates the signal, and only the <code>{'<span>'}</code>'s <code>textContent</code> changes — no re-render of the whole component.
+</Alert>
 
 ### DOM Binding Patterns
 

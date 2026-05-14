@@ -1,6 +1,8 @@
+import { Badge, Alert, Card, Text } from '@emberkit/ui';
+
 # Signals
 
-Signals are EmberKit's reactive primitives. They store state and notify subscribers when values change — without re-rendering the entire page.
+<Text color="muted" className="mb-6">Signals are EmberKit's reactive primitives. They store state and notify subscribers when values change — without re-rendering the entire page.</Text>
 
 ## Creating a Signal
 
@@ -54,7 +56,9 @@ setCount(5); // logs "count changed to 5"
 unsub();
 ```
 
-This is the foundation for EmberKit's [zero-JS DOM binding](#dom-binding-with-data-ek-hydrate) — the hydration system uses `subscribe` internally to update specific DOM elements when a signal changes, without re-rendering the whole page.
+<Alert variant="info" title="How it works">
+  This is the foundation for EmberKit's zero-JS DOM binding — the hydration system uses <code>subscribe</code> internally to update specific DOM elements when a signal changes, without re-rendering the whole page.
+</Alert>
 
 ## Computed Values with createMemo
 
@@ -188,13 +192,20 @@ Components detect signal props automatically and apply bindings internally:
 
 **Supported attributes:**
 
-| Attribute | Purpose |
-|---|---|
-| `data-ek-bind` | Accepts the signal getter directly (`data-ek-bind={count}`) |
-| `data-ek-show` | Classes to add when signal value is truthy |
-| `data-ek-hide` | Classes to add when signal value is falsy |
-| `data-ek-show-when` | Only show when signal equals this string value (for tabs, etc.) |
-| `data-ek-hide-class` | Class to toggle when using `data-ek-show-when` (defaults to `"hidden"`) |
+<Card variant="outline">
+  <table>
+    <thead>
+      <tr><th>Attribute</th><th>Purpose</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>data-ek-bind</code></td><td>Accepts the signal getter directly (<code>data-ek-bind={'{count}'}</code>)</td></tr>
+      <tr><td><code>data-ek-show</code></td><td>Classes to add when signal value is truthy</td></tr>
+      <tr><td><code>data-ek-hide</code></td><td>Classes to add when signal value is falsy</td></tr>
+      <tr><td><code>data-ek-show-when</code></td><td>Only show when signal equals this string value (for tabs, etc.)</td></tr>
+      <tr><td><code>data-ek-hide-class</code></td><td>Class to toggle when using <code>data-ek-show-when</code> (defaults to <code>"hidden"</code>)</td></tr>
+    </tbody>
+  </table>
+</Card>
 
 ### Tabs Example
 

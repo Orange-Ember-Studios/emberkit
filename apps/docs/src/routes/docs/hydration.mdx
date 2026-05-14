@@ -1,6 +1,8 @@
+import { Badge, Alert, Card, Text } from '@emberkit/ui';
+
 # Hydration
 
-Hydration is the process of making server-rendered HTML interactive. EmberKit's hydration is lightweight and targeted — instead of re-rendering the entire component tree, it connects signals to specific DOM elements via declarative `data-ek-bind` attributes.
+<Text color="muted" className="mb-6">Hydration is the process of making server-rendered HTML interactive. EmberKit's hydration is lightweight and targeted — instead of re-rendering the entire component tree, it connects signals to specific DOM elements via declarative <code className="text-primary-400">data-ek-bind</code> attributes.</Text>
 
 ## How It Works
 
@@ -33,7 +35,9 @@ function Counter() {
 
 ## data-ek-bind Reference
 
-`data-ek-bind` connects a signal getter directly to a DOM element. The framework serializes the signal's identity during SSR and reconnects it during hydration.
+<Alert variant="info" title="data-ek-bind">
+  Connects a signal getter directly to a DOM element. The framework serializes the signal's identity during SSR and reconnects it during hydration.
+</Alert>
 
 | Pattern | Behavior |
 |---------|----------|

@@ -15,20 +15,20 @@ export interface AlertProps {
 
 function variantClasses(variant: AlertVariant): string {
   const map: Record<AlertVariant, string> = {
-    info: 'bg-info-50 border-info-500',
-    success: 'bg-success-50 border-success-500',
-    warning: 'bg-warning-50 border-warning-500',
-    error: 'bg-error-50 border-error-500',
+    info: 'bg-info-900 border-info-500',
+    success: 'bg-success-900 border-success-500',
+    warning: 'bg-warning-900 border-warning-500',
+    error: 'bg-error-900 border-error-500',
   };
   return map[variant];
 }
 
 function textColor(variant: AlertVariant): string {
   const map: Record<AlertVariant, string> = {
-    info: 'text-info-900',
-    success: 'text-success-900',
-    warning: 'text-warning-900',
-    error: 'text-error-900',
+    info: 'text-info-50',
+    success: 'text-success-50',
+    warning: 'text-warning-50',
+    error: 'text-error-50',
   };
   return map[variant];
 }

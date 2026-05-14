@@ -14,11 +14,11 @@ export interface BadgeProps {
 function variantClass(variant: BadgeVariant): string {
   const map: Record<BadgeVariant, string> = {
     default: 'bg-surface-200 text-surface-800',
-    success: 'bg-success-50 text-success-900',
-    warning: 'bg-warning-50 text-warning-900',
-    error: 'bg-error-50 text-error-900',
-    info: 'bg-info-50 text-info-900',
-    accent: 'bg-accent-100 text-accent-900',
+    success: 'bg-success-900 text-success-50',
+    warning: 'bg-warning-900 text-warning-50',
+    error: 'bg-error-900 text-error-50',
+    info: 'bg-info-900 text-info-50',
+    accent: 'bg-accent-900 text-accent-50',
   };
   return map[variant];
 }
