@@ -12,7 +12,7 @@ export function getSignalByIndex(idx: number): { subscribe: (fn: (v: unknown) =>
 export function createSignal<T>(
   initialValue: T,
   options: SignalOptions<T> = {},
-): [() => T, (newValue: T) => void] & Signal<T> {
+): [() => T, (newValue: T | ((prev: T) => T)) => void] & Signal<T> {
   let value = initialValue;
   const subs = new Set<(v: T) => void>();
 

@@ -1,5 +1,11 @@
 # @emberkit/core
 
+## 0.2.1
+
+### Patch Changes
+
+- Fix style object serialization in SSR rendering, add native HTML attribute types to Input/Select, update semantic color tokens for dark theme, add :root fallback for all color CSS variables
+
 ## 0.1.2
 
 ### Patch Changes
