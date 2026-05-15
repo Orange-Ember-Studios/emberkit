@@ -117,196 +117,179 @@ const Layout: RouteComponent = ({ children }) => {
 export default Layout;`,
 
   "src/routes/index.tsx": `import type { RouteComponent } from '@emberkit/core';
-import { Button, Card, Heading, Text, Badge, Input } from '@emberkit/ui';
 import { signal } from '@emberkit/core';
+import {
+  Button,
+  Card,
+  Heading,
+  Text,
+  Badge,
+  Tabs,
+  Alert,
+  Icon,
+} from '@emberkit/ui';
 
 const HomePage: RouteComponent = () => {
-  const email = signal('');
-  const activeTab = signal('buttons');
+  const activeTab = signal('features');
+
+  const features = [
+    { icon: '⚡', title: 'Lightning Fast', desc: 'Sub-10KB runtime with tree-shakeable architecture' },
+    { icon: '📘', title: 'TypeScript First', desc: 'Full type safety with intelligent autocomplete' },
+    { icon: '📁', title: 'File-Based Routing', desc: 'Routes automatically created from your file structure' },
+  ];
+
+  const components = [
+    { name: 'Button', desc: 'Multiple variants and sizes for all use cases' },
+    { name: 'Card', desc: 'Flexible container component with padding options' },
+    { name: 'Badge', desc: 'Status indicators with different variants' },
+    { name: 'Alert', desc: 'Notification component for important messages' },
+    { name: 'Tabs', desc: 'Organized content switching interface' },
+    { name: 'Input', desc: 'Styled form input with validation support' },
+  ];
 
   return (
     <div className="relative space-y-24">
-      {/* Hero */}
+      {/* Hero Section */}
       <section className="relative text-center py-20">
         <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[400px] w-[400px] rounded-full bg-ember-500/15 blur-[150px] animate-pulse-glow" />
-
-        <div className="relative z-10 animate-fade-in-down">
-          <Badge variant="primary" className="mb-6 inline-flex">
-            &#10024; Built with EmberKit UI
+        <div className="relative z-10 space-y-6 animate-fade-in-down">
+          <Badge variant="primary" className="inline-block">
+            ✨ Welcome to {{name}}
           </Badge>
-          <Heading level="h1" size="4xl" weight="bold" className="mb-6">
-            Welcome to{' '}
-            <span className="bg-gradient-to-r from-ember-400 via-ember-500 to-amber-500 bg-clip-text text-transparent">
-              {{name}}
-            </span>
+          <Heading level="h1" size="4xl" weight="bold">
+            Built with EmberKit <span className="bg-gradient-to-r from-ember-400 via-ember-500 to-amber-500 bg-clip-text text-transparent">UI System</span>
           </Heading>
-          <Text size="xl" color="muted" className="max-w-2xl mx-auto mb-10">
-            A modern starter template with EmberKit UI components and Tailwind CSS.
-            Build beautiful interfaces with our pre-built component library.
+          <Text size="xl" color="muted" className="max-w-2xl mx-auto">
+            A modern, component-driven template using the EmberKit design system. Beautiful, accessible, and production-ready.
           </Text>
-          <div className="flex gap-4 justify-center flex-wrap">
-            <Button variant="primary" size="lg" className="shadow-lg shadow-ember-500/20 hover:shadow-ember-500/40 transition-shadow">
+          <div className="flex gap-4 justify-center flex-wrap pt-4">
+            <Button variant="primary" size="lg">
               Get Started
             </Button>
             <Button variant="secondary" size="lg">
-              View Docs &#8594;
+              View Docs →
             </Button>
           </div>
         </div>
       </section>
 
-      {/* Features Grid */}
+      {/* Features Grid using Cards */}
       <section>
-        <Heading level="h2" size="2xl" weight="semibold" className="mb-2 text-center">
+        <Heading level="h2" size="2xl" weight="semibold" className="text-center mb-2">
           Why EmberKit?
         </Heading>
-        <Text color="muted" className="text-center mb-10 max-w-lg mx-auto">
+        <Text color="muted" className="text-center mb-12 max-w-lg mx-auto">
           Everything you need to build fast, beautiful web applications.
         </Text>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {[
-            { icon: '&#9889;', title: 'Lightning Fast', desc: 'Sub-10KB runtime with tree-shakeable architecture' },
-            { icon: '&#128303;', title: 'TypeScript First', desc: 'Full type safety with intelligent autocomplete' },
-            { icon: '&#128726;', title: 'File-Based Routing', desc: 'Routes automatically created from your file structure' },
-          ].map((f, i) => (
-            <Card key={f.title} padding="lg" className="relative group hover:border-ember-500/50 transition-all duration-300 hover:-translate-y-1 cursor-pointer">
+          {features.map((feature) => (
+            <Card key={feature.title} padding="lg" className="relative group hover:border-ember-500/50 transition-all hover:-translate-y-1 cursor-pointer">
               <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-ember-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-              <div className="relative">
-                <div className="w-12 h-12 rounded-xl bg-ember-500/10 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">
-                  {f.icon}
-                </div>
-                <Heading level="h3" size="lg" weight="semibold" className="mb-2">
-                  {f.title}
+              <div className="relative space-y-3">
+                <div className="text-3xl">{feature.icon}</div>
+                <Heading level="h3" size="md" weight="semibold">
+                  {feature.title}
                 </Heading>
-                <Text color="muted">{f.desc}</Text>
+                <Text color="muted" size="sm">
+                  {feature.desc}
+                </Text>
               </div>
             </Card>
           ))}
         </div>
       </section>
 
-      {/* Component Showcase */}
+      {/* Component Showcase with Tabs */}
       <section>
-        <Heading level="h2" size="2xl" weight="semibold" className="mb-2 text-center">
-          UI Components
+        <Heading level="h2" size="2xl" weight="semibold" className="text-center mb-2">
+          Design System Components
         </Heading>
-        <Text color="muted" className="text-center mb-8">
-          Explore our pre-built component library.
+        <Text color="muted" className="text-center mb-8 max-w-lg mx-auto">
+          Pre-built, accessible components ready to use in your project.
         </Text>
 
-        {/* Tabs */}
-        <div className="flex justify-center mb-8">
-          <div className="inline-flex p-1 rounded-lg bg-slate-800/50 border border-slate-700/50">
-            {[
-              { id: 'buttons', label: 'Buttons' },
-              { id: 'cards', label: 'Cards' },
-              { id: 'forms', label: 'Forms' },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                className={\`px-4 py-2 text-sm font-medium rounded-md transition-all \${activeTab.value === tab.id ? 'bg-ember-500 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}\`}
-                onClick={() => { activeTab.value = tab.id; }}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Tab Content */}
-        {activeTab.value === 'buttons' && (
-          <Card padding="xl" className="max-w-2xl mx-auto">
-            <div className="text-center mb-6">
-              <Badge variant="primary" className="mb-2">Buttons</Badge>
-              <Heading level="h3" size="lg" weight="semibold">Button Variants</Heading>
-            </div>
-            <div className="flex flex-wrap gap-3 justify-center">
-              <Button variant="primary">Primary</Button>
-              <Button variant="secondary">Secondary</Button>
-              <Button variant="ghost">Ghost</Button>
-              <Button variant="primary" size="sm">Small</Button>
-              <Button variant="secondary" size="lg">Large</Button>
-            </div>
-            <div className="mt-6 pt-6 border-t border-slate-700/50">
-              <Heading level="h4" size="sm" weight="semibold" className="mb-3 text-slate-400">With Icons</Heading>
-              <div className="flex flex-wrap gap-3 justify-center">
-                <Button variant="primary">&#9889; Get Started</Button>
-                <Button variant="secondary">Learn More &#8594;</Button>
-                <Button variant="ghost">&#10084; Like</Button>
-              </div>
-            </div>
-          </Card>
-        )}
-
-        {activeTab.value === 'cards' && (
-          <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
-            <Card padding="lg" className="hover:border-ember-500/50 transition-colors">
-              <Badge variant="success" className="mb-3">Analytics</Badge>
-              <Heading level="h3" size="lg" weight="semibold" className="mb-2">
-                Revenue Growth
-              </Heading>
-              <div className="text-3xl font-bold text-ember-400 mb-1">$45,231</div>
-              <Text color="muted" className="text-sm">+20.1% from last month</Text>
-              <div className="mt-4 h-2 rounded-full bg-slate-700 overflow-hidden">
-                <div className="h-full w-3/4 rounded-full bg-gradient-to-r from-ember-500 to-amber-500" />
-              </div>
-            </Card>
-            <Card padding="lg" className="hover:border-ember-500/50 transition-colors">
-              <Badge variant="info" className="mb-3">Users</Badge>
-              <Heading level="h3" size="lg" weight="semibold" className="mb-2">
-                Active Users
-              </Heading>
-              <div className="text-3xl font-bold text-blue-400 mb-1">2,338</div>
-              <Text color="muted" className="text-sm">+15.3% from last month</Text>
-              <div className="mt-4 h-2 rounded-full bg-slate-700 overflow-hidden">
-                <div className="h-full w-1/2 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500" />
-              </div>
-            </Card>
-          </div>
-        )}
-
-        {activeTab.value === 'forms' && (
-          <Card padding="xl" className="max-w-md mx-auto">
-            <div className="text-center mb-6">
-              <Badge variant="info" className="mb-2">Forms</Badge>
-              <Heading level="h3" size="lg" weight="semibold">Newsletter Signup</Heading>
-            </div>
+        <div className="space-y-8">
+          {/* Buttons Section */}
+          <Card padding="xl">
+            <Heading level="h3" size="lg" weight="semibold" className="mb-6">
+              Button Component
+            </Heading>
             <div className="space-y-4">
-              <Input
-                label="Name"
-                placeholder="John Doe"
-              />
-              <Input
-                label="Email"
-                type="email"
-                placeholder="you@example.com"
-                value={email.value}
-                onChange={(e) => { email.value = e.currentTarget.value; }}
-              />
-              <Button variant="primary" className="w-full shadow-lg shadow-ember-500/20">
-                Subscribe &#10148;
-              </Button>
+              <Text color="muted" size="sm">
+                The Button component comes in multiple variants and sizes for different use cases.
+              </Text>
+              <div className="flex flex-wrap gap-2 pt-4">
+                <Button variant="primary">Primary</Button>
+                <Button variant="secondary">Secondary</Button>
+                <Button variant="ghost">Ghost</Button>
+                <Button variant="primary" size="sm">Small</Button>
+                <Button variant="secondary" size="lg">Large</Button>
+              </div>
             </div>
           </Card>
-        )}
+
+          {/* Badge & Alert Section */}
+          <Card padding="xl">
+            <Heading level="h3" size="lg" weight="semibold" className="mb-6">
+              Status Components
+            </Heading>
+            <div className="space-y-6">
+              <div>
+                <Text weight="semibold" className="mb-3">Badges</Text>
+                <div className="flex flex-wrap gap-2">
+                  <Badge variant="primary">Primary</Badge>
+                  <Badge variant="success">Success</Badge>
+                  <Badge variant="warning">Warning</Badge>
+                  <Badge variant="info">Info</Badge>
+                </div>
+              </div>
+              <Alert variant="success">
+                ✓ This is a success alert message. Use it to confirm important actions.
+              </Alert>
+              <Alert variant="info">
+                ℹ This is an info alert. Useful for displaying helpful information.
+              </Alert>
+            </div>
+          </Card>
+
+          {/* Components Grid */}
+          <Card padding="xl">
+            <Heading level="h3" size="lg" weight="semibold" className="mb-6">
+              Available Components
+            </Heading>
+            <div className="grid md:grid-cols-2 gap-4">
+              {components.map((comp) => (
+                <div key={comp.name} className="p-4 rounded-lg bg-slate-800/30 border border-slate-700/50">
+                  <Text weight="semibold" size="sm">{comp.name}</Text>
+                  <Text color="muted" size="xs" className="mt-1">{comp.desc}</Text>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </div>
       </section>
 
-      {/* CTA */}
+      {/* CTA Section */}
       <section className="relative py-20">
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
           <div className="w-[500px] h-[200px] rounded-full bg-ember-500/10 blur-[100px]" />
         </div>
-        <div className="relative z-10 text-center">
+        <Card padding="xl" className="relative z-10 max-w-2xl mx-auto text-center">
           <Heading level="h2" size="2xl" weight="semibold" className="mb-4">
-            Ready to build something amazing?
+            Ready to Build?
           </Heading>
-          <Text color="muted" className="max-w-xl mx-auto mb-8">
+          <Text color="muted" className="mb-8">
             Start building your next project with EmberKit's powerful components and TypeScript-first API.
           </Text>
-          <Button variant="primary" size="lg" className="shadow-lg shadow-ember-500/25 hover:shadow-ember-500/40 transition-shadow">
-            Create Project &#10148;
-          </Button>
-        </div>
+          <div className="flex gap-4 justify-center">
+            <Button variant="primary" size="lg">
+              Create Project →
+            </Button>
+            <Button variant="secondary" size="lg">
+              Learn More
+            </Button>
+          </div>
+        </Card>
       </section>
     </div>
   );
@@ -316,9 +299,18 @@ export default HomePage;`,
 
   "src/routes/about.tsx": `import type { RouteComponent } from '@emberkit/core';
 import { Head } from '@emberkit/core';
-import { Heading, Text, Button, Card, Badge } from '@emberkit/ui';
+import { Heading, Text, Button, Card, Badge, Alert } from '@emberkit/ui';
 
 const AboutPage: RouteComponent = () => {
+  const features = [
+    { icon: '⚙️', title: 'TypeScript-first', desc: 'Full type safety with intelligent autocomplete' },
+    { icon: '🎨', title: 'UI Components', desc: 'Pre-built design system components' },
+    { icon: '🎯', title: 'Tailwind CSS', desc: 'Utility-first styling framework' },
+    { icon: '📁', title: 'File Routing', desc: 'Automatic routes from file structure' },
+  ];
+
+  const techStack = ['EmberKit', 'TypeScript', 'Tailwind CSS', 'Vite', 'JSX', 'Design System'];
+
   return (
     <>
       <Head>
@@ -326,59 +318,69 @@ const AboutPage: RouteComponent = () => {
       </Head>
       <div className="max-w-3xl mx-auto space-y-12">
         {/* Header */}
-        <div className="text-center">
-          <Badge variant="primary" className="mb-4 inline-flex">About</Badge>
+        <div className="text-center space-y-4">
+          <Badge variant="primary" className="inline-block">
+            About Us
+          </Badge>
           <Heading level="h1" size="3xl" weight="bold">
-            About {' '}
-            <span className="bg-gradient-to-r from-ember-400 to-ember-600 bg-clip-text text-transparent">{{name}}</span>
+            About <span className="bg-gradient-to-r from-ember-400 to-ember-600 bg-clip-text text-transparent">{{name}}</span>
           </Heading>
+          <Text size="lg" color="muted" className="max-w-2xl mx-auto">
+            A modern, component-driven project built with EmberKit and the UI design system.
+          </Text>
         </div>
 
-        {/* Description */}
+        {/* Description Card */}
         <Card padding="xl" className="border-ember-500/20">
           <Text size="lg" color="muted" className="leading-relaxed">
-            This project was created with EmberKit and the UI component library.
-            It demonstrates how to build modern, beautiful interfaces with our
-            pre-built components and Tailwind CSS.
+            This project demonstrates how to build modern, beautiful interfaces with EmberKit's pre-built components and Tailwind CSS.
+            It showcases best practices in component-driven development, accessible design, and TypeScript-first architecture.
           </Text>
         </Card>
 
-        {/* Features */}
-        <div className="grid sm:grid-cols-2 gap-4">
-          {[
-            { icon: '&#128268;', title: 'TypeScript-first', desc: 'Full type safety with intelligent autocomplete' },
-            { icon: '&#127912;', title: 'UI Components', desc: 'Pre-built atoms, molecules, and organisms' },
-            { icon: '&#127752;', title: 'Tailwind CSS', desc: 'Utility-first styling with custom theme' },
-            { icon: '&#128726;', title: 'File Routing', desc: 'Automatic routes from your file structure' },
-          ].map((f) => (
-            <Card key={f.title} padding="lg" className="hover:border-ember-500/50 transition-all hover:-translate-y-0.5">
-              <div className="text-2xl mb-3">{f.icon}</div>
-              <Heading level="h3" size="md" weight="semibold" className="mb-1">
-                {f.title}
-              </Heading>
-              <Text color="muted" size="sm">{f.desc}</Text>
-            </Card>
-          ))}
-        </div>
-
-        {/* Tech Stack */}
-        <Card padding="xl">
-          <Heading level="h3" size="lg" weight="semibold" className="mb-4 text-center">
-            Tech Stack
+        {/* Features Grid */}
+        <section>
+          <Heading level="h2" size="xl" weight="semibold" className="mb-6">
+            Key Features
           </Heading>
-          <div className="flex flex-wrap gap-2 justify-center">
-            {['EmberKit', 'TypeScript', 'Tailwind CSS', 'Vite', 'JSX'].map((tech) => (
-              <Badge key={tech} variant="primary" className="px-3 py-1.5">
-                {tech}
-              </Badge>
+          <div className="grid sm:grid-cols-2 gap-4">
+            {features.map((f) => (
+              <Card key={f.title} padding="lg" className="hover:border-ember-500/50 transition-all hover:-translate-y-0.5">
+                <div className="text-2xl mb-3">{f.icon}</div>
+                <Heading level="h3" size="md" weight="semibold" className="mb-1">
+                  {f.title}
+                </Heading>
+                <Text color="muted" size="sm">{f.desc}</Text>
+              </Card>
             ))}
           </div>
-        </Card>
+        </section>
 
-        {/* Back */}
-        <div className="text-center">
+        {/* Tech Stack */}
+        <section>
+          <Card padding="xl">
+            <Heading level="h3" size="lg" weight="semibold" className="mb-6 text-center">
+              Tech Stack
+            </Heading>
+            <div className="flex flex-wrap gap-2 justify-center">
+              {techStack.map((tech) => (
+                <Badge key={tech} variant="primary" className="px-3 py-1.5">
+                  {tech}
+                </Badge>
+              ))}
+            </div>
+          </Card>
+        </section>
+
+        {/* Benefits Alert */}
+        <Alert variant="success">
+          ✨ <strong>Pro Tip:</strong> This template uses the EmberKit design system components. Check the component library documentation to learn about all available components and their capabilities.
+        </Alert>
+
+        {/* Back Button */}
+        <div className="text-center pt-4">
           <Button variant="secondary">
-            &#8592; Back to Home
+            ← Back to Home
           </Button>
         </div>
       </div>
