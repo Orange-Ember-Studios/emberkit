@@ -10,10 +10,10 @@
     "@emberkit/ui": "0.2.4"
   },
   "changesets": [
+    "cli-blog-api",
     "cli-counter-fix",
     "cli-counter-solid-color",
     "cli-counter-value",
-    "cli-docs-path",
     "cli-official-url",
     "cli-signal-hydration",
     "ui-design-tokens"

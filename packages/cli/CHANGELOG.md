@@ -1,5 +1,11 @@
 # @emberkit/cli
 
+## 0.6.1-alpha.9
+
+### Patch Changes
+
+- Fix blog template to follow EmberKit API correctly. Update routing links, signal API examples, and component types.
+
 ## 0.6.1-alpha.8
 
 ### Patch Changes
