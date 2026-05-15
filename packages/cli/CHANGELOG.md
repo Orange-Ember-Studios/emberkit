@@ -1,5 +1,13 @@
 # @emberkit/cli
 
+## 0.5.2
+
+### Patch Changes
+
+- Fix require() not defined error in ESM environment
+  - Convert all require() calls to ES module imports in filesystem utils
+  - Fixes crash when installing dependencies after project creation
+
 ## 0.5.1
 
 ### Patch Changes
