@@ -93,7 +93,7 @@ const Layout: RouteComponent = ({ children }) => {
             <nav className="flex items-center gap-8">
               <a href="/" className="text-slate-400 hover:text-ember-500 font-medium transition-colors">Home</a>
               <a href="/about" className="text-slate-400 hover:text-ember-500 font-medium transition-colors">About</a>
-              <a href="https://emberkit.dev/docs" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-ember-500 font-medium transition-colors">
+              <a href="https://emberkit.orangeember.com/docs" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-ember-500 font-medium transition-colors">
                 Docs <span className="text-xs">&#8599;</span>
               </a>
             </nav>
@@ -107,7 +107,7 @@ const Layout: RouteComponent = ({ children }) => {
         </main>
 
         <footer className="relative z-10 border-t border-slate-800/50 py-8 text-center text-sm text-slate-500">
-          <p>Built with <a href="https://emberkit.dev" className="text-ember-500 hover:underline">EmberKit</a></p>
+          <p>Built with <a href="https://emberkit.orangeember.com" className="text-ember-500 hover:underline">EmberKit</a></p>
         </footer>
       </div>
     </>

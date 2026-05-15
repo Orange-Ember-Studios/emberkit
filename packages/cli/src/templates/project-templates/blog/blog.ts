@@ -97,7 +97,7 @@ const Layout: RouteComponent = ({ children }) => {
         </header>
         <main className="flex-1">{children}</main>
         <footer className="border-t border-gray-200 py-8 text-center text-sm text-gray-500">
-          <p>Built with <a href="https://emberkit.dev" className="text-gray-700 hover:underline">EmberKit</a></p>
+          <p>Built with <a href="https://emberkit.orangeember.com" className="text-gray-700 hover:underline">EmberKit</a></p>
         </footer>
       </div>
     </>
@@ -281,7 +281,7 @@ const AboutPage: RouteComponent = () => {
         <h1 className="text-4xl font-bold font-serif mb-6">About</h1>
         <div className="prose">
           <p>Hi, I'm the author of this blog. I write about web development, frameworks, and building fast user interfaces.</p>
-          <p>This blog is built with <a href="https://emberkit.dev">EmberKit</a>, a minimalist TypeScript-first JSX framework.</p>
+          <p>This blog is built with <a href="https://emberkit.orangeember.com">EmberKit</a>, a minimalist TypeScript-first JSX framework.</p>
           <h2>Tech Stack</h2>
           <ul>
             <li>EmberKit for routing and rendering</li>
