@@ -1,16 +1,16 @@
-type FC<P> = (props: P) => unknown;
+import type { FC, JSXNode } from "@emberkit/core";
 import type { NavItem } from "../../organisms/Header/index.js";
 import { Header, Sidebar } from "../../organisms/index.js";
 
 export interface DefaultLayoutProps {
-  children?: unknown;
-  [key: string]: unknown;
+  children?: JSXNode;
   title?: string;
   navItems?: NavItem[];
   sidebarItems?: import("../../organisms/Sidebar/index.js").SidebarItem[];
-  logo?: unknown;
-  headerActions?: unknown;
+  logo?: JSXNode;
+  headerActions?: JSXNode;
   sidebarCollapsed?: boolean;
+  [key: string]: unknown;
 }
 
 const DefaultLayout: FC<DefaultLayoutProps> = ({
@@ -23,24 +23,24 @@ const DefaultLayout: FC<DefaultLayoutProps> = ({
   sidebarCollapsed = false,
 }) => {
   return (
-    <div class="flex h-screen bg-surface-50">
+    <div className="flex h-screen bg-surface-50">
       {sidebarItems.length > 0 && (
         <Sidebar
           items={sidebarItems}
           collapsed={sidebarCollapsed}
           header={
-            <span class="text-lg font-semibold text-surface-900">App</span>
+            <span className="text-lg font-semibold text-surface-900">App</span>
           }
         />
       )}
-      <div class="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden">
         <Header
           title={title}
           navItems={navItems}
           logo={logo}
           actions={headerActions}
         />
-        <main class="flex-1 overflow-y-auto p-6">{children}</main>
+        <main className="flex-1 overflow-y-auto p-6">{children}</main>
       </div>
     </div>
   );

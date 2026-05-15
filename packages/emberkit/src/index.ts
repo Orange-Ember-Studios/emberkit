@@ -5,9 +5,9 @@ export { createSignal, createMemo, createEffect, batch, untrack } from './signal
 export { createContext, useContext } from './context/index.js';
 export { navigate, preload, useNavigate } from './navigation/index.js';
 export { createRouter, matchRoute } from './router/index.js';
-export { createLoaderData, type LoaderResult } from './loader/index.js';
+export { createLoaderData, type LoaderResult, type LoaderFunction } from './loader/index.js';
 export { createErrorBoundary, createLoadingBoundary } from './boundaries/index.js';
-export type { JSXElement, DOMElement } from './runtime/types.js';
+export type { JSXElement, JSXNode, DOMElement } from './runtime/types.js';
 export type { Signal, WritableSignal, ReadonlySignal } from './signals/index.js';
 export {
   createMarkdownParser,

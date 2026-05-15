@@ -1,6 +1,6 @@
-export const routeTemplate = `import type { RouteComponent } from '@emberkit/runtime';
+export const routeTemplate = `import type { FC } from '@emberkit/core';
 
-const {{name}}Route: RouteComponent = (props) => {
+const {{name}}Route: FC = () => {
   return (
     <div>
       <h1>{{name}}</h1>
@@ -11,13 +11,13 @@ const {{name}}Route: RouteComponent = (props) => {
 export default {{name}}Route;
 `;
 
-export const componentTemplate = `import type { Component } from '@emberkit/runtime';
+export const componentTemplate = `import type { FC } from '@emberkit/core';
 
 interface {{name}}Props {
   className?: string;
 }
 
-const {{name}}: Component<{{name}}Props> = ({ className = '' }) => {
+const {{name}}: FC<{{name}}Props> = ({ className = '' }) => {
   return (
     <div className={className}>
       {{name}} component
@@ -28,13 +28,13 @@ const {{name}}: Component<{{name}}Props> = ({ className = '' }) => {
 export default {{name}};
 `;
 
-export const layoutTemplate = `import type { RouteComponent } from '@emberkit/runtime';
+export const layoutTemplate = `import type { FC, JSXNode } from '@emberkit/core';
 
 interface {{name}}LayoutProps {
-  children: JSX.Element;
+  children?: JSXNode;
 }
 
-const {{name}}Layout: RouteComponent<{{name}}LayoutProps> = ({ children }) => {
+const {{name}}Layout: FC<{{name}}LayoutProps> = ({ children }) => {
   return (
     <div className="{{kebab-name}}">
       <header>
@@ -49,10 +49,13 @@ const {{name}}Layout: RouteComponent<{{name}}LayoutProps> = ({ children }) => {
 export default {{name}}Layout;
 `;
 
-export const errorBoundaryTemplate = `import type { RouteComponent } from '@emberkit/runtime';
-import { createErrorBoundary } from '@emberkit/runtime';
+export const errorBoundaryTemplate = `import type { FC, JSXNode } from '@emberkit/core';
 
-const {{name}}Error: RouteComponent<{ error: Error }> = ({ error }) => {
+interface {{name}}ErrorProps {
+  error: Error;
+}
+
+const {{name}}Error: FC<{{name}}ErrorProps> = ({ error }): JSXNode => {
   return (
     <div className="error-boundary">
       <h2>Something went wrong</h2>
@@ -64,12 +67,14 @@ const {{name}}Error: RouteComponent<{ error: Error }> = ({ error }) => {
 export default {{name}}Error;
 `;
 
-export const loaderTemplate = `import type { Loader } from '@emberkit/loader';
+export const loaderTemplate = `import type { LoaderFunction, LoaderResult } from '@emberkit/core';
 
-export const loader: Loader = async ({ params, request }) => {
+export const loader: LoaderFunction = async ({ params, request }) => {
   return {
-    // Add your data here
-  };
+    data: {
+      // Add your data here
+    },
+  } as LoaderResult<unknown>;
 };
 `;
 
@@ -90,7 +95,7 @@ export default defineConfig({
 });
 `;
 
-export const indexTemplate = `import { render } from '@emberkit/runtime';
+export const indexTemplate = `import { render } from '@emberkit/core';
 import App from './routes/_layout';
 
 const root = document.getElementById('app');
@@ -100,18 +105,13 @@ if (root) {
 }
 `;
 
-export const layoutRoutesTemplate = `import { defineRoutes } from '@emberkit/router';
+export const layoutRoutesTemplate = `// EmberKit uses file-based routing.
+// Routes are automatically discovered from the src/routes directory.
+// - src/routes/index.tsx → /
+// - src/routes/about.tsx → /about
+// - src/routes/[slug].tsx → /:slug
 
-export default defineRoutes([
-  {
-    path: '/',
-    component: () => import('./routes/index'),
-  },
-  {
-    path: '/:slug',
-    component: () => import('./routes/[slug]'),
-  },
-]);
+export {};
 `;
 
 export function getTemplate(type: string): string {

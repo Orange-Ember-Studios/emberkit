@@ -1,11 +1,11 @@
-type FC<P> = (props: P) => unknown;
+import type { FC, JSXNode } from "@emberkit/core";
 
 export interface AuthLayoutProps {
-  children?: unknown;
-  [key: string]: unknown;
+  children?: JSXNode;
   title?: string;
   subtitle?: string;
-  logo?: unknown;
+  logo?: JSXNode;
+  [key: string]: unknown;
 }
 
 const AuthLayout: FC<AuthLayoutProps> = ({
@@ -15,20 +15,20 @@ const AuthLayout: FC<AuthLayoutProps> = ({
   logo,
 }) => {
   return (
-    <div class="min-h-screen flex items-center justify-center bg-surface-50 px-4 py-12">
-      <div class="w-full max-w-md">
-        <div class="text-center mb-8">
+    <div className="min-h-screen flex items-center justify-center bg-surface-50 px-4 py-12">
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
           {logo ? (
-            <div class="flex justify-center mb-4">{logo}</div>
+            <div className="flex justify-center mb-4">{logo}</div>
           ) : (
-            <div class="flex justify-center mb-4">
-              <span class="text-3xl font-bold text-primary-400">E</span>
+            <div className="flex justify-center mb-4">
+              <span className="text-3xl font-bold text-primary-400">E</span>
             </div>
           )}
-          <h1 class="text-2xl font-bold text-surface-900">{title}</h1>
-          <p class="mt-2 text-sm text-surface-500">{subtitle}</p>
+          <h1 className="text-2xl font-bold text-surface-900">{title}</h1>
+          <p className="mt-2 text-sm text-surface-500">{subtitle}</p>
         </div>
-        <div class="bg-surface-100 rounded-xl shadow-sm border border-surface-300 p-8">
+        <div className="bg-surface-100 rounded-xl shadow-sm border border-surface-300 p-8">
           {children}
         </div>
       </div>
