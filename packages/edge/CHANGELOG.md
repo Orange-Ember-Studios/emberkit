@@ -1,5 +1,11 @@
 # @emberkit/edge
 
+## 0.2.4
+
+### Patch Changes
+
+- Align package version with the published release (artifact identical to 0.2.3).
+
 ## 0.2.3
 
 ## 0.2.3-alpha.0
