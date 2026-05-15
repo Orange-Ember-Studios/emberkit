@@ -2,6 +2,7 @@
   "name": "@emberkit/tsconfig",
   "version": "0.2.1",
   "type": "module",
+  "private": false,
   "description": "Shared TypeScript configuration for EmberKit projects",
   "license": "Apache-2.0",
   "repository": {

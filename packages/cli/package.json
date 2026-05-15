@@ -2,6 +2,7 @@
   "name": "@emberkit/cli",
   "version": "0.2.1-alpha.0",
   "type": "module",
+  "private": false,
   "description": "CLI tool for EmberKit projects",
   "license": "Apache-2.0",
   "repository": {
