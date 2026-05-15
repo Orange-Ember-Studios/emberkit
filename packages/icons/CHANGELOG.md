@@ -1,5 +1,12 @@
 # @emberkit/icons
 
+## 0.2.7
+
+### Patch Changes
+
+- Updated dependencies [0027e88]
+  - @emberkit/core@0.2.9
+
 ## 0.2.6
 
 ### Patch Changes

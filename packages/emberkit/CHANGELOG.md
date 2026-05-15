@@ -1,5 +1,11 @@
 # @emberkit/core
 
+## 0.2.9
+
+### Patch Changes
+
+- 0027e88: Fix static routes incorrectly matching dynamic peers at the same path depth
+
 ## 0.2.8
 
 ### Patch Changes
