@@ -138,3 +138,15 @@ export function batch<T>(fn: () => T): T {
 export function untrack<T>(fn: () => T): T {
   return fn();
 }
+
+export function signal<T>(initialValue: T): Signal<T> {
+  return createSignal(initialValue);
+}
+
+export function computed<T>(computation: () => T): Signal<T> {
+  return createMemo(computation);
+}
+
+export function effect(callback: () => void | (() => void)): () => void {
+  return createEffect(callback);
+}
