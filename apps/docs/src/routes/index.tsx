@@ -7,7 +7,7 @@ const HomePage: RouteComponent = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="relative min-h-screen bg-[#0b0f19] text-gray-100 overflow-hidden">
+    <div className="relative -mx-6 -mt-8 lg:-mx-16 lg:-mt-12 min-h-screen bg-[#0b0f19] text-gray-100 overflow-hidden">
 
       {/* Ambient glow blobs */}
       <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[500px] w-[500px] rounded-full bg-orange-500/20 blur-[150px] animate-pulse" />

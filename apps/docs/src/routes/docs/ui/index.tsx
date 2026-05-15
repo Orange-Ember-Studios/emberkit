@@ -89,7 +89,7 @@ const UIContent: RouteComponent = () => {
   const [page, setPage] = createSignal(1);
   const [count, setCount] = createSignal<number>(0);
   return (
-    <div class="-mx-16 min-h-screen text-surface-900 max-lg:-mx-6">
+    <div class="-mx-6 -mt-8 min-h-screen text-surface-900 lg:-mx-16 lg:-mt-12">
       {/* Hero */}
       <div class="relative overflow-hidden border-b border-white/5 glass-card rounded-none">
         <div
@@ -530,8 +530,8 @@ import type { ButtonProps } from "@emberkit/ui/atoms";`}
             />
           </div>
 
-          {/* Text + Heading */}
-          <div class="mb-12 grid grid-cols-1 gap-6 lg:grid-cols-2">
+          {/* Text + Heading — stacked so demos and props tables have full width */}
+          <div class="mb-12 flex flex-col gap-10">
             <div class="ds-showcase">
               <Heading level={4} className="mb-3">
                 Text
@@ -598,7 +598,7 @@ import type { ButtonProps } from "@emberkit/ui/atoms";`}
                 <code class="font-mono text-primary-400">h6</code> with preset
                 typography; use once per section for accessible outlines.
               </Text>
-              <div class="space-y-1">
+              <div class="space-y-3">
                 <Heading level={1}>h1. Heading</Heading>
                 <Heading level={2}>h2. Heading</Heading>
                 <Heading level={3}>h3. Heading</Heading>
