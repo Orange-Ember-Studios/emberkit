@@ -1,5 +1,11 @@
 # @emberkit/cli
 
+## 0.6.1-alpha.2
+
+### Patch Changes
+
+- Refactor with-ui template to use design system components exclusively. Home page now showcases Button, Card, Heading, Text, Badge, Alert components from @emberkit/ui library.
+
 ## 0.6.1-alpha.1
 
 ### Patch Changes

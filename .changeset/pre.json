@@ -10,6 +10,6 @@
     "@emberkit/ui": "0.2.4"
   },
   "changesets": [
-    "cli-ui-template-fix"
+    "cli-design-system-template"
   ]
 }
