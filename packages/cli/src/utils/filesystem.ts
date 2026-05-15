@@ -1,3 +1,8 @@
+import { existsSync, mkdirSync, readFileSync as fsReadFileSync, writeFileSync as fsWriteFileSync } from "fs";
+import { resolve, dirname } from "path";
+import { execSync } from "child_process";
+import { platform } from "os";
+
 export { generate, toPascalCase, toKebabCase } from "./generator.js";
 
 export interface FileSystemOptions {
@@ -6,15 +11,13 @@ export interface FileSystemOptions {
 }
 
 export function ensureDirSync(dirPath: string): void {
-  const { mkdirSync, existsSync } = require("fs");
   if (!existsSync(dirPath)) {
     mkdirSync(dirPath, { recursive: true });
   }
 }
 
 export function readFileSync(filePath: string): string {
-  const { readFileSync } = require("fs");
-  return readFileSync(filePath, "utf-8");
+  return fsReadFileSync(filePath, "utf-8");
 }
 
 export function writeFileSync(
@@ -22,19 +25,17 @@ export function writeFileSync(
   content: string,
   options?: FileSystemOptions,
 ): void {
-  const fs = require("fs");
-  const dir = require("path").dirname(filePath);
+  const dir = dirname(filePath);
   ensureDirSync(dir);
-  fs.writeFileSync(filePath, content, options ?? { encoding: "utf-8" });
+  fsWriteFileSync(filePath, content, options ?? { encoding: "utf-8" });
 }
 
 export function fileExists(filePath: string): boolean {
-  const { existsSync } = require("fs");
   return existsSync(filePath);
 }
 
 export function resolvePath(...segments: string[]): string {
-  return require("path").resolve(...segments);
+  return resolve(...segments);
 }
 
 export function getPackageManager(): "pnpm" | "npm" | "yarn" {
@@ -44,16 +45,13 @@ export function getPackageManager(): "pnpm" | "npm" | "yarn" {
   if (userAgent.startsWith("yarn")) return "yarn";
   if (userAgent.startsWith("npm")) return "npm";
 
-  const { existsSync } = require("fs");
-  const { platform } = require("os");
-
   try {
     if (platform() === "win32") {
-      if (existsSync("C:\\Program Files\\pnpm\\pnpm.exe") || existsSync(process.env.LOCALAPPDATA + "\\pnpm\\pnpm.exe")) {
+      const localAppData = process.env.LOCALAPPDATA ?? "";
+      if (existsSync("C:\\Program Files\\pnpm\\pnpm.exe") || existsSync(localAppData + "\\pnpm\\pnpm.exe")) {
         return "pnpm";
       }
     } else {
-      const { execSync } = require("child_process");
       execSync("pnpm --version", { stdio: "ignore" });
       return "pnpm";
     }
