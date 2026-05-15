@@ -10,6 +10,7 @@
     "@emberkit/ui": "0.2.4"
   },
   "changesets": [
-    "cli-counter-fix"
+    "cli-counter-fix",
+    "cli-counter-solid-color"
   ]
 }

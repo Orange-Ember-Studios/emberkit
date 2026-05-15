@@ -1,5 +1,11 @@
 # @emberkit/cli
 
+## 0.6.1-alpha.4
+
+### Patch Changes
+
+- Use solid text-amber-400 color for counter display instead of gradient. Ensures counter number is clearly visible on all screens.
+
 ## 0.6.1-alpha.3
 
 ### Patch Changes
