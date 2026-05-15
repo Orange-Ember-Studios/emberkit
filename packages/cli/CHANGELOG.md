@@ -1,5 +1,11 @@
 # @emberkit/cli
 
+## 0.4.0
+
+### Minor Changes
+
+- Update templates: basic and with-ui now use Tailwind v4, fix package manager detection to prefer pnpm
+
 ## 0.3.1
 
 ### Patch Changes
