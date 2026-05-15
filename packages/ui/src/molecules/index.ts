@@ -1,3 +1,6 @@
+export { CodeBlock, tokenizeCode } from "./CodeBlock/index.js";
+export type { CodeBlockProps } from "./CodeBlock/index.js";
+
 export { Card } from "./Card/index.js";
 export type { CardProps } from "./Card/index.js";
 
