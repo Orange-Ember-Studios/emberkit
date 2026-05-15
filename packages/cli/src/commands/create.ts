@@ -761,16 +761,18 @@ export default defineConfig({
 
   "vite.config.ts": `import { defineConfig } from 'vite';
 import { emberkitVitePlugin } from '@emberkit/core/vite-plugin';
-import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-  plugins: [emberkitVitePlugin(), tailwindcss()],
+  plugins: [emberkitVitePlugin()],
   server: {
     port: 3000,
     host: 'localhost',
   },
   esbuild: {
     jsxImportSource: '@emberkit/core',
+  },
+  css: {
+    postcss: './postcss.config.js',
   },
 });`,
 
