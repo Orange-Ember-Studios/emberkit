@@ -1,5 +1,11 @@
 # @emberkit/cli
 
+## 0.6.1-alpha.12
+
+### Patch Changes
+
+- CLI: eslint flat config, centralize template dependency versions, read version from package.json. Edge/icons: eslint flat config.
+
 ## 0.6.1-alpha.11
 
 ### Patch Changes

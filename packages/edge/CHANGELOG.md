@@ -1,5 +1,11 @@
 # @emberkit/edge
 
+## 0.2.3-alpha.0
+
+### Patch Changes
+
+- CLI: eslint flat config, centralize template dependency versions, read version from package.json. Edge/icons: eslint flat config.
+
 ## 0.2.2
 
 ### Patch Changes
