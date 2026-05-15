@@ -1,5 +1,11 @@
 # @emberkit/cli
 
+## 0.6.1-alpha.10
+
+### Patch Changes
+
+- Fix blog template dynamic route component signature to correctly receive route params.
+
 ## 0.6.1-alpha.9
 
 ### Patch Changes
