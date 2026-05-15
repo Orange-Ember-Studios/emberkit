@@ -36,17 +36,17 @@ importers:
   apps/docs:
     dependencies:
       '@emberkit/cli':
-        specifier: workspace:*
-        version: link:../../packages/cli
+        specifier: ^0.2.0
+        version: 0.2.0(@types/node@22.19.18)
       '@emberkit/core':
-        specifier: workspace:*
-        version: link:../../packages/emberkit
+        specifier: ^0.2.1
+        version: 0.2.1(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)
       '@emberkit/icons':
-        specifier: workspace:*
-        version: link:../../packages/icons
+        specifier: ^0.2.0
+        version: 0.2.0(@emberkit/core@0.2.1(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0))
       '@emberkit/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
+        specifier: ^0.2.2
+        version: 0.2.2(@emberkit/core@0.2.1(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0))(@emberkit/icons@0.2.0(@emberkit/core@0.2.1(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)))(tailwindcss@4.3.0)
       '@tailwindcss/vite':
         specifier: ^4.3.0
         version: 4.3.0(vite@6.4.2(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0))
@@ -119,18 +119,17 @@ importers:
   packages/icons:
     devDependencies:
       '@emberkit/core':
-        specifier: ^0.2.0
-        version: 0.2.0(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)
+        specifier: workspace:*
+        version: link:../emberkit
 
   packages/ui:
     dependencies:
       '@emberkit/core':
-        specifier: ^0.2.1
-        version: 0.2.1(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)
+        specifier: workspace:*
+        version: link:../emberkit
       '@emberkit/icons':
-        specifier: ^0.2.0
-        version: 0.2.0(@emberkit/core@0.2.1(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0))
-    devDependencies:
+        specifier: workspace:*
+        version: link:../icons
       tailwindcss:
         specifier: ^4.0.0
         version: 4.3.0
@@ -304,8 +303,9 @@ packages:
     resolution: {integrity: sha512-QxULHAm7cNu72w97JUNCBFODFaXpbDg+dP8b/oWFAZ2MTRppA3U00Y2L1HqaS4J6yBqxwa/Y3nMBaxVKbB/NsA==}
     engines: {node: '>=20.19.0'}
 
-  '@emberkit/core@0.2.0':
-    resolution: {integrity: sha512-wWmzNXMBlok4UTHyFxs11Ftp3TOlcMr0BLcBcbpAdRvf6W0x6ebs8MvNChtck/Gt4RIZFwk+wpgwRNdZhH7fNg==}
+  '@emberkit/cli@0.2.0':
+    resolution: {integrity: sha512-yFskOV51l+zM5iOYQDT9d6idiJRbAeqz9Sw8RSrNVvlA/b3shyVHVsQEjZPhcyAVP240YCMqO69F9smByYy9YQ==}
+    hasBin: true
 
   '@emberkit/core@0.2.1':
     resolution: {integrity: sha512-d86nFSuiENQafZ5i8nFC9+Nb770X7bPSvcmII+djRKIbMndvSYFg98zVcRLnLCeuxincQEimFfUAOS4DJEBF6Q==}
@@ -314,6 +314,13 @@ packages:
     resolution: {integrity: sha512-lFNNwBmsZvSPE8Y3izoH4jozF/OSlS5W7bBzJ2/22IGP55i627jwkJXRTgBdcf8Xyd7Tsyp0UUPZ2tAFMIUVpA==}
     peerDependencies:
       '@emberkit/core': workspace:*
+
+  '@emberkit/ui@0.2.2':
+    resolution: {integrity: sha512-FtuilDffnCmvE6FWJUne0lQyCjy7JGv0HvUf64dl/k+eGobOt91jmctXelp/FMK7DPoylSk/SVYSAPjUO6ARtQ==}
+    peerDependencies:
+      '@emberkit/core': ^0.2.1
+      '@emberkit/icons': ^0.2.0
+      tailwindcss: ^4.0.0
 
   '@emnapi/runtime@1.10.0':
     resolution: {integrity: sha512-ewvYlk86xUoGI0zQRNq/mC+16R1QeDlKQy21Ki3oSYXNgLb45GV1P6A0M+/s6nyCuNDqe5VpaY84BzXGwVbwFA==}
@@ -3017,24 +3024,12 @@ snapshots:
 
   '@csstools/css-tokenizer@4.0.0': {}
 
-  '@emberkit/core@0.2.0(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)':
+  '@emberkit/cli@0.2.0(@types/node@22.19.18)':
     dependencies:
-      '@mdx-js/mdx': 3.1.1
-      remark-gfm: 4.0.1
-      vite: 6.4.2(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)
+      commander: 11.1.0
+      inquirer: 9.3.8(@types/node@22.19.18)
     transitivePeerDependencies:
       - '@types/node'
-      - jiti
-      - less
-      - lightningcss
-      - sass
-      - sass-embedded
-      - stylus
-      - sugarss
-      - supports-color
-      - terser
-      - tsx
-      - yaml
 
   '@emberkit/core@0.2.1(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)':
     dependencies:
@@ -3058,6 +3053,12 @@ snapshots:
   '@emberkit/icons@0.2.0(@emberkit/core@0.2.1(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0))':
     dependencies:
       '@emberkit/core': 0.2.1(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)
+
+  '@emberkit/ui@0.2.2(@emberkit/core@0.2.1(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0))(@emberkit/icons@0.2.0(@emberkit/core@0.2.1(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)))(tailwindcss@4.3.0)':
+    dependencies:
+      '@emberkit/core': 0.2.1(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)
+      '@emberkit/icons': 0.2.0(@emberkit/core@0.2.1(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0))
+      tailwindcss: 4.3.0
 
   '@emnapi/runtime@1.10.0':
     dependencies:

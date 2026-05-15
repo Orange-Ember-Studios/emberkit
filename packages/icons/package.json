@@ -39,9 +39,9 @@
   },
   "dependencies": {},
   "peerDependencies": {
-    "@emberkit/core": "^0.2.2-alpha.0"
+    "@emberkit/core": "workspace:*"
   },
   "devDependencies": {
-    "@emberkit/core": "^0.2.2-alpha.0"
+    "@emberkit/core": "workspace:*"
   }
 }

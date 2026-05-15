@@ -1,7 +1,7 @@
 import type { Plugin } from 'vite';
 import type { EmberKitPluginOptions, EmberKitMode } from './types.js';
 import { DEFAULT_CONFIG } from './types.js';
-import { readdirSync, statSync } from 'node:fs';
+import { readdirSync, statSync, existsSync } from 'node:fs';
 import { join, relative, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { compile } from '@mdx-js/mdx';
@@ -41,12 +41,14 @@ export function emberkitVitePlugin(userOptions: EmberKitPluginOptions = {}): Plu
         plugins.push(compression({ algorithm: 'brotliCompress' } as any));
       }
 
+      const isWorkspace = existsSync(join(pkgRoot, 'src', 'index.ts'));
+
       return {
         plugins,
         resolve: {
-          alias: {
+          alias: isWorkspace ? {
             '@emberkit/core': srcDir,
-          },
+          } : {},
         },
         esbuild: {
           jsxImportSource: '@emberkit/core',
