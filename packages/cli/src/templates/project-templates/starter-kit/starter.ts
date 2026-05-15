@@ -160,7 +160,7 @@ const HomePage: RouteComponent = () => {
           >
             &#8722;
           </button>
-          <span className="text-5xl font-bold tabular-nums min-w-[80px] bg-clip-text text-transparent bg-gradient-to-b from-white to-slate-400">{count}</span>
+          <span className="text-5xl font-bold tabular-nums min-w-[80px] bg-gradient-to-b from-ember-400 to-amber-500 bg-clip-text text-transparent">{count}</span>
           <button
             className="w-12 h-12 rounded-lg bg-slate-800 border border-slate-700 hover:bg-ember-500 hover:border-ember-500 text-ember-500 hover:text-white text-xl transition-all hover:scale-110"
             onClick={() => count.value++}
