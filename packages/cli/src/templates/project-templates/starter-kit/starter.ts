@@ -108,10 +108,10 @@ const Layout: RouteComponent = ({ children }) => {
 export default Layout;`,
 
   "src/routes/index.tsx": `import type { RouteComponent } from '@emberkit/core';
-import { signal } from '@emberkit/core';
+import { createSignal } from '@emberkit/core';
 
 const HomePage: RouteComponent = () => {
-  const count = signal(0);
+  const [count, setCount] = createSignal(0);
 
   return (
     <div className="relative max-w-6xl mx-auto px-6 py-16 space-y-24">
@@ -156,14 +156,14 @@ const HomePage: RouteComponent = () => {
         <div className="flex items-center justify-center gap-6">
           <button
             className="w-12 h-12 rounded-lg bg-slate-800 border border-slate-700 hover:bg-ember-500 hover:border-ember-500 text-ember-500 hover:text-white text-xl transition-all hover:scale-110"
-            onClick={() => count.value--}
+            onClick={() => setCount(c => c - 1)}
           >
             &#8722;
           </button>
-          <span className="text-5xl font-bold tabular-nums min-w-[80px] text-amber-400">{count.value}</span>
+          <span className="text-5xl font-bold tabular-nums min-w-[80px] text-amber-400" data-ek-bind={count}>{count()}</span>
           <button
             className="w-12 h-12 rounded-lg bg-slate-800 border border-slate-700 hover:bg-ember-500 hover:border-ember-500 text-ember-500 hover:text-white text-xl transition-all hover:scale-110"
-            onClick={() => count.value++}
+            onClick={() => setCount(c => c + 1)}
           >
             +
           </button>
