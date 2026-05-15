@@ -675,8 +675,7 @@ const withUiTemplate: Record<string, string> = {
     "build": "emberkit build",
     "preview": "emberkit preview",
     "lint": "eslint src --ext .ts,.tsx",
-    "format": "prettier --write \\"src/**/*.{ts,tsx}\\"",
-    "build:css": "tailwindcss -i ./src/styles.css -o ./dist/styles.css"
+    "format": "prettier --write \\"src/**/*.{ts,tsx}\\""
   },
   "dependencies": {
     "@emberkit/core": "^0.2.4",
@@ -686,9 +685,8 @@ const withUiTemplate: Record<string, string> = {
     "@emberkit/cli": "^0.2.4",
     "typescript": "^5.7.0",
     "vite": "^6.0.0",
-    "tailwindcss": "^3.4.0",
-    "postcss": "^8.4.0",
-    "autoprefixer": "^10.4.0"
+    "tailwindcss": "^4.0.0",
+    "@tailwindcss/vite": "^4.0.0"
   }
 }`,
 
@@ -715,40 +713,6 @@ const withUiTemplate: Record<string, string> = {
   "exclude": ["node_modules", "dist"]
 }`,
 
-  "tailwind.config.js": `/** @type {import('tailwindcss').Config} */
-export default {
-  content: ['./src/**/*.{js,ts,jsx,tsx}', './index.html'],
-  theme: {
-    extend: {
-      colors: {
-        ember: {
-          50: '#fff7ed',
-          100: '#ffedd5',
-          200: '#fed7aa',
-          300: '#fdba74',
-          400: '#fb923c',
-          500: '#f97316',
-          600: '#ea580c',
-          700: '#c2410c',
-          800: '#9a3412',
-          900: '#7c2d12',
-        },
-      },
-      fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-      },
-    },
-  },
-  plugins: [],
-};`,
-
-  "postcss.config.js": `export default {
-  plugins: {
-    tailwindcss: {},
-    autoprefixer: {},
-  },
-};`,
-
   "emberkit.config.ts": `import { defineConfig } from '@emberkit/core';
 
 export default defineConfig({
@@ -761,18 +725,16 @@ export default defineConfig({
 
   "vite.config.ts": `import { defineConfig } from 'vite';
 import { emberkitVitePlugin } from '@emberkit/core/vite-plugin';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-  plugins: [emberkitVitePlugin()],
+  plugins: [emberkitVitePlugin(), tailwindcss()],
   server: {
     port: 3000,
     host: 'localhost',
   },
   esbuild: {
     jsxImportSource: '@emberkit/core',
-  },
-  css: {
-    postcss: './postcss.config.js',
   },
 });`,
 
@@ -804,25 +766,26 @@ if (root) {
 
   "src/styles.css": `@import "tailwindcss";
 
-:root {
-  --color-bg: #0f172a;
-  --color-bg-secondary: #1e293b;
-  --color-text: #e2e8f0;
-  --color-text-muted: #94a3b8;
-  --color-primary: #f97316;
-  --color-primary-hover: #ea580c;
-  --color-border: #334155;
+@theme {
+  --color-ember-50: #fff7ed;
+  --color-ember-100: #ffedd5;
+  --color-ember-200: #fed7aa;
+  --color-ember-300: #fdba74;
+  --color-ember-400: #fb923c;
+  --color-ember-500: #f97316;
+  --color-ember-600: #ea580c;
+  --color-ember-700: #c2410c;
+  --color-ember-800: #9a3412;
+  --color-ember-900: #7c2d12;
+  --font-family-sans: 'Inter', system-ui, sans-serif;
 }
 
 body {
-  background-color: var(--color-bg);
-  color: var(--color-text);
-  font-family: 'Inter', system-ui, sans-serif;
+  @apply bg-slate-900 text-slate-200 font-sans;
 }
 
 a {
-  color: inherit;
-  text-decoration: none;
+  @apply text-inherit no-underline;
 }`,
 
   "src/routes/_layout.tsx": `import type { RouteComponent } from '@emberkit/core';
