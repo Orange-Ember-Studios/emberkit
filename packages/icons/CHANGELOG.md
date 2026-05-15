@@ -1,5 +1,11 @@
 # @emberkit/icons
 
+## 0.2.6
+
+### Patch Changes
+
+- 584b41b: Redesign IconEmberKit as minimal double-teardrop ember ring
+
 ## 0.2.5
 
 ### Patch Changes

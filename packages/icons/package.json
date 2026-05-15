@@ -1,6 +1,6 @@
 {
   "name": "@emberkit/icons",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "type": "module",
   "private": false,
   "description": "SVG icon library for EmberKit",
