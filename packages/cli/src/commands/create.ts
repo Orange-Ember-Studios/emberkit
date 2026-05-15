@@ -1,7 +1,8 @@
 import { existsSync, mkdirSync, writeFileSync } from "fs";
-import { resolve, join } from "path";
+import { resolve, join, dirname } from "path";
 import { execSync } from "child_process";
 import { getPackageManager, getInstallCommand } from "../utils/filesystem.js";
+import { formatTemplate, toKebabCase } from "../templates/index.js";
 import { starterFiles } from "../templates/project-templates/starter-kit/starter.js";
 import { withUiTemplate } from "../templates/project-templates/starter-kit/with-ui.js";
 import { minimalTemplate } from "../templates/project-templates/minimal/minimal.js";
@@ -87,24 +88,6 @@ function printInfo(message: string) {
   console.log(`  ${info} ${DIM + message + RESET}`);
 }
 
-function formatTemplate(
-  template: string,
-  vars: Record<string, string>,
-): string {
-  let result = template;
-  for (const [key, value] of Object.entries(vars)) {
-    result = result.replace(new RegExp(`\\{\\{${key}\\}\\}`, "g"), value);
-  }
-  return result;
-}
-
-function toKebabCase(str: string): string {
-  return str
-    .replace(/([a-z])([A-Z])/g, "$1-$2")
-    .replace(/[\s_]+/g, "-")
-    .toLowerCase();
-}
-
 function getNpmPackageName(name: string): string {
   const kebab = toKebabCase(name);
   return kebab.startsWith("@") ? kebab : kebab.replace(/^emberkit-/, "");
@@ -151,7 +134,7 @@ export async function create(options: CreateOptions): Promise<void> {
 
   for (const [filePath, content] of Object.entries(templateFiles)) {
     const fullPath = join(targetDir, filePath);
-    const dir = join(targetDir, filePath.split("/").slice(0, -1).join("/"));
+    const dir = dirname(fullPath);
 
     if (!existsSync(dir)) {
       mkdirSync(dir, { recursive: true });

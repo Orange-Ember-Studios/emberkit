@@ -43,7 +43,6 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "commander": "^11.1.0",
     "inquirer": "^9.2.0"
   },
   "devDependencies": {

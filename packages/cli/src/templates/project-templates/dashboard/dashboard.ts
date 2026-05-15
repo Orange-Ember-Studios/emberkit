@@ -1,94 +1,23 @@
+import {
+  buildPackageJson,
+  buildTsConfig,
+  buildViteConfig,
+  buildIndexHtml,
+  buildEntryFile,
+  GITIGNORE,
+} from "../_shared/base.js";
+
 export const dashboardTemplate: Record<string, string> = {
-  "package.json": `{
-  "name": "{{name}}",
-  "version": "0.1.0",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "dev": "emberkit dev",
-    "build": "emberkit build",
-    "preview": "emberkit preview"
-  },
-  "dependencies": {
-    "@emberkit/core": "^0.2.4",
-    "@emberkit/ui": "^0.2.3"
-  },
-  "devDependencies": {
-    "@emberkit/cli": "^0.2.4",
-    "typescript": "^5.7.0",
-    "vite": "^6.0.0",
-    "tailwindcss": "^4.0.0",
-    "@tailwindcss/vite": "^4.0.0"
-  }
-}`,
-
-  "tsconfig.json": `{
-  "compilerOptions": {
-    "target": "ES2022",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "jsx": "react-jsx",
-    "jsxImportSource": "@emberkit/core",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "paths": {
-      "@/*": ["./src/*"]
-    }
-  },
-  "include": ["src"],
-  "exclude": ["node_modules", "dist"]
-}`,
-
-  "vite.config.ts": `import { defineConfig } from 'vite';
-import { emberkitVitePlugin } from '@emberkit/core/vite-plugin';
-import tailwindcss from '@tailwindcss/vite';
-
-export default defineConfig({
-  plugins: [emberkitVitePlugin(), tailwindcss()],
-  server: {
-    port: 3000,
-    host: 'localhost',
-  },
-  esbuild: {
-    jsxImportSource: '@emberkit/core',
-  },
-});`,
-
-  "index.html": `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{name}}</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-</head>
-<body id="app">
-  <script type="module" src="/src/index.tsx"></script>
-</body>
-</html>`,
-
-  "src/index.tsx": `import { render } from '@emberkit/core';
-import { routes } from 'virtual:emberkit-routes';
-import App from './routes/_layout';
-import './styles.css';
-
-const root = document.getElementById('app');
-
-if (root) {
-  try {
-    render(App, root, { routes });
-  } catch (error) {
-    console.error('[entry] Render error:', error);
-  }
-}`,
+  "package.json": buildPackageJson({ hasTailwind: true, hasUI: true }),
+  "tsconfig.json": buildTsConfig(),
+  "vite.config.ts": buildViteConfig(true),
+  "index.html": buildIndexHtml({
+    fonts: [
+      "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+    ],
+  }),
+  ".gitignore": GITIGNORE,
+  "src/index.tsx": buildEntryFile({ hasLayout: true, hasCss: true }),
 
   "src/styles.css": `@import "tailwindcss";
 

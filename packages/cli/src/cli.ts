@@ -2,8 +2,9 @@ import inquirer from "inquirer";
 import { dev } from "./commands/dev.js";
 import { build } from "./commands/build.js";
 import { preview } from "./commands/preview.js";
-import { create } from "./commands/create.js";
-import { TEMPLATES } from "./commands/create.js";
+import { create, TEMPLATES } from "./commands/create.js";
+import { generate } from "./utils/generator.js";
+import { toKebabCase } from "./templates/index.js";
 
 export interface CLIConfig {
   version: string;
@@ -36,7 +37,7 @@ export async function runCLI(args: string[]): Promise<void> {
       break;
     case "--version":
     case "-v":
-      console.log("EmberKit CLI v0.1.0");
+      console.log("EmberKit CLI v0.6.0");
       break;
     case "--help":
     case "-h":
@@ -51,7 +52,7 @@ export async function runCLI(args: string[]): Promise<void> {
 
 function showHelp(): void {
   console.log(`
-🔥 EmberKit CLI v0.1.0
+🔥 EmberKit CLI v0.6.0
 
 Usage: emberkit <command> [options]
 
@@ -60,15 +61,24 @@ Commands:
   dev                  Start development server
   build                Build for production
   preview              Preview production build
-  generate <type>      Generate code (routes, components, etc.)
+  generate <type> <name>  Generate a file from a template
 
 Options:
   --template, -t <id>  Project template to use
   --no-install         Skip dependency installation
+  --path, -p <path>    Output path for generate (overrides default)
   --help, -h           Show this help message
   --version, -v        Show version number
 
-Templates:
+Generate types:
+  route      Route component (src/routes/)
+  component  UI component (src/components/)
+  layout     Layout component (src/layouts/)
+  loader     Data loader (src/loaders/)
+  action     Form action (src/actions/)
+  api        API route handler (src/routes/_api/)
+
+Project templates:
   basic      Simple starter with Tailwind CSS (default)
   with-ui    Starter with EmberKit UI components
   minimal    Barebones project, no CSS framework
@@ -185,12 +195,47 @@ function extractFlagValue(
   return undefined;
 }
 
+const GENERATE_TYPES: Record<string, { dir: string; ext: string }> = {
+  route: { dir: "src/routes", ext: ".tsx" },
+  component: { dir: "src/components", ext: ".tsx" },
+  layout: { dir: "src/layouts", ext: ".tsx" },
+  error: { dir: "src/routes", ext: ".tsx" },
+  loader: { dir: "src/loaders", ext: ".ts" },
+  action: { dir: "src/actions", ext: ".ts" },
+  api: { dir: "src/routes/_api", ext: ".ts" },
+};
+
 async function runGenerate(args: string[]): Promise<void> {
-  const [type, name] = args;
+  const nonFlagArgs = args.filter((a) => !a.startsWith("-"));
+  const [type, name] = nonFlagArgs;
+
   if (!type || !name) {
-    console.error("Usage: emberkit generate <type> <name>");
+    console.error(
+      `Usage: emberkit generate <type> <name> [--path <file-path>]\n\nTypes: ${Object.keys(GENERATE_TYPES).join(", ")}`,
+    );
     process.exit(1);
   }
-  console.log(`🎨 Generating ${type}: ${name}`);
-  console.log("(Not yet implemented)");
+
+  const explicitPath = extractFlagValue(args, "--path", "-p");
+  const typeConfig = GENERATE_TYPES[type];
+
+  if (!typeConfig && !explicitPath) {
+    console.error(
+      `Unknown type "${type}". Valid types: ${Object.keys(GENERATE_TYPES).join(", ")}`,
+    );
+    process.exit(1);
+  }
+
+  const filePath =
+    explicitPath ??
+    `${typeConfig.dir}/${toKebabCase(name)}${typeConfig.ext}`;
+
+  const result = await generate({ name, path: filePath, template: type });
+
+  if (result.success) {
+    console.log(`✓ Generated ${type}: ${result.path}`);
+  } else {
+    console.error(`✗ ${result.error}`);
+    process.exit(1);
+  }
 }
