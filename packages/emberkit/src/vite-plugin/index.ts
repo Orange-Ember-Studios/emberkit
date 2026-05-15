@@ -390,6 +390,12 @@ function renderCodeBlock(lang: string, code: string): string {
     highlighted = highlightBash(highlighted);
   } else if (lang === 'json') {
     highlighted = highlightJSON(highlighted);
+  } else if (lang === 'html' || lang === 'xml' || lang === 'svg') {
+    highlighted = highlightHTML(highlighted);
+  } else if (lang === 'css' || lang === 'scss' || lang === 'sass' || lang === 'less') {
+    highlighted = highlightCSS(highlighted);
+  } else if (lang === 'markdown' || lang === 'md') {
+    highlighted = highlightMarkdown(highlighted);
   } else {
     highlighted = escapeHtml(highlighted);
   }
@@ -808,6 +814,220 @@ function highlightJSON(code: string): string {
   // Booleans and null
   result = result.replace(/:\s*(true|false|null)/g, ': <span class="kw">$1</span>');
   return result;
+}
+
+function highlightHTML(code: string): string {
+  const tokens: string[] = [];
+  let remaining = code;
+
+  while (remaining.length > 0) {
+    let m: RegExpMatchArray | null;
+
+    // HTML comment
+    m = remaining.match(/^<!--[\s\S]*?-->/);
+    if (m) {
+      tokens.push(`<span class="cm">${escapeHtml(m[0])}</span>`);
+      remaining = remaining.slice(m[0].length);
+      continue;
+    }
+
+    // DOCTYPE
+    m = remaining.match(/^<!DOCTYPE[^>]*>/i);
+    if (m) {
+      tokens.push(`<span class="kw">${escapeHtml(m[0])}</span>`);
+      remaining = remaining.slice(m[0].length);
+      continue;
+    }
+
+    // Closing tag </tag>
+    m = remaining.match(/^(<\/)([a-zA-Z][\w-]*)(>)/);
+    if (m) {
+      tokens.push(
+        `<span class="op">&lt;/</span><span class="tag">${m[2]}</span><span class="op">&gt;</span>`,
+      );
+      remaining = remaining.slice(m[0].length);
+      continue;
+    }
+
+    // Opening tag start <tag — capture tag name, then walk attrs until >
+    m = remaining.match(/^(<)([a-zA-Z][\w-]*)/);
+    if (m) {
+      tokens.push(`<span class="op">&lt;</span><span class="tag">${m[2]}</span>`);
+      remaining = remaining.slice(m[0].length);
+
+      // Walk attributes until we hit > or />
+      while (remaining.length > 0) {
+        // Self-close />
+        let am = remaining.match(/^(\s*\/>)/);
+        if (am) {
+          tokens.push(`<span class="op">${escapeHtml(am[1])}</span>`);
+          remaining = remaining.slice(am[1].length);
+          break;
+        }
+        // Close >
+        am = remaining.match(/^(\s*>)/);
+        if (am) {
+          tokens.push(`<span class="op">${escapeHtml(am[1])}</span>`);
+          remaining = remaining.slice(am[1].length);
+          break;
+        }
+        // Attribute with quoted value
+        am = remaining.match(/^(\s+)([a-zA-Z_:][\w:.-]*)(\s*=\s*)("[^"]*"|'[^']*')/);
+        if (am) {
+          tokens.push(
+            `${am[1]}<span class="attr">${am[2]}</span><span class="op">${escapeHtml(am[3])}</span><span class="str">${escapeHtml(am[4])}</span>`,
+          );
+          remaining = remaining.slice(am[0].length);
+          continue;
+        }
+        // Boolean attribute
+        am = remaining.match(/^(\s+)([a-zA-Z_:][\w:.-]*)/);
+        if (am) {
+          tokens.push(`${am[1]}<span class="attr">${am[2]}</span>`);
+          remaining = remaining.slice(am[0].length);
+          continue;
+        }
+        // Anything else (whitespace, = alone, etc.)
+        tokens.push(escapeHtml(remaining[0]));
+        remaining = remaining.slice(1);
+      }
+      continue;
+    }
+
+    // Text content — consume until next < or end
+    m = remaining.match(/^[^<]+/);
+    if (m) {
+      tokens.push(escapeHtml(m[0]));
+      remaining = remaining.slice(m[0].length);
+      continue;
+    }
+
+    tokens.push(escapeHtml(remaining[0]));
+    remaining = remaining.slice(1);
+  }
+
+  return tokens.join('');
+}
+
+function highlightCSS(code: string): string {
+  const tokens: string[] = [];
+  let remaining = code;
+
+  while (remaining.length > 0) {
+    let m: RegExpMatchArray | null;
+
+    // Block comment
+    m = remaining.match(/^\/\*[\s\S]*?\*\//);
+    if (m) {
+      tokens.push(`<span class="cm">${escapeHtml(m[0])}</span>`);
+      remaining = remaining.slice(m[0].length);
+      continue;
+    }
+
+    // String
+    m = remaining.match(/^('[^']*'|"[^"]*")/);
+    if (m) {
+      tokens.push(`<span class="str">${escapeHtml(m[0])}</span>`);
+      remaining = remaining.slice(m[0].length);
+      continue;
+    }
+
+    // At-rule (@import, @media, etc.)
+    m = remaining.match(/^(@[\w-]+)/);
+    if (m) {
+      tokens.push(`<span class="kw">${m[0]}</span>`);
+      remaining = remaining.slice(m[0].length);
+      continue;
+    }
+
+    // Hex color
+    m = remaining.match(/^(#[0-9a-fA-F]{3,8})\b/);
+    if (m) {
+      tokens.push(`<span class="num">${m[0]}</span>`);
+      remaining = remaining.slice(m[0].length);
+      continue;
+    }
+
+    // Number with optional unit
+    m = remaining.match(/^(\d+\.?\d*(?:px|em|rem|vh|vw|%|s|ms|deg|fr)?)/);
+    if (m) {
+      tokens.push(`<span class="num">${m[0]}</span>`);
+      remaining = remaining.slice(m[0].length);
+      continue;
+    }
+
+    // Property name (word before colon)
+    m = remaining.match(/^([\w-]+)(\s*:)/);
+    if (m) {
+      tokens.push(`<span class="attr">${m[1]}</span><span class="op">${m[2]}</span>`);
+      remaining = remaining.slice(m[0].length);
+      continue;
+    }
+
+    // CSS value keywords
+    m = remaining.match(/^(none|auto|inherit|initial|unset|revert|flex|grid|block|inline|absolute|relative|fixed|sticky|center|left|right|top|bottom|normal|bold|italic)\b/);
+    if (m) {
+      tokens.push(`<span class="val">${m[0]}</span>`);
+      remaining = remaining.slice(m[0].length);
+      continue;
+    }
+
+    // Selector pseudo-class / pseudo-element
+    m = remaining.match(/^(:{1,2}[\w-]+)/);
+    if (m) {
+      tokens.push(`<span class="fn">${m[0]}</span>`);
+      remaining = remaining.slice(m[0].length);
+      continue;
+    }
+
+    // Selector class / id
+    m = remaining.match(/^([.#][\w-]+)/);
+    if (m) {
+      tokens.push(`<span class="type">${m[0]}</span>`);
+      remaining = remaining.slice(m[0].length);
+      continue;
+    }
+
+    m = remaining.match(/^(\s+)/);
+    if (m) {
+      tokens.push(m[0]);
+      remaining = remaining.slice(m[0].length);
+      continue;
+    }
+
+    tokens.push(escapeHtml(remaining[0]));
+    remaining = remaining.slice(1);
+  }
+
+  return tokens.join('');
+}
+
+function highlightMarkdown(code: string): string {
+  return code
+    .split('\n')
+    .map((line) => {
+      const escaped = escapeHtml(line);
+      // Frontmatter delimiter
+      if (/^---$/.test(line)) return `<span class="op">${escaped}</span>`;
+      // Headings
+      const headingM = line.match(/^(#{1,6})\s(.+)/);
+      if (headingM) {
+        return `<span class="kw">${escapeHtml(headingM[1])}</span> <span class="tag">${escapeHtml(headingM[2])}</span>`;
+      }
+      // Bold / italic markers (keep simple — just colour the line)
+      if (/^\s*[-*+]\s/.test(line)) {
+        return `<span class="op">${escapeHtml(line.match(/^(\s*[-*+])/)![1])}</span>${escapeHtml(line.slice(line.match(/^(\s*[-*+])/)![1].length))}`;
+      }
+      // Blockquote
+      if (/^>/.test(line)) return `<span class="cm">${escaped}</span>`;
+      // Frontmatter key: value
+      const fmM = line.match(/^([\w-]+):\s*(.*)/);
+      if (fmM) {
+        return `<span class="attr">${escapeHtml(fmM[1])}</span><span class="op">:</span> <span class="str">${escapeHtml(fmM[2])}</span>`;
+      }
+      return escaped;
+    })
+    .join('\n');
 }
 
 function processTables(html: string): string {
