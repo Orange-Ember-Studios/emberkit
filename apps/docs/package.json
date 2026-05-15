@@ -11,7 +11,7 @@
     "deploy:preview": "wrangler deploy --preview"
   },
   "dependencies": {
-    "@emberkit/cli": "^0.3.0",
+    "@emberkit/cli": "^0.3.1",
     "@emberkit/core": "^0.2.4",
     "@emberkit/icons": "^0.2.1",
     "@emberkit/ui": "^0.2.3",

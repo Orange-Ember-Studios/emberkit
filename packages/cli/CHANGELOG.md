@@ -1,5 +1,11 @@
 # @emberkit/cli
 
+## 0.3.1
+
+### Patch Changes
+
+- Update with-ui template to use Tailwind v4 syntax
+
 ## 0.3.0
 
 ### Minor Changes
