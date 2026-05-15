@@ -1,5 +1,11 @@
 # @emberkit/cli
 
+## 0.3.0
+
+### Minor Changes
+
+- Add with-ui template with @emberkit/ui and Tailwind support
+
 ## 0.2.5
 
 ### Patch Changes
