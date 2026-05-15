@@ -43,6 +43,10 @@
     "@emberkit/core": "workspace:*"
   },
   "devDependencies": {
-    "@emberkit/core": "workspace:*"
+    "@emberkit/core": "workspace:*",
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.0.0",
+    "eslint-plugin-perfectionist": "^5.9.0",
+    "typescript-eslint": "^8.59.3"
   }
 }
