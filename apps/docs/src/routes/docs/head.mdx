@@ -120,9 +120,9 @@ You can mix shorthand props with raw JSX children:
 
 When `children` are provided, they take precedence — the shorthand props are ignored.
 
-## Multiple `<Head>` Components
+## Multiple <code className="text-primary-400">{'<Head>'}</code> Components
 
-Use multiple `<Head>` components across your component tree. All tags are collected and merged into `<head>`:
+Use multiple <code className="text-primary-400">{'<Head>'}</code> components across your component tree. All tags are collected and merged into <code className="text-primary-400">{'<head>'}</code>:
 
 ```tsx
 // Layout provides default meta
@@ -186,17 +186,17 @@ function ArticlePage() {
 
 ### SSR
 
-During server-side rendering, `<Head>`:
+During server-side rendering, <code className="text-primary-400">{'<Head>'}</code>:
 
 1. Renders its children to an HTML string
 2. Registers the HTML to an internal head content registry
 3. Returns `null` (nothing in the page body)
 
-After `renderToString()` completes, `renderSSR()` drains the registry and passes the collected tags to `createHtmlDocument()`, which injects them into `<head>`.
+After `renderToString()` completes, `renderSSR()` drains the registry and passes the collected tags to `createHtmlDocument()`, which injects them into <code className="text-primary-400">{'<head>'}</code>.
 
 ### Client-Side Navigation
 
-During SPA navigation, `<Head>`:
+During SPA navigation, <code className="text-primary-400">{'<Head>'}</code>:
 
 1. Renders its children to an HTML string
 2. Parses the HTML and updates `document.head` directly

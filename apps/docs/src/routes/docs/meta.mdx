@@ -4,13 +4,13 @@ import { Badge, Alert, Card, Text } from '@emberkit/ui';
 
 <Text color="muted" className="mb-6">EmberKit provides built-in tools for managing meta tags, Open Graph, Twitter cards, and structured data.</Text>
 
-## The `<Head>` Component
+## The <code className="text-primary-400">{'<Head>'}</code> Component
 
-The recommended way to manage `<head>` tags is the `<Head>` component. It renders nothing in the body and automatically injects tags into `<head>` during SSR. On the client, it updates `document.head` directly.
+The recommended way to manage <code className="text-primary-400">{'<head>'}</code> tags is the <code className="text-primary-400">{'<Head>'}</code> component. It renders nothing in the body and automatically injects tags into <code className="text-primary-400">{'<head>'}</code> during SSR. On the client, it updates <code className="text-primary-400">document.head</code> directly.
 
 ### With JSX Children
 
-Pass any `<head>` elements as children:
+Pass any <code className="text-primary-400">{'<head>'}</code> elements as children:
 
 ```tsx
 import { Head } from '@emberkit/core';
@@ -109,9 +109,9 @@ function ArticlePage() {
 }
 ```
 
-### Multiple `<Head>` Components
+### Multiple <code className="text-primary-400">{'<Head>'}</code> Components
 
-You can use multiple `<Head>` components (e.g., in a layout and a page). All tags are collected and injected into `<head>`:
+You can use multiple <code className="text-primary-400">{'<Head>'}</code> components (e.g., in a layout and a page). All tags are collected and injected into <code className="text-primary-400">{'<head>'}</code>:
 
 ```tsx
 // _layout.tsx
@@ -298,7 +298,7 @@ const pageMeta = mergeMeta(DEFAULT_META, {
 
 ## Next Steps
 
-- [Head Component](/docs/head) - Declarative `<head>` management with `<Head>`
+- [Head Component](/docs/head) — Declarative <code className="text-primary-400">{'<head>'}</code> management with <code className="text-primary-400">{'<Head>'}</code>
 - [SSR](/docs/ssr) - Server-side meta rendering
 - [Markdown/MDX](/docs/markdown) - Frontmatter meta
 - [Edge Deployment](/docs/edge) - Edge-rendered meta
