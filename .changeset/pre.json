@@ -13,6 +13,7 @@
     "cli-counter-fix",
     "cli-counter-solid-color",
     "cli-counter-value",
+    "cli-official-url",
     "cli-signal-hydration"
   ]
 }

@@ -1,5 +1,11 @@
 # @emberkit/cli
 
+## 0.6.1-alpha.7
+
+### Patch Changes
+
+- Update all EmberKit documentation URLs from emberkit.dev to the official domain: emberkit.orangeember.com across all templates.
+
 ## 0.6.1-alpha.6
 
 ### Patch Changes
