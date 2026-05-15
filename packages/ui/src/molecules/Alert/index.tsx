@@ -15,10 +15,11 @@ export interface AlertProps {
 
 function variantClasses(variant: AlertVariant): string {
   const map: Record<AlertVariant, string> = {
-    info: "bg-info-50 border-info-500",
-    success: "bg-success-50 border-success-500",
-    warning: "bg-warning-50 border-warning-500",
-    error: "bg-error-50 border-error-500",
+    info: "bg-info-500/10 border-info-500/60 ring-1 ring-info-500/20",
+    success: "bg-success-500/10 border-success-500/60 ring-1 ring-success-500/20",
+    warning:
+      "bg-warning-500/10 border-warning-500/60 ring-1 ring-warning-500/20",
+    error: "bg-error-500/10 border-error-500/60 ring-1 ring-error-500/20",
   };
   return map[variant];
 }
@@ -52,7 +53,7 @@ const Alert: FC<AlertProps> = ({
   onDismiss,
 }) => {
   const cls =
-    `relative flex items-start gap-3 rounded-lg border-l-4 p-4 ${variantClasses(variant)} ${className}`.trim();
+    `relative flex items-start gap-3 rounded-xl border-l-4 p-4 backdrop-blur-sm ${variantClasses(variant)} ${className}`.trim();
 
   const textCls = textColor(variant);
 

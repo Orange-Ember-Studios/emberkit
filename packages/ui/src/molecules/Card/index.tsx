@@ -22,7 +22,7 @@ const Card: FC<CardProps> = ({
   onClick,
 }) => {
   const base =
-    "glass-card rounded-2xl border border-white/10 shadow-lg overflow-hidden transition-all duration-300";
+    "glass-card rounded-2xl overflow-hidden transition-all duration-300";
   const hover = onClick
     ? "cursor-pointer hover:shadow-xl hover:border-primary-500/30 hover:scale-[1.01] hover:-translate-y-0.5"
     : "";

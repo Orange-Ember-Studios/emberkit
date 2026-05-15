@@ -49,7 +49,7 @@ const Modal: FC<ModalProps> = ({
         onClick={onClose}
       />
       <div
-        class={`relative w-full ${sizeClass(size)} mx-4 glass-card rounded-2xl shadow-2xl border border-white/10 scale-in`}
+        class={`relative w-full ${sizeClass(size)} mx-4 glass-card rounded-2xl shadow-2xl scale-in`}
       >
         <div class="flex items-start justify-between p-6 pb-0">
           <div>

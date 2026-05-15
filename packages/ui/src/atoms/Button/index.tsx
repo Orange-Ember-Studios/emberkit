@@ -25,25 +25,25 @@ export interface ButtonProps {
 function variantClasses(variant: ButtonVariant): string {
   const map: Record<ButtonVariant, string> = {
     primary:
-      "bg-primary-800 text-white shadow-lg shadow-primary-800/25 " +
-      "hover:bg-primary-700 hover:shadow-xl hover:shadow-primary-700/40 hover:scale-[1.02] " +
-      "active:scale-[0.98] active:shadow-md active:shadow-primary-700/20",
+      "bg-primary-500 text-white ring-1 ring-primary-400/40 shadow-lg shadow-primary-500/25 " +
+      "hover:bg-primary-400 hover:shadow-xl hover:shadow-primary-400/35 hover:scale-[1.02] " +
+      "active:scale-[0.98] active:bg-primary-600",
     secondary:
       "glass text-surface-900 " +
-      "hover:bg-white/15 hover:border-white/20 hover:scale-[1.02] " +
+      "hover:bg-white/12 hover:border-white/20 hover:scale-[1.02] " +
       "active:scale-[0.98]",
     outline:
-      "border-2 border-surface-500/60 text-surface-800 bg-transparent " +
-      "hover:bg-primary-500/15 hover:border-primary-500 hover:text-primary-400 hover:shadow-lg hover:shadow-primary-500/15 hover:scale-[1.02] " +
+      "border border-surface-500/50 text-surface-800 bg-surface-200/30 " +
+      "hover:bg-primary-500/10 hover:border-primary-500/60 hover:text-primary-300 hover:scale-[1.02] " +
       "active:scale-[0.98]",
     ghost:
-      "text-surface-500 bg-transparent " +
-      "hover:text-surface-800 hover:bg-white/8 hover:scale-[1.02] " +
+      "text-surface-600 bg-transparent " +
+      "hover:text-surface-900 hover:bg-white/8 hover:scale-[1.02] " +
       "active:scale-[0.98]",
     danger:
-      "bg-error-50 text-error-900 ring-1 ring-error-500/40 shadow-lg shadow-error-500/15 " +
-      "hover:bg-error-900/15 hover:shadow-xl hover:shadow-error-500/25 hover:scale-[1.02] " +
-      "active:scale-[0.98] active:shadow-md active:shadow-error-500/10",
+      "bg-error-500/15 text-error-500 ring-1 ring-error-500/35 shadow-md shadow-error-500/10 " +
+      "hover:bg-error-500/25 hover:text-error-900 hover:shadow-lg hover:scale-[1.02] " +
+      "active:scale-[0.98]",
   };
   return map[variant];
 }

@@ -3,6 +3,11 @@
  * These values extend/override Tailwind's default theme.
  */
 
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap");
+
+/* Scan compiled components when installed from npm (relative to dist/tokens/) */
+@source "../**/*.{js,jsx,ts,tsx}";
+
 @theme {
   /* ── Brand Palette: Orange Ember ── */
   --color-primary-50: #fff7ed;
@@ -197,6 +202,38 @@
   --color-surface-900: #e5e8f0;
 }
 
+@keyframes ek-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes ek-pulse-glow {
+  0%,
+  100% {
+    opacity: 0.6;
+    filter: blur(0);
+  }
+  50% {
+    opacity: 1;
+    filter: blur(1px);
+  }
+}
+
+@keyframes ek-shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
 @layer base {
   *,
   *::before,
@@ -223,5 +260,84 @@
     font-family: var(--font-heading);
     font-weight: var(--font-weight-semibold);
     line-height: 1.25;
+    color: var(--color-surface-900);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-primary-500);
+    outline-offset: 2px;
+  }
+
+  button:focus:not(:focus-visible),
+  a:focus:not(:focus-visible) {
+    outline: none;
+  }
+}
+
+@layer components {
+  /* Frosted surfaces — used by Card, Button secondary, Modal, etc. */
+  .glass {
+    background: linear-gradient(
+      135deg,
+      rgb(255 255 255 / 0.08),
+      rgb(255 255 255 / 0.02)
+    );
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgb(255 255 255 / 0.1);
+  }
+
+  .glass-strong {
+    background: linear-gradient(
+      135deg,
+      rgb(255 255 255 / 0.12),
+      rgb(255 255 255 / 0.04)
+    );
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgb(255 255 255 / 0.15);
+  }
+
+  .glass-card {
+    background: linear-gradient(
+      135deg,
+      rgb(15 18 30 / 0.85),
+      rgb(22 27 42 / 0.9)
+    );
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgb(255 255 255 / 0.08);
+    box-shadow: 0 8px 32px rgb(0 0 0 / 0.3);
+  }
+
+  .glow-primary {
+    box-shadow:
+      0 0 20px rgb(249 115 22 / 0.15),
+      0 0 60px rgb(249 115 22 / 0.05);
+  }
+
+  .glow-accent {
+    box-shadow:
+      0 0 20px rgb(245 158 11 / 0.15),
+      0 0 60px rgb(245 158 11 / 0.05);
+  }
+
+  .scale-in {
+    animation: ek-scale-in 0.25s var(--ease-out) both;
+  }
+
+  .animate-pulse-glow {
+    animation: ek-pulse-glow 2s ease-in-out infinite;
+  }
+
+  .animate-shimmer {
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgb(255 255 255 / 0.06),
+      transparent
+    );
+    background-size: 200% 100%;
+    animation: ek-shimmer 3s ease-in-out infinite;
   }
 }

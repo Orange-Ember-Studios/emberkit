@@ -18,7 +18,7 @@
     "atomic-design",
     "tailwind"
   ],
-  "sideEffects": false,
+  "sideEffects": ["**/*.css"],
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "style": "./dist/tokens/tokens.css",

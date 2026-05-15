@@ -8,9 +8,16 @@ import {
   Badge,
   Input,
   Spinner,
-} from "@emberkit/ui";
-import { Card, FormField, Alert, Tabs, Modal, Select } from "@emberkit/ui";
-import { DataTable, Pagination } from "@emberkit/ui";
+} from "@emberkit/ui/atoms";
+import {
+  Card,
+  FormField,
+  Alert,
+  Tabs,
+  Modal,
+  Select,
+} from "@emberkit/ui/molecules";
+import { DataTable, Pagination } from "@emberkit/ui/organisms";
 
 const UI_PAGE_SECTIONS = [
   { id: "atoms", label: "Atoms" },
@@ -25,10 +32,14 @@ const UIContent: RouteComponent = () => {
   const [page, setPage] = createSignal(1);
   const [count, setCount] = createSignal<number>(0);
   return (
-    <div class="min-h-screen text-surface-900">
+    <div class="-mx-16 min-h-screen text-surface-900 max-lg:-mx-6">
       {/* Hero */}
       <div class="relative overflow-hidden border-b border-white/5 glass-card rounded-none">
-        <div class="relative mx-auto max-w-5xl px-8 py-20">
+        <div
+          class="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-20%,rgb(249_115_22/0.18),transparent)]"
+          aria-hidden="true"
+        />
+        <div class="relative mx-auto max-w-5xl px-8 py-16 md:py-20">
           <Badge variant="accent" size="sm" className="mb-4">
             @emberkit/ui v0.1.0
           </Badge>
@@ -38,7 +49,11 @@ const UIContent: RouteComponent = () => {
           </Heading>
           <Text size="lg" color="muted" className="mb-8 max-w-2xl">
             A dark-themed, high-contrast atomic design system built with
-            EmberKit JSX and Tailwind 4. Inspired by Orange Ember Studios.
+            EmberKit JSX and Tailwind 4. Import{" "}
+            <code class="text-primary-400 font-mono text-base">
+              @emberkit/ui/tokens.css
+            </code>{" "}
+            after Tailwind for polished defaults out of the box.
           </Text>
           <div class="flex flex-wrap gap-3">
             <Button
@@ -144,7 +159,7 @@ const UIContent: RouteComponent = () => {
           </div>
 
           {/* Button */}
-          <div class="mb-12 glass-card rounded-2xl p-7">
+          <div class="mb-12 ds-showcase">
             <Heading level={4} className="mb-1">
               Button
             </Heading>
@@ -167,7 +182,7 @@ const UIContent: RouteComponent = () => {
           </div>
 
           {/* Icon */}
-          <div class="mb-12 glass-card rounded-2xl p-7">
+          <div class="mb-12 ds-showcase">
             <Heading level={4} className="mb-1">
               Icon
             </Heading>
@@ -216,7 +231,7 @@ const UIContent: RouteComponent = () => {
 
           {/* Text + Heading */}
           <div class="mb-12 grid grid-cols-1 gap-6 md:grid-cols-2">
-            <div class="glass-card rounded-2xl p-7">
+            <div class="ds-showcase">
               <Heading level={4} className="mb-3">
                 Text
               </Heading>
@@ -233,7 +248,7 @@ const UIContent: RouteComponent = () => {
                 <Text color="error">Error colored text</Text>
               </div>
             </div>
-            <div class="glass-card rounded-2xl p-7">
+            <div class="ds-showcase">
               <Heading level={4} className="mb-3">
                 Heading
               </Heading>
@@ -249,7 +264,7 @@ const UIContent: RouteComponent = () => {
           </div>
 
           {/* Badge */}
-          <div class="mb-12 glass-card rounded-2xl p-7">
+          <div class="mb-12 ds-showcase">
             <Heading level={4} className="mb-1">
               Badge
             </Heading>
@@ -267,7 +282,7 @@ const UIContent: RouteComponent = () => {
           </div>
 
           {/* Input */}
-          <div class="mb-12 glass-card rounded-2xl p-7">
+          <div class="mb-12 ds-showcase">
             <Heading level={4} className="mb-1">
               Input
             </Heading>
@@ -283,7 +298,7 @@ const UIContent: RouteComponent = () => {
           </div>
 
           {/* Spinner */}
-          <div class="glass-card rounded-2xl p-7">
+          <div class="ds-showcase">
             <Heading level={4} className="mb-1">
               Spinner
             </Heading>
@@ -342,7 +357,7 @@ const UIContent: RouteComponent = () => {
           </div>
 
           {/* FormField */}
-          <div class="mb-12 glass-card rounded-2xl p-7">
+          <div class="mb-12 ds-showcase">
             <Heading level={4} className="mb-4">
               FormField
             </Heading>
@@ -386,7 +401,7 @@ const UIContent: RouteComponent = () => {
           </div>
 
           {/* Tabs */}
-          <div class="mb-12 glass-card rounded-2xl p-7">
+          <div class="mb-12 ds-showcase">
             <Heading level={4} className="mb-4">
               Tabs
             </Heading>
@@ -399,7 +414,7 @@ const UIContent: RouteComponent = () => {
               activeTab={tab}
               onChange={(id) => setTab(id)}
             />
-            <div class="mt-4 rounded-xl bg-white/5 border border-white/5">
+            <div class="mt-4 rounded-xl border border-white/10 bg-surface-200/40">
               <div data-ek-bind={tab} data-ek-show-when="preview" class="p-4">
                 <Text>Preview content here.</Text>
               </div>
@@ -414,7 +429,7 @@ const UIContent: RouteComponent = () => {
           </div>
 
           {/* Signal Hydration example — live counter */}
-          <div class="mb-12 glass-card rounded-2xl p-7">
+          <div class="mb-12 ds-showcase">
             <Heading level={4} className="mb-1">
               Signal + Hydration
             </Heading>
@@ -455,7 +470,7 @@ const UIContent: RouteComponent = () => {
           </div>
 
           {/* Modal */}
-          <div class="mb-12 glass-card rounded-2xl p-7">
+          <div class="mb-12 ds-showcase">
             <Heading level={4} className="mb-1">
               Modal
             </Heading>
@@ -489,7 +504,7 @@ const UIContent: RouteComponent = () => {
           </div>
 
           {/* Select */}
-          <div class="glass-card rounded-2xl p-7">
+          <div class="ds-showcase">
             <Heading level={4} className="mb-1">
               Select
             </Heading>
@@ -529,7 +544,7 @@ const UIContent: RouteComponent = () => {
           </div>
 
           {/* DataTable */}
-          <div class="mb-12 glass-card rounded-2xl p-7">
+          <div class="mb-12 ds-showcase">
             <Heading level={4} className="mb-4">
               DataTable
             </Heading>
@@ -557,7 +572,7 @@ const UIContent: RouteComponent = () => {
           </div>
 
           {/* Pagination */}
-          <div class="mb-12 glass-card rounded-2xl p-7">
+          <div class="mb-12 ds-showcase">
             <Heading level={4} className="mb-4">
               Pagination
             </Heading>
@@ -589,7 +604,7 @@ const UIContent: RouteComponent = () => {
             <Text color="muted" size="sm" className="mb-5">
               Full scale from lightest to darkest orange.
             </Text>
-            <div class="glass-card rounded-2xl p-6">
+            <div class="ds-showcase">
               <div class="grid grid-cols-5 gap-3 sm:grid-cols-10">
                 {[50, 100, 200, 300, 400, 500, 600, 700, 800, 900].map(
                   (shade) => (
@@ -618,7 +633,7 @@ const UIContent: RouteComponent = () => {
             <Text color="muted" size="sm" className="mb-5">
               Inverted for dark mode — 50 is darkest, 900 is lightest.
             </Text>
-            <div class="glass-card rounded-2xl p-6">
+            <div class="ds-showcase">
               <div class="grid grid-cols-5 gap-3 sm:grid-cols-10">
                 {[50, 100, 200, 300, 400, 500, 600, 700, 800, 900].map(
                   (shade) => (
@@ -652,7 +667,7 @@ const UIContent: RouteComponent = () => {
                 (name) => (
                   <div
                     key={name}
-                    class="glass-card rounded-2xl p-5 text-center group hover:-translate-y-0.5 transition-all duration-200"
+                    class="ds-showcase p-5 text-center group hover:-translate-y-0.5 transition-all duration-200"
                   >
                     <div
                       class="mx-auto mb-3 h-10 w-10 rounded-xl shadow-lg transition-transform duration-200 group-hover:scale-110"
@@ -750,7 +765,7 @@ const UIContent: RouteComponent = () => {
           </div>
 
           {/* Typography */}
-          <div class="glass-card rounded-2xl p-8">
+          <div class="ds-showcase p-8">
             <Heading level={4} className="mb-2">
               Typography
             </Heading>

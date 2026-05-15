@@ -33,13 +33,15 @@ function DataTable<T extends Record<string, unknown>>({
   sortDirection,
   onSort,
 }: DataTableProps<T>) {
-  const cls = `w-full overflow-x-auto ${className}`.trim();
+  const cls =
+    `w-full overflow-hidden rounded-xl border border-white/10 bg-surface-100/40 ${className}`.trim();
 
   return (
     <div class={cls}>
+      <div class="overflow-x-auto">
       <table class="w-full border-collapse">
         <thead>
-          <tr class="border-b border-white/10 bg-white/5">
+          <tr class="border-b border-white/10 bg-white/[0.04]">
             {columns.map((col) => {
               const thCls = [
                 "px-4 py-3 text-left text-xs font-medium text-surface-800 uppercase tracking-wider",
@@ -106,6 +108,7 @@ function DataTable<T extends Record<string, unknown>>({
           )}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }

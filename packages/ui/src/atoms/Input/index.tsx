@@ -34,10 +34,13 @@ const Input: FC<InputProps> = ({
   onBlur,
 }) => {
   const base =
-    "w-full rounded-lg border bg-surface-100 text-surface-900 placeholder-surface-700 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-0 disabled:bg-surface-200 disabled:cursor-not-allowed";
+    "w-full rounded-xl border bg-surface-200/70 text-surface-900 placeholder-surface-600 " +
+    "shadow-sm shadow-black/20 transition-all duration-150 " +
+    "focus:outline-none focus:ring-2 focus:ring-offset-0 focus:ring-offset-surface-50 " +
+    "disabled:bg-surface-300/50 disabled:text-surface-600 disabled:cursor-not-allowed";
   const border = error
-    ? "border-error-500 focus:ring-error-300"
-    : "border-surface-300 focus:border-primary-500 focus:ring-primary-300";
+    ? "border-error-500/80 focus:border-error-500 focus:ring-error-500/30"
+    : "border-surface-400/50 hover:border-surface-500/70 focus:border-primary-500 focus:ring-primary-500/25";
   const cls = `${base} ${border} ${sizeClass(size)} ${className}`.trim();
 
   return (

@@ -18,12 +18,14 @@ export interface BadgeProps {
 
 function variantClass(variant: BadgeVariant): string {
   const map: Record<BadgeVariant, string> = {
-    default: "bg-surface-200 text-surface-800",
-    success: "bg-success-900 text-success-50",
-    warning: "bg-warning-900 text-warning-50",
-    error: "bg-error-900 text-error-50",
-    info: "bg-info-900 text-info-50",
-    accent: "bg-accent-900 text-accent-50",
+    default: "bg-surface-300/50 text-surface-800 ring-1 ring-white/10",
+    success:
+      "bg-success-500/15 text-success-500 ring-1 ring-success-500/30",
+    warning:
+      "bg-warning-500/15 text-warning-500 ring-1 ring-warning-500/30",
+    error: "bg-error-500/15 text-error-500 ring-1 ring-error-500/30",
+    info: "bg-info-500/15 text-info-500 ring-1 ring-info-500/30",
+    accent: "bg-accent-500/15 text-accent-400 ring-1 ring-accent-500/30",
   };
   return map[variant];
 }
