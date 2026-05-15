@@ -159,10 +159,10 @@ importers:
   packages/ui:
     dependencies:
       '@emberkit/core':
-        specifier: workspace:*
+        specifier: workspace:^0.2.8
         version: link:../emberkit
       '@emberkit/icons':
-        specifier: workspace:*
+        specifier: workspace:^0.2.6
         version: link:../icons
       tailwindcss:
         specifier: ^4.0.0

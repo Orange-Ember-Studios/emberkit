@@ -1,5 +1,11 @@
 # @emberkit/cli
 
+## 0.6.4
+
+### Patch Changes
+
+- Pin UI to workspace semver for core/icons; refresh CLI template package ranges
+
 ## 0.6.3
 
 ### Patch Changes
