@@ -1248,8 +1248,29 @@ function scanRouteFiles(dir: string): string[] {
   return files;
 }
 
+function scoreRoutePath(routePath: string): number {
+  let score = 100;
+  const segments = routePath.split('/').filter(Boolean);
+
+  score -= segments.length * 20;
+
+  for (const segment of segments) {
+    if (segment.startsWith(':') || segment.startsWith('*') || segment.endsWith('*')) {
+      score -= 30;
+    } else {
+      score += 10;
+    }
+  }
+
+  if (routePath.includes('*')) {
+    score -= 50;
+  }
+
+  return Math.max(0, score);
+}
+
 function generateRoutesCode(files: string[], routeDir: string): string {
-  const routeEntries: string[] = [];
+  const routeEntries: Array<{ path: string; entry: string }> = [];
 
   for (const file of files) {
     const relativePath = relative(routeDir, file).replace(/\\/g, '/');
@@ -1282,17 +1303,16 @@ function generateRoutesCode(files: string[], routeDir: string): string {
     }
 
     const importPath = file.replace(/\\/g, '/');
+    const entry = isMarkdown
+      ? `  { path: ${JSON.stringify(routePath)}, component: () => import(${JSON.stringify(importPath)}), isMarkdown: true }`
+      : `  { path: ${JSON.stringify(routePath)}, component: () => import(${JSON.stringify(importPath)}) }`;
 
-    if (isMarkdown) {
-      routeEntries.push(
-        `  { path: ${JSON.stringify(routePath)}, component: () => import(${JSON.stringify(importPath)}), isMarkdown: true }`,
-      );
-    } else {
-      routeEntries.push(
-        `  { path: ${JSON.stringify(routePath)}, component: () => import(${JSON.stringify(importPath)}) }`,
-      );
-    }
+    routeEntries.push({ path: routePath, entry });
   }
 
-  return `export const routes = [\n${routeEntries.join(',\n')}\n];`;
+  // Sort static routes before dynamic routes so the emitted array already has
+  // the correct priority order (defense-in-depth alongside runtime scoring).
+  routeEntries.sort((a, b) => scoreRoutePath(b.path) - scoreRoutePath(a.path));
+
+  return `export const routes = [\n${routeEntries.map((r) => r.entry).join(',\n')}\n];`;
 }
