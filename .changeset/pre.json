@@ -11,6 +11,7 @@
   },
   "changesets": [
     "cli-counter-fix",
-    "cli-counter-solid-color"
+    "cli-counter-solid-color",
+    "cli-counter-value"
   ]
 }

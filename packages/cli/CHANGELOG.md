@@ -1,5 +1,11 @@
 # @emberkit/cli
 
+## 0.6.1-alpha.5
+
+### Patch Changes
+
+- Fix counter display to render the numeric value instead of the signal object.
+
 ## 0.6.1-alpha.4
 
 ### Patch Changes
