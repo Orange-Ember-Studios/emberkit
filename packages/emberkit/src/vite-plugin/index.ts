@@ -6,8 +6,6 @@ import { join, relative, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { compile } from '@mdx-js/mdx';
 import remarkGfm from 'remark-gfm';
-import { compression } from 'vite-plugin-compression2';
-
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const VIRTUAL_EMBERKIT_CONFIG = 'virtual:emberkit-config';
@@ -29,15 +27,17 @@ export function emberkitVitePlugin(userOptions: EmberKitPluginOptions = {}): Plu
     name: 'emberkit:vite-plugin',
     enforce: 'pre',
 
-    config() {
+    async config() {
       const pkgRoot = resolve(__dirname, '..', '..');
       const srcDir = join(pkgRoot, 'src');
 
       const plugins: Plugin[] = [];
       if (options.compression?.gzip) {
+        const { compression } = await import('vite-plugin-compression2');
         plugins.push(compression({ algorithm: 'gzip' } as any));
       }
       if (options.compression?.brotli) {
+        const { compression } = await import('vite-plugin-compression2');
         plugins.push(compression({ algorithm: 'brotliCompress' } as any));
       }
 
