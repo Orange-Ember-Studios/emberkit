@@ -130,7 +130,7 @@ import {
 } from '@emberkit/ui';
 
 const HomePage: RouteComponent = () => {
-  const activeTab = signal('features');
+  const [activeTab, setActiveTab] = createSignal('features');
 
   const features = [
     { icon: '⚡', title: 'Lightning Fast', desc: 'Sub-10KB runtime with tree-shakeable architecture' },

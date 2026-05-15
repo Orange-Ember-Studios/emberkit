@@ -46,9 +46,11 @@ export function emberkitVitePlugin(userOptions: EmberKitPluginOptions = {}): Plu
       return {
         plugins,
         resolve: {
-          alias: isWorkspace ? {
-            '@emberkit/core': srcDir,
-          } : {},
+          alias: isWorkspace
+            ? {
+                '@emberkit/core': srcDir,
+              }
+            : {},
         },
         esbuild: {
           jsxImportSource: '@emberkit/core',

@@ -38,11 +38,11 @@ body {
 }`,
 
   "src/routes/_layout.tsx": `import type { RouteComponent } from '@emberkit/core';
-import { signal } from '@emberkit/core';
+import { createSignal } from '@emberkit/core';
 import { Sidebar, Header } from '@emberkit/ui';
 
 const Layout: RouteComponent = ({ children }) => {
-  const sidebarOpen = signal(true);
+  const [sidebarOpen, setSidebarOpen] = createSignal(true);
 
   const sidebarItems = [
     { label: 'Dashboard', href: '/dashboard', icon: 'grid' },
@@ -57,15 +57,15 @@ const Layout: RouteComponent = ({ children }) => {
       <Sidebar
         logo={<span className="font-bold text-lg">&#9889; {{name}}</span>}
         items={sidebarItems}
-        collapsed={!sidebarOpen.value}
-        onToggle={() => { sidebarOpen.value = !sidebarOpen.value; }}
+        collapsed={!sidebarOpen()}
+        onToggle={() => { setSidebarOpen(!sidebarOpen()); }}
         className="w-64"
       />
       <div className="flex-1 flex flex-col min-w-0">
         <Header
           title="Dashboard"
           user={{ name: 'User', avatar: '' }}
-          onMenuClick={() => { sidebarOpen.value = !sidebarOpen.value; }}
+          onMenuClick={() => { setSidebarOpen(!sidebarOpen()); }}
         />
         <main className="flex-1 p-6 overflow-auto">
           {children}
@@ -174,7 +174,7 @@ export default DashboardPage;`,
 
   "src/routes/users.tsx": `import type { RouteComponent } from '@emberkit/core';
 import { Card, Badge, Button, Input } from '@emberkit/ui';
-import { signal } from '@emberkit/core';
+import { createSignal } from '@emberkit/core';
 
 interface User {
   id: number;
@@ -194,12 +194,12 @@ const users: User[] = [
 ];
 
 const UsersPage: RouteComponent = () => {
-  const search = signal('');
+  const [search, setSearch] = createSignal('');
 
   const filteredUsers = users.filter(
     (u) =>
-      u.name.toLowerCase().includes(search.value.toLowerCase()) ||
-      u.email.toLowerCase().includes(search.value.toLowerCase())
+      u.name.toLowerCase().includes(search().toLowerCase()) ||
+      u.email.toLowerCase().includes(search().toLowerCase())
   );
 
   const statusVariant = (status: User['status']) => {
@@ -224,8 +224,8 @@ const UsersPage: RouteComponent = () => {
         <div className="mb-4">
           <Input
             placeholder="Search users..."
-            value={search.value}
-            onInput={(e) => { search.value = e.currentTarget.value; }}
+            value={search()}
+            onInput={(e) => { setSearch(e.currentTarget.value); }}
             className="max-w-sm"
           />
         </div>
@@ -273,17 +273,17 @@ export default UsersPage;`,
 
   "src/routes/settings.tsx": `import type { RouteComponent } from '@emberkit/core';
 import { Card, Input, Button, Alert } from '@emberkit/ui';
-import { signal } from '@emberkit/core';
+import { createSignal } from '@emberkit/core';
 
 const SettingsPage: RouteComponent = () => {
-  const name = signal('John Doe');
-  const email = signal('john@example.com');
-  const saved = signal(false);
+  const [name, setName] = createSignal('John Doe');
+  const [email, setEmail] = createSignal('john@example.com');
+  const [saved, setSaved] = createSignal(false);
 
   const handleSave = (e: Event) => {
     e.preventDefault();
-    saved.value = true;
-    setTimeout(() => { saved.value = false; }, 3000);
+    setSaved(true);
+    setTimeout(() => { setSaved(false); }, 3000);
   };
 
   return (
@@ -293,7 +293,7 @@ const SettingsPage: RouteComponent = () => {
         <p className="text-gray-600 mt-1">Manage your account preferences.</p>
       </div>
 
-      {saved.value && (
+      {saved() && (
         <Alert variant="success">Settings saved successfully!</Alert>
       )}
 
@@ -302,14 +302,14 @@ const SettingsPage: RouteComponent = () => {
         <form onSubmit={handleSave} className="space-y-4">
           <Input
             label="Full Name"
-            value={name.value}
-            onInput={(e) => { name.value = e.currentTarget.value; }}
+            value={name()}
+            onInput={(e) => { setName(e.currentTarget.value); }}
           />
           <Input
             label="Email"
             type="email"
-            value={email.value}
-            onInput={(e) => { email.value = e.currentTarget.value; }}
+            value={email()}
+            onInput={(e) => { setEmail(e.currentTarget.value); }}
           />
           <div className="flex justify-end">
             <Button variant="primary" type="submit">Save Changes</Button>

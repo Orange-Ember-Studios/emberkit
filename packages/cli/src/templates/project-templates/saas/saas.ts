@@ -117,11 +117,11 @@ const Layout: RouteComponent = ({ children }) => {
 export default Layout;`,
 
   "src/routes/index.tsx": `import type { RouteComponent } from '@emberkit/core';
-import { signal } from '@emberkit/core';
+import { createSignal } from '@emberkit/core';
 import { Button, Card, Badge } from '@emberkit/ui';
 
 const HomePage: RouteComponent = () => {
-  const annual = signal(false);
+  const [annual, setAnnual] = createSignal(false);
 
   const features = [
     { icon: '&#9889;', title: 'Lightning Fast', desc: 'Sub-10KB runtime with tree-shakeable architecture' },
@@ -135,8 +135,8 @@ const HomePage: RouteComponent = () => {
   const plans = [
     {
       name: 'Starter',
-      price: annual.value ? '$0' : '$0',
-      period: annual.value ? '/year' : '/month',
+      price: annual() ? '$0' : '$0',
+      period: annual() ? '/year' : '/month',
       desc: 'Perfect for side projects',
       features: ['1 user', '5 projects', '1GB storage', 'Community support'],
       cta: 'Get Started Free',
@@ -144,8 +144,8 @@ const HomePage: RouteComponent = () => {
     },
     {
       name: 'Pro',
-      price: annual.value ? '$199' : '$19',
-      period: annual.value ? '/year' : '/month',
+      price: annual() ? '$199' : '$19',
+      period: annual() ? '/year' : '/month',
       desc: 'For growing teams',
       features: ['10 users', 'Unlimited projects', '50GB storage', 'Priority support', 'Analytics', 'API access'],
       cta: 'Start Free Trial',
@@ -225,14 +225,14 @@ const HomePage: RouteComponent = () => {
             <p className="text-lg text-slate-600 mb-8">Choose the plan that works for your team</p>
             <div className="inline-flex items-center gap-3 p-1 bg-white rounded-lg border border-slate-200">
               <button
-                className={\`px-4 py-2 text-sm font-medium rounded-md transition-colors \${!annual.value ? 'bg-brand-600 text-white' : 'text-slate-600'}\`}
-                onClick={() => { annual.value = false; }}
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${!annual() ? 'bg-brand-600 text-white' : 'text-slate-600'}`}
+                onClick={() => { setAnnual(false); }}
               >
                 Monthly
               </button>
               <button
-                className={\`px-4 py-2 text-sm font-medium rounded-md transition-colors \${annual.value ? 'bg-brand-600 text-white' : 'text-slate-600'}\`}
-                onClick={() => { annual.value = true; }}
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${annual() ? 'bg-brand-600 text-white' : 'text-slate-600'}`}
+                onClick={() => { setAnnual(true); }}
               >
                 Annual <span className="text-brand-600 ml-1 font-semibold">-20%</span>
               </button>
@@ -295,19 +295,19 @@ export default HomePage;`,
   "src/routes/login.tsx": `import type { RouteComponent } from '@emberkit/core';
 import { Head } from '@emberkit/core';
 import { Button, Input, Card } from '@emberkit/ui';
-import { signal } from '@emberkit/core';
+import { createSignal } from '@emberkit/core';
 
 const LoginPage: RouteComponent = () => {
-  const email = signal('');
-  const password = signal('');
-  const error = signal<string | null>(null);
+  const [email, setEmail] = createSignal('');
+  const [password, setPassword] = createSignal('');
+  const [error, setError] = createSignal<string | null>(null);
 
   const handleSubmit = (e: Event) => {
     e.preventDefault();
-    error.value = null;
+    setError(null);
 
-    if (!email.value || !password.value) {
-      error.value = 'Please fill in all fields';
+    if (!email() || !password()) {
+      setError('Please fill in all fields');
       return;
     }
 
@@ -330,18 +330,18 @@ const LoginPage: RouteComponent = () => {
               label="Email"
               type="email"
               placeholder="you@example.com"
-              value={email.value}
-              onInput={(e) => { email.value = e.currentTarget.value; }}
+              value={email()}
+              onInput={(e) => { setEmail(e.currentTarget.value); }}
             />
             <Input
               label="Password"
               type="password"
               placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
-              value={password.value}
-              onInput={(e) => { password.value = e.currentTarget.value; }}
+              value={password()}
+              onInput={(e) => { setPassword(e.currentTarget.value); }}
             />
-            {error.value && (
-              <p className="text-red-500 text-sm">{error.value}</p>
+            {error() && (
+              <p className="text-red-500 text-sm">{error()}</p>
             )}
             <div className="flex items-center justify-between text-sm">
               <label className="flex items-center gap-2">
@@ -366,20 +366,20 @@ export default LoginPage;`,
   "src/routes/signup.tsx": `import type { RouteComponent } from '@emberkit/core';
 import { Head } from '@emberkit/core';
 import { Button, Input, Card } from '@emberkit/ui';
-import { signal } from '@emberkit/core';
+import { createSignal } from '@emberkit/core';
 
 const SignupPage: RouteComponent = () => {
-  const name = signal('');
-  const email = signal('');
-  const password = signal('');
-  const error = signal<string | null>(null);
+  const [name, setName] = createSignal('');
+  const [email, setEmail] = createSignal('');
+  const [password, setPassword] = createSignal('');
+  const [error, setError] = createSignal<string | null>(null);
 
   const handleSubmit = (e: Event) => {
     e.preventDefault();
-    error.value = null;
+    setError(null);
 
-    if (!name.value || !email.value || !password.value) {
-      error.value = 'Please fill in all fields';
+    if (!name() || !email() || !password()) {
+      setError('Please fill in all fields');
       return;
     }
 
@@ -401,25 +401,25 @@ const SignupPage: RouteComponent = () => {
             <Input
               label="Full Name"
               placeholder="John Doe"
-              value={name.value}
-              onInput={(e) => { name.value = e.currentTarget.value; }}
+              value={name()}
+              onInput={(e) => { setName(e.currentTarget.value); }}
             />
             <Input
               label="Email"
               type="email"
               placeholder="you@example.com"
-              value={email.value}
-              onInput={(e) => { email.value = e.currentTarget.value; }}
+              value={email()}
+              onInput={(e) => { setEmail(e.currentTarget.value); }}
             />
             <Input
               label="Password"
               type="password"
               placeholder="8+ characters"
-              value={password.value}
-              onInput={(e) => { password.value = e.currentTarget.value; }}
+              value={password()}
+              onInput={(e) => { setPassword(e.currentTarget.value); }}
             />
-            {error.value && (
-              <p className="text-red-500 text-sm">{error.value}</p>
+            {error() && (
+              <p className="text-red-500 text-sm">{error()}</p>
             )}
             <p className="text-xs text-slate-500">
               By signing up, you agree to our {' '}
