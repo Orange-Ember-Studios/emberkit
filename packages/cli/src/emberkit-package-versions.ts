@@ -4,7 +4,7 @@ export const EMBERKIT_PACKAGE_VERSIONS = {
   core: "^0.2.6",
   ui: "^0.3.0",
   icons: "^0.2.3",
-  cli: "^0.6.1",
+  cli: "^0.6.2",
   edge: "^0.2.3",
   tsconfig: "^0.2.1",
 } as const;

@@ -1,5 +1,11 @@
 # @emberkit/cli
 
+## 0.6.2
+
+### Patch Changes
+
+- Automate CLI template version sync script
+
 ## 0.6.1
 
 ## 0.6.1-alpha.12
