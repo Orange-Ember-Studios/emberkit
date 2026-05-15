@@ -11,11 +11,11 @@ export interface PackageJsonOptions {
 export function buildPackageJson(options: PackageJsonOptions = {}): string {
   const { hasTailwind = false, hasUI = false } = options;
 
-  const deps: Record<string, string> = { "@emberkit/core": "^0.2.4" };
-  if (hasUI) deps["@emberkit/ui"] = "^0.2.3";
+  const deps: Record<string, string> = { "@emberkit/core": "^0.2.6-alpha.0" };
+  if (hasUI) deps["@emberkit/ui"] = "^0.3.0-alpha.1";
 
   const devDeps: Record<string, string> = {
-    "@emberkit/cli": "^0.2.4",
+    "@emberkit/cli": "^0.6.1-alpha.11",
     typescript: "^5.7.0",
     vite: "^6.0.0",
   };
