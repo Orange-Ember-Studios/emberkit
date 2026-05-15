@@ -1,5 +1,13 @@
 # @emberkit/cli
 
+## 0.5.3
+
+### Patch Changes
+
+- Improve visual styling of project templates
+  - Implement juicy styles (gradients, animations, ambient glow) for basic and with-ui templates
+  - Update layout and page designs for a more premium look and feel
+
 ## 0.5.2
 
 ### Patch Changes
