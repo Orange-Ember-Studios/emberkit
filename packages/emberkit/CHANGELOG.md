@@ -1,5 +1,14 @@
 # @emberkit/core
 
+## 0.2.5
+
+### Patch Changes
+
+- Add signal, computed, effect exports for simpler API
+  - signal() - shorthand for createSignal() with .value property
+  - computed() - shorthand for createMemo()
+  - effect() - shorthand for createEffect()
+
 ## 0.2.4
 
 ### Patch Changes
