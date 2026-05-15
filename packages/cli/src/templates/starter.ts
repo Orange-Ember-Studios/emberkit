@@ -12,10 +12,10 @@ export const starterFiles: Record<string, string> = {
     "format": "prettier --write \\"src/**/*.{ts,tsx}\\""
   },
   "dependencies": {
-    "@emberkit/core": "^0.1.0"
+    "@emberkit/core": "^0.2.3"
   },
   "devDependencies": {
-    "@emberkit/cli": "^0.1.0",
+    "@emberkit/cli": "^0.2.3",
     "typescript": "^5.7.0",
     "vite": "^6.0.0"
   }
