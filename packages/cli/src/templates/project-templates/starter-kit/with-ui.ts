@@ -9,7 +9,7 @@ export const withUiTemplate: Record<string, string> = {
     "build": "emberkit build",
     "preview": "emberkit preview",
     "lint": "eslint src --ext .ts,.tsx",
-    "format": "prettier --write \"src/**/*.{ts,tsx}\""
+    "format": "prettier --write \"src/**/*.{ts,tsx}\"
   },
   "dependencies": {
     "@emberkit/core": "^0.2.4",

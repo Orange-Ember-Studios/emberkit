@@ -2,13 +2,13 @@ import { existsSync, mkdirSync, writeFileSync } from "fs";
 import { resolve, join } from "path";
 import { execSync } from "child_process";
 import { getPackageManager, getInstallCommand } from "../utils/filesystem.js";
-import { starterFiles } from "../templates/projects/starter.js";
-import { withUiTemplate } from "../templates/projects/with-ui.js";
-import { minimalTemplate } from "../templates/minimal/minimal.js";
-import { blogTemplate } from "../templates/blog/blog.js";
-import { saasTemplate } from "../templates/saas/saas.js";
-import { dashboardTemplate } from "../templates/dashboard/dashboard.js";
-import { apiTemplate } from "../templates/api/api.js";
+import { starterFiles } from "../templates/project-templates/starter-kit/starter.js";
+import { withUiTemplate } from "../templates/project-templates/starter-kit/with-ui.js";
+import { minimalTemplate } from "../templates/project-templates/minimal/minimal.js";
+import { blogTemplate } from "../templates/project-templates/blog/blog.js";
+import { saasTemplate } from "../templates/project-templates/saas/saas.js";
+import { dashboardTemplate } from "../templates/project-templates/dashboard/dashboard.js";
+import { apiTemplate } from "../templates/project-templates/api/api.js";
 
 export interface CreateOptions {
   name: string;
