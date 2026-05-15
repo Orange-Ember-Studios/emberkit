@@ -12,6 +12,7 @@
   "changesets": [
     "cli-counter-fix",
     "cli-counter-solid-color",
-    "cli-counter-value"
+    "cli-counter-value",
+    "cli-signal-hydration"
   ]
 }

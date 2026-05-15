@@ -1,5 +1,11 @@
 # @emberkit/cli
 
+## 0.6.1-alpha.6
+
+### Patch Changes
+
+- Fix counter demo to use correct EmberKit signal API (createSignal) with proper hydration binding (data-ek-bind). Buttons now update the counter correctly.
+
 ## 0.6.1-alpha.5
 
 ### Patch Changes
