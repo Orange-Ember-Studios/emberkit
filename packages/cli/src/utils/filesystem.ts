@@ -42,6 +42,25 @@ export function getPackageManager(): "pnpm" | "npm" | "yarn" {
 
   if (userAgent.startsWith("pnpm")) return "pnpm";
   if (userAgent.startsWith("yarn")) return "yarn";
+  if (userAgent.startsWith("npm")) return "npm";
+
+  const { existsSync } = require("fs");
+  const { platform } = require("os");
+
+  try {
+    if (platform() === "win32") {
+      if (existsSync("C:\\Program Files\\pnpm\\pnpm.exe") || existsSync(process.env.LOCALAPPDATA + "\\pnpm\\pnpm.exe")) {
+        return "pnpm";
+      }
+    } else {
+      const { execSync } = require("child_process");
+      execSync("pnpm --version", { stdio: "ignore" });
+      return "pnpm";
+    }
+  } catch {
+    return "npm";
+  }
+
   return "npm";
 }
 

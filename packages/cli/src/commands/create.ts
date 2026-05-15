@@ -87,9 +87,7 @@ const starterFiles: Record<string, string> = {
   "scripts": {
     "dev": "emberkit dev",
     "build": "emberkit build",
-    "preview": "emberkit preview",
-    "lint": "eslint src --ext .ts,.tsx",
-    "format": "prettier --write \\"src/**/*.{ts,tsx}\\""
+    "preview": "emberkit preview"
   },
   "dependencies": {
     "@emberkit/core": "^0.2.4"
@@ -97,7 +95,9 @@ const starterFiles: Record<string, string> = {
   "devDependencies": {
     "@emberkit/cli": "^0.2.4",
     "typescript": "^5.7.0",
-    "vite": "^6.0.0"
+    "vite": "^6.0.0",
+    "tailwindcss": "^4.0.0",
+    "@tailwindcss/vite": "^4.0.0"
   }
 }`,
 
@@ -124,27 +124,15 @@ const starterFiles: Record<string, string> = {
   "exclude": ["node_modules", "dist"]
 }`,
 
-  "emberkit.config.ts": `import { defineConfig } from '@emberkit/core';
-
-export default defineConfig({
-  mode: 'spa',
-  build: {
-    outDir: 'dist',
-    target: 'esnext',
-  },
-});`,
-
   "vite.config.ts": `import { defineConfig } from 'vite';
 import { emberkitVitePlugin } from '@emberkit/core/vite-plugin';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-  plugins: [emberkitVitePlugin()],
+  plugins: [emberkitVitePlugin(), tailwindcss()],
   server: {
     port: 3000,
     host: 'localhost',
-  },
-  esbuild: {
-    jsxImportSource: '@emberkit/core',
   },
 });`,
 
@@ -157,11 +145,6 @@ export default defineConfig({
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Inter', sans-serif; background: #0f172a; color: #e2e8f0; }
-    a { color: inherit; text-decoration: none; }
-  </style>
 </head>
 <body>
   <div id="app"></div>
@@ -178,6 +161,30 @@ if (root) {
   render(App, root);
 }`,
 
+  "src/styles.css": `@import "tailwindcss";
+
+@theme {
+  --color-ember-50: #fff7ed;
+  --color-ember-100: #ffedd5;
+  --color-ember-200: #fed7aa;
+  --color-ember-300: #fdba74;
+  --color-ember-400: #fb923c;
+  --color-ember-500: #f97316;
+  --color-ember-600: #ea580c;
+  --color-ember-700: #c2410c;
+  --color-ember-800: #9a3412;
+  --color-ember-900: #7c2d12;
+  --font-sans: 'Inter', system-ui, sans-serif;
+}
+
+body {
+  @apply bg-slate-900 text-slate-200 font-sans min-h-screen;
+}
+
+a {
+  @apply text-inherit no-underline transition-colors;
+}`,
+
   "src/routes/_layout.tsx": `import type { RouteComponent } from '@emberkit/core';
 import { Head } from '@emberkit/core';
 
@@ -188,21 +195,27 @@ const Layout: RouteComponent = ({ children }) => {
         <title>{{name}}</title>
         <meta name="description" content="Built with EmberKit" />
       </Head>
-      <div className="app">
-        <header className="header">
-          <div className="logo">
-            <span className="logo-icon">🔥</span>
-            <span className="logo-text">{{name}}</span>
+      <div className="flex flex-col min-h-screen">
+        <header className="border-b border-slate-800 bg-slate-900/50 backdrop-blur sticky top-0 z-50">
+          <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="/" className="flex items-center gap-2 group">
+              <span className="text-2xl">🔥</span>
+              <span className="text-xl font-bold bg-gradient-to-r from-ember-400 to-ember-500 bg-clip-text text-transparent">
+                {{name}}
+              </span>
+            </a>
+            <nav className="flex items-center gap-6">
+              <a href="/" className="text-slate-400 hover:text-ember-500 font-medium">Home</a>
+              <a href="/about" className="text-slate-400 hover:text-ember-500 font-medium">About</a>
+              <a href="https://emberkit.dev/docs" target="_blank" className="text-slate-400 hover:text-ember-500 font-medium">
+                Docs <span className="text-xs">↗</span>
+              </a>
+            </nav>
           </div>
-          <nav className="nav">
-            <a href="/" className="nav-link">Home</a>
-            <a href="/about" className="nav-link">About</a>
-            <a href="https://emberkit.dev/docs" className="nav-link" target="_blank">Docs →</a>
-          </nav>
         </header>
-        <main className="main">{children}</main>
-        <footer className="footer">
-          <p>Built with <a href="https://emberkit.dev" className="footer-link">EmberKit</a></p>
+        <main className="flex-1">{children}</main>
+        <footer className="border-t border-slate-800 py-8 text-center text-slate-500">
+          <p>Built with <a href="https://emberkit.dev" className="text-ember-500 hover:underline">EmberKit</a></p>
         </footer>
       </div>
     </>
@@ -218,59 +231,67 @@ const HomePage: RouteComponent = () => {
   const count = signal(0);
 
   return (
-    <div className="home">
-      <section className="hero">
-        <h1 className="hero-title">
-          Welcome to <span className="gradient-text">{{name}}</span>
+    <div className="max-w-6xl mx-auto px-6 py-16 space-y-20">
+      <section className="text-center space-y-6">
+        <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight">
+          Welcome to <span className="bg-gradient-to-r from-ember-400 via-ember-500 to-ember-600 bg-clip-text text-transparent">{{name}}</span>
         </h1>
-        <p className="hero-desc">
+        <p className="text-xl text-slate-400 max-w-2xl mx-auto">
           A minimalist TypeScript-first JSX framework built for speed and simplicity.
           Get started in seconds with hot module replacement and zero-config routing.
         </p>
-        <div className="hero-actions">
-          <a href="/about" className="btn btn-primary">
+        <div className="flex gap-4 justify-center pt-4">
+          <a href="/about" className="px-6 py-3 bg-ember-500 hover:bg-ember-600 text-white font-semibold rounded-lg transition-all hover:scale-105">
             Learn More
           </a>
-          <a href="https://emberkit.dev/docs" target="_blank" className="btn btn-secondary">
+          <a href="https://emberkit.dev/docs" target="_blank" className="px-6 py-3 border border-slate-700 hover:border-ember-500 text-slate-300 hover:text-ember-500 font-semibold rounded-lg transition-all">
             Read Docs →
           </a>
         </div>
       </section>
 
-      <section className="features">
-        <div className="feature-card">
-          <div className="feature-icon">⚡</div>
-          <h3>Lightning Fast</h3>
-          <p>Sub-10KB runtime with tree-shakeable architecture</p>
+      <section className="grid md:grid-cols-3 gap-6">
+        <div className="p-6 rounded-xl border border-slate-800 bg-slate-800/30 hover:border-ember-500/50 transition-colors group">
+          <div className="text-3xl mb-4">⚡</div>
+          <h3 className="text-lg font-semibold mb-2">Lightning Fast</h3>
+          <p className="text-slate-400">Sub-10KB runtime with tree-shakeable architecture</p>
         </div>
-        <div className="feature-card">
-          <div className="feature-icon">🔷</div>
-          <h3>TypeScript First</h3>
-          <p>Full type safety with intelligent autocomplete</p>
+        <div className="p-6 rounded-xl border border-slate-800 bg-slate-800/30 hover:border-ember-500/50 transition-colors group">
+          <div className="text-3xl mb-4">🔷</div>
+          <h3 className="text-lg font-semibold mb-2">TypeScript First</h3>
+          <p className="text-slate-400">Full type safety with intelligent autocomplete</p>
         </div>
-        <div className="feature-card">
-          <div className="feature-icon">🛤️</div>
-          <h3>File-Based Routing</h3>
-          <p>Routes automatically created from your file structure</p>
+        <div className="p-6 rounded-xl border border-slate-800 bg-slate-800/30 hover:border-ember-500/50 transition-colors group">
+          <div className="text-3xl mb-4">🛤️</div>
+          <h3 className="text-lg font-semibold mb-2">File-Based Routing</h3>
+          <p className="text-slate-400">Routes automatically created from your file structure</p>
         </div>
       </section>
 
-      <section className="counter">
-        <h2>Try the Counter</h2>
-        <div className="counter-display">
+      <section className="p-8 rounded-2xl bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-slate-700 text-center">
+        <h2 className="text-2xl font-bold mb-6">Interactive Counter Demo</h2>
+        <div className="flex items-center justify-center gap-6">
           <button
-            className="counter-btn"
+            className="w-12 h-12 rounded-lg bg-slate-800 border border-slate-700 hover:bg-ember-500 hover:border-ember-500 text-ember-500 hover:text-white text-xl transition-all"
             onClick={() => count.value--}
           >
             −
           </button>
-          <span className="counter-value">{count}</span>
+          <span className="text-5xl font-bold tabular-nums min-w-[80px]">{count}</span>
           <button
-            className="counter-btn"
+            className="w-12 h-12 rounded-lg bg-slate-800 border border-slate-700 hover:bg-ember-500 hover:border-ember-500 text-ember-500 hover:text-white text-xl transition-all"
             onClick={() => count.value++}
           >
             +
           </button>
+        </div>
+        <p className="text-slate-500 mt-4 text-sm">Try clicking the buttons!</p>
+      </section>
+
+      <section className="text-center py-8">
+        <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-ember-500/10 border border-ember-500/20 text-ember-400">
+          <span className="w-2 h-2 rounded-full bg-ember-500 animate-pulse"></span>
+          <span className="text-sm font-medium">Ready to build something amazing?</span>
         </div>
       </section>
     </div>
@@ -284,304 +305,37 @@ import { Head } from '@emberkit/core';
 
 const AboutPage: RouteComponent = () => {
   return (
-    <div className="about">
+    <div className="max-w-3xl mx-auto px-6 py-16">
       <Head>
         <title>About - {{name}}</title>
       </Head>
-      <div className="about-content">
-        <h1>About {{name}}</h1>
-        <p>
-          EmberKit is a minimalist TypeScript-first JSX framework built for speed and simplicity.
-          It combines the best of modern frontend development with a lightweight runtime.
-        </p>
-        <div className="about-features">
-          <div className="about-feature">
-            <span className="feature-badge">SPA & SSR</span>
-            <span>Works in both modes</span>
-          </div>
-          <div className="about-feature">
-            <span className="feature-badge">Zero Config</span>
-            <span>Sensible defaults</span>
-          </div>
-          <div className="about-feature">
-            <span className="feature-badge">HMR</span>
-            <span>Hot module replacement</span>
-          </div>
+      <h1 className="text-4xl font-bold mb-6">About {{name}}</h1>
+      <p className="text-slate-400 text-lg leading-relaxed mb-8">
+        EmberKit is a minimalist TypeScript-first JSX framework built for speed and simplicity.
+        It combines the best of modern frontend development with a lightweight runtime.
+      </p>
+      <div className="grid sm:grid-cols-3 gap-4 mb-8">
+        <div className="p-4 rounded-lg bg-slate-800/50 border border-slate-700">
+          <span className="text-ember-500 text-sm font-semibold">SPA & SSR</span>
+          <p className="text-slate-500 text-sm mt-1">Works in both modes</p>
         </div>
-        <a href="/" className="back-link">← Back to Home</a>
+        <div className="p-4 rounded-lg bg-slate-800/50 border border-slate-700">
+          <span className="text-ember-500 text-sm font-semibold">Zero Config</span>
+          <p className="text-slate-500 text-sm mt-1">Sensible defaults</p>
+        </div>
+        <div className="p-4 rounded-lg bg-slate-800/50 border border-slate-700">
+          <span className="text-ember-500 text-sm font-semibold">HMR</span>
+          <p className="text-slate-500 text-sm mt-1">Hot module replacement</p>
+        </div>
       </div>
+      <a href="/" className="inline-flex items-center gap-2 text-ember-500 hover:text-ember-400 font-medium">
+        ← Back to Home
+      </a>
     </div>
   );
 };
 
 export default AboutPage;`,
-
-  "src/styles.css": `.app {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1.5rem 2rem;
-  border-bottom: 1px solid #1e293b;
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.logo-icon {
-  font-size: 1.5rem;
-}
-
-.logo-text {
-  font-weight: 700;
-  font-size: 1.25rem;
-  background: linear-gradient(135deg, #f97316, #fb923c);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.nav {
-  display: flex;
-  gap: 1.5rem;
-}
-
-.nav-link {
-  color: #94a3b8;
-  font-weight: 500;
-  transition: color 0.2s;
-}
-
-.nav-link:hover {
-  color: #f97316;
-}
-
-.main {
-  flex: 1;
-  max-width: 1200px;
-  width: 100%;
-  margin: 0 auto;
-  padding: 3rem 2rem;
-}
-
-.footer {
-  padding: 2rem;
-  text-align: center;
-  border-top: 1px solid #1e293b;
-  color: #64748b;
-}
-
-.footer-link {
-  color: #f97316;
-}
-
-.home {
-  display: flex;
-  flex-direction: column;
-  gap: 4rem;
-}
-
-.hero {
-  text-align: center;
-  padding: 2rem 0;
-}
-
-.hero-title {
-  font-size: 3rem;
-  font-weight: 800;
-  margin-bottom: 1.5rem;
-  line-height: 1.1;
-}
-
-.gradient-text {
-  background: linear-gradient(135deg, #f97316, #fb923c, #fdba74);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.hero-desc {
-  font-size: 1.25rem;
-  color: #94a3b8;
-  max-width: 600px;
-  margin: 0 auto 2rem;
-  line-height: 1.6;
-}
-
-.hero-actions {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-}
-
-.btn {
-  display: inline-block;
-  padding: 0.875rem 1.75rem;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  transition: all 0.2s;
-}
-
-.btn-primary {
-  background: #f97316;
-  color: white;
-}
-
-.btn-primary:hover {
-  background: #ea580c;
-  transform: translateY(-1px);
-}
-
-.btn-secondary {
-  background: #1e293b;
-  color: #e2e8f0;
-  border: 1px solid #334155;
-}
-
-.btn-secondary:hover {
-  background: #334155;
-  border-color: #475569;
-}
-
-.features {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
-}
-
-.feature-card {
-  background: #1e293b;
-  border: 1px solid #334155;
-  border-radius: 0.75rem;
-  padding: 1.5rem;
-  transition: all 0.2s;
-}
-
-.feature-card:hover {
-  border-color: #f97316;
-  transform: translateY(-2px);
-}
-
-.feature-icon {
-  font-size: 2rem;
-  margin-bottom: 1rem;
-}
-
-.feature-card h3 {
-  font-size: 1.125rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-}
-
-.feature-card p {
-  color: #64748b;
-  font-size: 0.875rem;
-}
-
-.counter {
-  text-align: center;
-  padding: 2rem;
-  background: #1e293b;
-  border-radius: 1rem;
-}
-
-.counter h2 {
-  margin-bottom: 1.5rem;
-  font-size: 1.5rem;
-}
-
-.counter-display {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1.5rem;
-}
-
-.counter-btn {
-  width: 48px;
-  height: 48px;
-  border-radius: 0.5rem;
-  border: 1px solid #334155;
-  background: #0f172a;
-  color: #f97316;
-  font-size: 1.5rem;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.counter-btn:hover {
-  background: #f97316;
-  color: white;
-  border-color: #f97316;
-}
-
-.counter-value {
-  font-size: 2.5rem;
-  font-weight: 700;
-  min-width: 60px;
-}
-
-.about {
-  max-width: 700px;
-  margin: 0 auto;
-}
-
-.about h1 {
-  font-size: 2rem;
-  font-weight: 700;
-  margin-bottom: 1.5rem;
-}
-
-.about > div > p {
-  color: #94a3b8;
-  font-size: 1.125rem;
-  line-height: 1.7;
-  margin-bottom: 2rem;
-}
-
-.about-features {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-  margin-bottom: 2rem;
-}
-
-.about-feature {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: #1e293b;
-  padding: 0.75rem 1rem;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-}
-
-.feature-badge {
-  background: #f97316;
-  color: white;
-  padding: 0.125rem 0.5rem;
-  border-radius: 0.25rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-
-.back-link {
-  display: inline-block;
-  color: #f97316;
-  font-weight: 500;
-}
-
-.back-link:hover {
-  text-decoration: underline;
-}`,
 };
 
 export async function create(options: CreateOptions): Promise<void> {
@@ -713,16 +467,6 @@ const withUiTemplate: Record<string, string> = {
   "exclude": ["node_modules", "dist"]
 }`,
 
-  "emberkit.config.ts": `import { defineConfig } from '@emberkit/core';
-
-export default defineConfig({
-  mode: 'spa',
-  build: {
-    outDir: 'dist',
-    target: 'esnext',
-  },
-});`,
-
   "vite.config.ts": `import { defineConfig } from 'vite';
 import { emberkitVitePlugin } from '@emberkit/core/vite-plugin';
 import tailwindcss from '@tailwindcss/vite';
@@ -732,9 +476,6 @@ export default defineConfig({
   server: {
     port: 3000,
     host: 'localhost',
-  },
-  esbuild: {
-    jsxImportSource: '@emberkit/core',
   },
 });`,
 
