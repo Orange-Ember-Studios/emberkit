@@ -150,7 +150,7 @@ const HomePage: RouteComponent = () => {
       <div className="space-y-10">
         {posts.map((post) => (
           <article key={post.slug} className="group">
-            <a href={\`/posts/\${post.slug}\`} className="block">
+            <a href={post.slug} className="block">
               <h2 className="text-xl font-semibold font-serif mb-2 group-hover:text-blue-600 transition-colors">
                 {post.title}
               </h2>
@@ -204,11 +204,11 @@ const posts: Record<string, PostData> = {
     content: \`
       <p>Signals are the reactive primitive at the core of EmberKit.</p>
       <h2>Creating Signals</h2>
-      <pre><code>const count = signal(0);</code></pre>
+      <pre><code>const [count, setCount] = createSignal(0);</code></pre>
       <h2>Computed Values</h2>
-      <pre><code>const doubled = computed(() => count.value * 2);</code></pre>
+      <pre><code>const doubled = createMemo(() => count() * 2);</code></pre>
       <h2>Side Effects</h2>
-      <pre><code>effect(() => console.log(count.value));</code></pre>
+      <pre><code>createEffect(() => console.log(count()));</code></pre>
     \`,
   },
   'file-based-routing': {
