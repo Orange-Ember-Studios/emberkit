@@ -90,7 +90,7 @@ const Layout: RouteComponent = ({ children }) => {
             <nav className="flex items-center gap-6">
               <a href="/" className="text-slate-400 hover:text-ember-500 font-medium transition-colors">Home</a>
               <a href="/about" className="text-slate-400 hover:text-ember-500 font-medium transition-colors">About</a>
-              <a href="https://emberkit.orangeember.com/docs" target="_blank" className="text-slate-400 hover:text-ember-500 font-medium transition-colors">
+              <a href="https://emberkit.orangeember.com" target="_blank" className="text-slate-400 hover:text-ember-500 font-medium transition-colors">
                 Docs <span className="text-xs">&#8599;</span>
               </a>
             </nav>
@@ -129,7 +129,7 @@ const HomePage: RouteComponent = () => {
           <a href="/about" className="px-6 py-3 bg-ember-500 hover:bg-ember-600 text-white font-semibold rounded-lg transition-all hover:scale-105 shadow-lg shadow-ember-500/20">
             Learn More
           </a>
-          <a href="https://emberkit.orangeember.com/docs" target="_blank" className="px-6 py-3 border border-slate-700 hover:border-ember-500 text-slate-300 hover:text-ember-500 font-semibold rounded-lg transition-all">
+          <a href="https://emberkit.orangeember.com" target="_blank" className="px-6 py-3 border border-slate-700 hover:border-ember-500 text-slate-300 hover:text-ember-500 font-semibold rounded-lg transition-all">
             Read Docs &#8594;
           </a>
         </div>
