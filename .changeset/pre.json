@@ -1,0 +1,13 @@
+{
+  "mode": "pre",
+  "tag": "alpha",
+  "initialVersions": {
+    "@emberkit/docs": "0.1.0",
+    "@emberkit/cli": "0.4.0",
+    "@emberkit/edge": "0.2.2",
+    "@emberkit/core": "0.2.4",
+    "@emberkit/icons": "0.2.1",
+    "@emberkit/ui": "0.2.3"
+  },
+  "changesets": []
+}
