@@ -1,5 +1,11 @@
 # @emberkit/cli
 
+## 0.6.5
+
+### Patch Changes
+
+- Update scaffold dependency ranges for `@emberkit/edge` to match published ^0.2.4.
+
 ## 0.6.4
 
 ### Patch Changes
