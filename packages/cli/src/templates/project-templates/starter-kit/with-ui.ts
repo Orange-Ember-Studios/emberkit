@@ -32,7 +32,7 @@ export const withUiTemplate: Record<string, string> = {
   --color-ember-700: #c2410c;
   --color-ember-800: #9a3412;
   --color-ember-900: #7c2d12;
-  --font-family-sans: 'Inter', system-ui, sans-serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
 }
 
 @keyframes float {
@@ -56,11 +56,11 @@ export const withUiTemplate: Record<string, string> = {
 }
 
 body {
-  @apply bg-[#0b0f19] text-slate-200 font-sans;
+  @apply bg-[#0b0f19] text-slate-200 font-sans min-h-screen;
 }
 
 a {
-  @apply text-inherit no-underline;
+  @apply text-inherit no-underline transition-colors;
 }
 
 .animate-float { animation: float 6s ease-in-out infinite; }
@@ -70,7 +70,6 @@ a {
 
   "src/routes/_layout.tsx": `import type { RouteComponent } from '@emberkit/core';
 import { Head } from '@emberkit/core';
-import { DefaultLayout } from '@emberkit/ui';
 
 const Layout: RouteComponent = ({ children }) => {
   return (
@@ -79,26 +78,37 @@ const Layout: RouteComponent = ({ children }) => {
         <title>{{name}}</title>
         <meta name="description" content="Built with EmberKit UI" />
       </Head>
-      <div className="relative min-h-screen">
+      <div className="relative min-h-screen flex flex-col">
         <div className="pointer-events-none fixed inset-0 overflow-hidden">
           <div className="absolute -top-40 -right-40 w-96 h-96 rounded-full bg-ember-500/10 blur-[120px] animate-pulse-glow" />
           <div className="absolute -bottom-40 -left-40 w-96 h-96 rounded-full bg-amber-500/5 blur-[120px] animate-pulse-glow" style={{ animationDelay: '2s' }} />
         </div>
-        <DefaultLayout
-          logo={
-            <span className="flex items-center gap-2">
+
+        <header className="relative z-50 border-b border-slate-800/50 bg-[#0b0f19]/80 backdrop-blur-xl sticky top-0">
+          <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="/" className="flex items-center gap-2 group">
               <span className="text-2xl animate-float">&#128293;</span>
-              <span className="font-bold text-xl bg-gradient-to-r from-ember-400 to-ember-600 bg-clip-text text-transparent">{{name}}</span>
-            </span>
-          }
-          navItems={[
-            { label: 'Home', href: '/' },
-            { label: 'About', href: '/about' },
-            { label: 'Docs', href: 'https://emberkit.dev/docs', external: true },
-          ]}
-        >
-          {children}
-        </DefaultLayout>
+              <span className="text-xl font-bold bg-gradient-to-r from-ember-400 to-ember-500 bg-clip-text text-transparent">{{name}}</span>
+            </a>
+            <nav className="flex items-center gap-8">
+              <a href="/" className="text-slate-400 hover:text-ember-500 font-medium transition-colors">Home</a>
+              <a href="/about" className="text-slate-400 hover:text-ember-500 font-medium transition-colors">About</a>
+              <a href="https://emberkit.dev/docs" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-ember-500 font-medium transition-colors">
+                Docs <span className="text-xs">&#8599;</span>
+              </a>
+            </nav>
+          </div>
+        </header>
+
+        <main className="relative z-10 flex-1">
+          <div className="max-w-6xl mx-auto px-6 py-12">
+            {children}
+          </div>
+        </main>
+
+        <footer className="relative z-10 border-t border-slate-800/50 py-8 text-center text-sm text-slate-500">
+          <p>Built with <a href="https://emberkit.dev" className="text-ember-500 hover:underline">EmberKit</a></p>
+        </footer>
       </div>
     </>
   );
@@ -125,7 +135,7 @@ const HomePage: RouteComponent = () => {
             &#10024; Built with EmberKit UI
           </Badge>
           <Heading level="h1" size="4xl" weight="bold" className="mb-6">
-            Welcome to {' '}
+            Welcome to{' '}
             <span className="bg-gradient-to-r from-ember-400 via-ember-500 to-amber-500 bg-clip-text text-transparent">
               {{name}}
             </span>
@@ -134,7 +144,7 @@ const HomePage: RouteComponent = () => {
             A modern starter template with EmberKit UI components and Tailwind CSS.
             Build beautiful interfaces with our pre-built component library.
           </Text>
-          <div className="flex gap-4 justify-center">
+          <div className="flex gap-4 justify-center flex-wrap">
             <Button variant="primary" size="lg" className="shadow-lg shadow-ember-500/20 hover:shadow-ember-500/40 transition-shadow">
               Get Started
             </Button>
@@ -159,7 +169,7 @@ const HomePage: RouteComponent = () => {
             { icon: '&#128303;', title: 'TypeScript First', desc: 'Full type safety with intelligent autocomplete' },
             { icon: '&#128726;', title: 'File-Based Routing', desc: 'Routes automatically created from your file structure' },
           ].map((f, i) => (
-            <Card key={f.title} padding="lg" className="relative group hover:border-ember-500/50 transition-all duration-300 hover:-translate-y-1" style={{ animationDelay: \`\${i * 100}ms\` }}>
+            <Card key={f.title} padding="lg" className="relative group hover:border-ember-500/50 transition-all duration-300 hover:-translate-y-1 cursor-pointer">
               <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-ember-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
               <div className="relative">
                 <div className="w-12 h-12 rounded-xl bg-ember-500/10 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">
@@ -314,7 +324,7 @@ const AboutPage: RouteComponent = () => {
       <Head>
         <title>About - {{name}}</title>
       </Head>
-      <div className="max-w-3xl mx-auto py-12 space-y-12">
+      <div className="max-w-3xl mx-auto space-y-12">
         {/* Header */}
         <div className="text-center">
           <Badge variant="primary" className="mb-4 inline-flex">About</Badge>
