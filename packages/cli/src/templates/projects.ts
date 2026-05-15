@@ -105,15 +105,34 @@ if (root) {
   --font-sans: 'Inter', system-ui, sans-serif;
 }
 
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.05); }
+}
+
 body {
-  @apply bg-slate-900 text-slate-200 font-sans min-h-screen;
+  @apply bg-[#0b0f19] text-slate-200 font-sans min-h-screen;
 }
 
 a {
   @apply text-inherit no-underline transition-colors;
-}`,
+}
 
-  "src/routes/_layout.tsx": `import type { RouteComponent } from '@emberkit/core';
+.animate-float { animation: float 6s ease-in-out infinite; }
+.animate-fade-in-up { animation: fade-in-up 0.6s ease-out forwards; }
+.animate-pulse-glow { animation: pulse-glow 4s ease-in-out infinite; }`,
+
+  "src/routes/_layout.tsx": \`import type { RouteComponent } from '@emberkit/core';
 import { Head } from '@emberkit/core';
 
 const Layout: RouteComponent = ({ children }) => {
@@ -123,26 +142,32 @@ const Layout: RouteComponent = ({ children }) => {
         <title>{{name}}</title>
         <meta name="description" content="Built with EmberKit" />
       </Head>
-      <div className="flex flex-col min-h-screen">
-        <header className="border-b border-slate-800 bg-slate-900/50 backdrop-blur sticky top-0 z-50">
+      <div className="relative min-h-screen flex flex-col">
+        {/* Ambient background */}
+        <div className="pointer-events-none fixed inset-0 overflow-hidden">
+          <div className="absolute -top-40 -right-40 w-96 h-96 rounded-full bg-ember-500/10 blur-[120px] animate-pulse-glow" />
+          <div className="absolute -bottom-40 -left-40 w-96 h-96 rounded-full bg-amber-500/5 blur-[120px] animate-pulse-glow" style={{ animationDelay: '2s' }} />
+        </div>
+
+        <header className="relative z-50 border-b border-slate-800/50 bg-[#0b0f19]/80 backdrop-blur-xl sticky top-0">
           <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
             <a href="/" className="flex items-center gap-2 group">
-              <span className="text-2xl">&#128293;</span>
+              <span className="text-2xl animate-float">&#128293;</span>
               <span className="text-xl font-bold bg-gradient-to-r from-ember-400 to-ember-500 bg-clip-text text-transparent">
                 {{name}}
               </span>
             </a>
             <nav className="flex items-center gap-6">
-              <a href="/" className="text-slate-400 hover:text-ember-500 font-medium">Home</a>
-              <a href="/about" className="text-slate-400 hover:text-ember-500 font-medium">About</a>
-              <a href="https://emberkit.dev/docs" target="_blank" className="text-slate-400 hover:text-ember-500 font-medium">
+              <a href="/" className="text-slate-400 hover:text-ember-500 font-medium transition-colors">Home</a>
+              <a href="/about" className="text-slate-400 hover:text-ember-500 font-medium transition-colors">About</a>
+              <a href="https://emberkit.dev/docs" target="_blank" className="text-slate-400 hover:text-ember-500 font-medium transition-colors">
                 Docs <span className="text-xs">&#8599;</span>
               </a>
             </nav>
           </div>
         </header>
-        <main className="flex-1">{children}</main>
-        <footer className="border-t border-slate-800 py-8 text-center text-slate-500">
+        <main className="relative z-10 flex-1">{children}</main>
+        <footer className="relative z-10 border-t border-slate-800/50 py-8 text-center text-slate-500">
           <p>Built with <a href="https://emberkit.dev" className="text-ember-500 hover:underline">EmberKit</a></p>
         </footer>
       </div>
@@ -150,7 +175,7 @@ const Layout: RouteComponent = ({ children }) => {
   );
 };
 
-export default Layout;`,
+export default Layout;\`,
 
   "src/routes/index.tsx": `import type { RouteComponent } from '@emberkit/core';
 import { signal } from '@emberkit/core';
@@ -159,17 +184,19 @@ const HomePage: RouteComponent = () => {
   const count = signal(0);
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-16 space-y-20">
-      <section className="text-center space-y-6">
-        <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight">
-          Welcome to <span className="bg-gradient-to-r from-ember-400 via-ember-500 to-ember-600 bg-clip-text text-transparent">{{name}}</span>
+    <div className="relative max-w-6xl mx-auto px-6 py-16 space-y-24">
+      {/* Hero Section */}
+      <section className="relative text-center space-y-6 animate-fade-in-down">
+        <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[400px] w-[400px] rounded-full bg-ember-500/10 blur-[120px] animate-pulse-glow" />
+        <h1 className="relative z-10 text-5xl md:text-6xl font-extrabold tracking-tight">
+          Welcome to <span className="bg-gradient-to-r from-ember-400 via-ember-500 to-amber-500 bg-clip-text text-transparent">{{name}}</span>
         </h1>
-        <p className="text-xl text-slate-400 max-w-2xl mx-auto">
+        <p className="relative z-10 text-xl text-slate-400 max-w-2xl mx-auto">
           A minimalist TypeScript-first JSX framework built for speed and simplicity.
           Get started in seconds with hot module replacement and zero-config routing.
         </p>
-        <div className="flex gap-4 justify-center pt-4">
-          <a href="/about" className="px-6 py-3 bg-ember-500 hover:bg-ember-600 text-white font-semibold rounded-lg transition-all hover:scale-105">
+        <div className="relative z-10 flex gap-4 justify-center pt-4">
+          <a href="/about" className="px-6 py-3 bg-ember-500 hover:bg-ember-600 text-white font-semibold rounded-lg transition-all hover:scale-105 shadow-lg shadow-ember-500/20">
             Learn More
           </a>
           <a href="https://emberkit.dev/docs" target="_blank" className="px-6 py-3 border border-slate-700 hover:border-ember-500 text-slate-300 hover:text-ember-500 font-semibold rounded-lg transition-all">
@@ -178,36 +205,34 @@ const HomePage: RouteComponent = () => {
         </div>
       </section>
 
+      {/* Features Grid */}
       <section className="grid md:grid-cols-3 gap-6">
-        <div className="p-6 rounded-xl border border-slate-800 bg-slate-800/30 hover:border-ember-500/50 transition-colors group">
-          <div className="text-3xl mb-4">&#9889;</div>
-          <h3 className="text-lg font-semibold mb-2">Lightning Fast</h3>
-          <p className="text-slate-400">Sub-10KB runtime with tree-shakeable architecture</p>
-        </div>
-        <div className="p-6 rounded-xl border border-slate-800 bg-slate-800/30 hover:border-ember-500/50 transition-colors group">
-          <div className="text-3xl mb-4">&#128303;</div>
-          <h3 className="text-lg font-semibold mb-2">TypeScript First</h3>
-          <p className="text-slate-400">Full type safety with intelligent autocomplete</p>
-        </div>
-        <div className="p-6 rounded-xl border border-slate-800 bg-slate-800/30 hover:border-ember-500/50 transition-colors group">
-          <div className="text-3xl mb-4">&#128726;</div>
-          <h3 className="text-lg font-semibold mb-2">File-Based Routing</h3>
-          <p className="text-slate-400">Routes automatically created from your file structure</p>
-        </div>
+        {[
+          { icon: '&#9889;', title: 'Lightning Fast', desc: 'Sub-10KB runtime with tree-shakeable architecture' },
+          { icon: '&#128303;', title: 'TypeScript First', desc: 'Full type safety with intelligent autocomplete' },
+          { icon: '&#128726;', title: 'File-Based Routing', desc: 'Routes automatically created from your file structure' },
+        ].map((f, i) => (
+          <div key={f.title} className="p-6 rounded-xl border border-slate-800 bg-slate-800/30 hover:border-ember-500/50 transition-all duration-300 hover:-translate-y-1 group animate-fade-in-up" style={{ animationDelay: \`\${i * 100}ms\` }}>
+            <div className="text-3xl mb-4 group-hover:scale-110 transition-transform">{f.icon}</div>
+            <h3 className="text-lg font-semibold mb-2">{f.title}</h3>
+            <p className="text-slate-400">{f.desc}</p>
+          </div>
+        ))}
       </section>
 
-      <section className="p-8 rounded-2xl bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-slate-700 text-center">
+      {/* Counter Demo */}
+      <section className="relative p-8 rounded-3xl bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-slate-700/50 text-center backdrop-blur-sm">
         <h2 className="text-2xl font-bold mb-6">Interactive Counter Demo</h2>
         <div className="flex items-center justify-center gap-6">
           <button
-            className="w-12 h-12 rounded-lg bg-slate-800 border border-slate-700 hover:bg-ember-500 hover:border-ember-500 text-ember-500 hover:text-white text-xl transition-all"
+            className="w-12 h-12 rounded-lg bg-slate-800 border border-slate-700 hover:bg-ember-500 hover:border-ember-500 text-ember-500 hover:text-white text-xl transition-all hover:scale-110"
             onClick={() => count.value--}
           >
             &#8722;
           </button>
-          <span className="text-5xl font-bold tabular-nums min-w-[80px]">{count}</span>
+          <span className="text-5xl font-bold tabular-nums min-w-[80px] bg-clip-text text-transparent bg-gradient-to-b from-white to-slate-400">{count}</span>
           <button
-            className="w-12 h-12 rounded-lg bg-slate-800 border border-slate-700 hover:bg-ember-500 hover:border-ember-500 text-ember-500 hover:text-white text-xl transition-all"
+            className="w-12 h-12 rounded-lg bg-slate-800 border border-slate-700 hover:bg-ember-500 hover:border-ember-500 text-ember-500 hover:text-white text-xl transition-all hover:scale-110"
             onClick={() => count.value++}
           >
             +
@@ -233,32 +258,34 @@ import { Head } from '@emberkit/core';
 
 const AboutPage: RouteComponent = () => {
   return (
-    <div className="max-w-3xl mx-auto px-6 py-16">
+    <div className="max-w-3xl mx-auto px-6 py-16 space-y-12 animate-fade-in-up">
       <Head>
         <title>About - {{name}}</title>
       </Head>
-      <h1 className="text-4xl font-bold mb-6">About {{name}}</h1>
-      <p className="text-slate-400 text-lg leading-relaxed mb-8">
-        EmberKit is a minimalist TypeScript-first JSX framework built for speed and simplicity.
-        It combines the best of modern frontend development with a lightweight runtime.
-      </p>
-      <div className="grid sm:grid-cols-3 gap-4 mb-8">
-        <div className="p-4 rounded-lg bg-slate-800/50 border border-slate-700">
-          <span className="text-ember-500 text-sm font-semibold">SPA & SSR</span>
-          <p className="text-slate-500 text-sm mt-1">Works in both modes</p>
-        </div>
-        <div className="p-4 rounded-lg bg-slate-800/50 border border-slate-700">
-          <span className="text-ember-500 text-sm font-semibold">Zero Config</span>
-          <p className="text-slate-500 text-sm mt-1">Sensible defaults</p>
-        </div>
-        <div className="p-4 rounded-lg bg-slate-800/50 border border-slate-700">
-          <span className="text-ember-500 text-sm font-semibold">HMR</span>
-          <p className="text-slate-500 text-sm mt-1">Hot module replacement</p>
-        </div>
+      <div className="text-center">
+        <h1 className="text-4xl font-bold mb-6">About {{name}}</h1>
+        <p className="text-slate-400 text-lg leading-relaxed max-w-2xl mx-auto">
+          EmberKit is a minimalist TypeScript-first JSX framework built for speed and simplicity.
+          It combines the best of modern frontend development with a lightweight runtime.
+        </p>
       </div>
-      <a href="/" className="inline-flex items-center gap-2 text-ember-500 hover:text-ember-400 font-medium">
-        &#8592; Back to Home
-      </a>
+      <div className="grid sm:grid-cols-3 gap-4">
+        {[
+          { label: 'SPA & SSR', desc: 'Works in both modes' },
+          { label: 'Zero Config', desc: 'Sensible defaults' },
+          { label: 'HMR', desc: 'Hot module replacement' },
+        ].map((f) => (
+          <div key={f.label} className="p-4 rounded-xl bg-slate-800/30 border border-slate-800 hover:border-ember-500/50 transition-all hover:-translate-y-1 group">
+            <span className="text-ember-500 text-sm font-semibold">{f.label}</span>
+            <p className="text-slate-500 text-sm mt-1">{f.desc}</p>
+          </div>
+        ))}
+      </div>
+      <div className="text-center">
+        <a href="/" className="inline-flex items-center gap-2 text-ember-500 hover:text-ember-400 font-medium transition-colors">
+          &#8592; Back to Home
+        </a>
+      </div>
     </div>
   );
 };
@@ -376,15 +403,40 @@ if (root) {
   --font-family-sans: 'Inter', system-ui, sans-serif;
 }
 
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in-down {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.05); }
+}
+
 body {
-  @apply bg-slate-900 text-slate-200 font-sans;
+  @apply bg-[#0b0f19] text-slate-200 font-sans;
 }
 
 a {
   @apply text-inherit no-underline;
-}`,
+}
 
-  "src/routes/_layout.tsx": `import type { RouteComponent } from '@emberkit/core';
+.animate-float { animation: float 6s ease-in-out infinite; }
+.animate-fade-in-up { animation: fade-in-up 0.6s ease-out forwards; }
+.animate-fade-in-down { animation: fade-in-down 0.6s ease-out forwards; }
+.animate-pulse-glow { animation: pulse-glow 4s ease-in-out infinite; }`,
+
+  "src/routes/_layout.tsx": \`import type { RouteComponent } from '@emberkit/core';
 import { Head } from '@emberkit/core';
 import { DefaultLayout } from '@emberkit/ui';
 
@@ -395,159 +447,302 @@ const Layout: RouteComponent = ({ children }) => {
         <title>{{name}}</title>
         <meta name="description" content="Built with EmberKit UI" />
       </Head>
-      <DefaultLayout
-        logo={<span className="text-ember-500 font-bold text-xl">&#128293; {{name}}</span>}
-        navItems={[
-          { label: 'Home', href: '/' },
-          { label: 'About', href: '/about' },
-          { label: 'Docs', href: 'https://emberkit.dev/docs', external: true },
-        ]}
-      >
-        {children}
-      </DefaultLayout>
+      <div className="relative min-h-screen">
+        <div className="pointer-events-none fixed inset-0 overflow-hidden">
+          <div className="absolute -top-40 -right-40 w-96 h-96 rounded-full bg-ember-500/10 blur-[120px] animate-pulse-glow" />
+          <div className="absolute -bottom-40 -left-40 w-96 h-96 rounded-full bg-amber-500/5 blur-[120px] animate-pulse-glow" style={{ animationDelay: '2s' }} />
+        </div>
+        <DefaultLayout
+          logo={
+            <span className="flex items-center gap-2">
+              <span className="text-2xl animate-float">&#128293;</span>
+              <span className="font-bold text-xl bg-gradient-to-r from-ember-400 to-ember-600 bg-clip-text text-transparent">{{name}}</span>
+            </span>
+          }
+          navItems={[
+            { label: 'Home', href: '/' },
+            { label: 'About', href: '/about' },
+            { label: 'Docs', href: 'https://emberkit.dev/docs', external: true },
+          ]}
+        >
+          {children}
+        </DefaultLayout>
+      </div>
     </>
   );
 };
 
-export default Layout;`,
+export default Layout;\`,
 
-  "src/routes/index.tsx": `import type { RouteComponent } from '@emberkit/core';
+  "src/routes/index.tsx": \`import type { RouteComponent } from '@emberkit/core';
 import { Button, Card, Heading, Text, Badge, Input } from '@emberkit/ui';
 import { signal } from '@emberkit/core';
 
 const HomePage: RouteComponent = () => {
   const email = signal('');
+  const activeTab = signal('buttons');
 
   return (
-    <div className="space-y-16">
-      <section className="text-center py-16">
-        <Heading level="h1" size="4xl" weight="bold" className="mb-4">
-          Welcome to <span className="text-ember-500">{{name}}</span>
-        </Heading>
-        <Text size="xl" color="muted" className="max-w-2xl mx-auto mb-8">
-          A modern starter template with EmberKit UI components and Tailwind CSS.
-          Build beautiful interfaces with our pre-built component library.
-        </Text>
-        <div className="flex gap-4 justify-center">
-          <Button variant="primary" size="lg">
-            Get Started
-          </Button>
-          <Button variant="secondary" size="lg">
-            View Docs
-          </Button>
+    <div className="relative space-y-24">
+      {/* Hero */}
+      <section className="relative text-center py-20">
+        <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[400px] w-[400px] rounded-full bg-ember-500/15 blur-[150px] animate-pulse-glow" />
+
+        <div className="relative z-10 animate-fade-in-down">
+          <Badge variant="primary" className="mb-6 inline-flex">
+            &#10024; Built with EmberKit UI
+          </Badge>
+          <Heading level="h1" size="4xl" weight="bold" className="mb-6">
+            Welcome to{' '}
+            <span className="bg-gradient-to-r from-ember-400 via-ember-500 to-amber-500 bg-clip-text text-transparent">
+              {{name}}
+            </span>
+          </Heading>
+          <Text size="xl" color="muted" className="max-w-2xl mx-auto mb-10">
+            A modern starter template with EmberKit UI components and Tailwind CSS.
+            Build beautiful interfaces with our pre-built component library.
+          </Text>
+          <div className="flex gap-4 justify-center">
+            <Button variant="primary" size="lg" className="shadow-lg shadow-ember-500/20 hover:shadow-ember-500/40 transition-shadow">
+              Get Started
+            </Button>
+            <Button variant="secondary" size="lg">
+              View Docs &#8594;
+            </Button>
+          </div>
         </div>
       </section>
 
+      {/* Features Grid */}
       <section>
-        <Heading level="h2" size="2xl" weight="semibold" className="mb-8 text-center">
+        <Heading level="h2" size="2xl" weight="semibold" className="mb-2 text-center">
+          Why EmberKit?
+        </Heading>
+        <Text color="muted" className="text-center mb-10 max-w-lg mx-auto">
+          Everything you need to build fast, beautiful web applications.
+        </Text>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[
+            { icon: '&#9889;', title: 'Lightning Fast', desc: 'Sub-10KB runtime with tree-shakeable architecture' },
+            { icon: '&#128303;', title: 'TypeScript First', desc: 'Full type safety with intelligent autocomplete' },
+            { icon: '&#128726;', title: 'File-Based Routing', desc: 'Routes automatically created from your file structure' },
+          ].map((f, i) => (
+            <Card key={f.title} padding="lg" className="relative group hover:border-ember-500/50 transition-all duration-300 hover:-translate-y-1" style={{ animationDelay: \`\${i * 100}ms\` }}>
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-ember-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="relative">
+                <div className="w-12 h-12 rounded-xl bg-ember-500/10 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">
+                  {f.icon}
+                </div>
+                <Heading level="h3" size="lg" weight="semibold" className="mb-2">
+                  {f.title}
+                </Heading>
+                <Text color="muted">{f.desc}</Text>
+              </div>
+            </Card>
+          ))}
+        </div>
+      </section>
+
+      {/* Component Showcase */}
+      <section>
+        <Heading level="h2" size="2xl" weight="semibold" className="mb-2 text-center">
           UI Components
         </Heading>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card padding="lg">
-            <Badge variant="primary" size="sm" className="mb-2">Button</Badge>
-            <Heading level="h3" size="lg" weight="semibold" className="mb-2">
-              Button Variants
-            </Heading>
-            <Text color="muted" className="mb-4">
-              Primary, secondary, ghost, and more button styles.
-            </Text>
-            <div className="flex gap-2 flex-wrap">
+        <Text color="muted" className="text-center mb-8">
+          Explore our pre-built component library.
+        </Text>
+
+        {/* Tabs */}
+        <div className="flex justify-center mb-8">
+          <div className="inline-flex p-1 rounded-lg bg-slate-800/50 border border-slate-700/50">
+            {[
+              { id: 'buttons', label: 'Buttons' },
+              { id: 'cards', label: 'Cards' },
+              { id: 'forms', label: 'Forms' },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                className={\`px-4 py-2 text-sm font-medium rounded-md transition-all \${activeTab.value === tab.id ? 'bg-ember-500 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}\`}
+                onClick={() => { activeTab.value = tab.id; }}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Tab Content */}
+        {activeTab.value === 'buttons' && (
+          <Card padding="xl" className="max-w-2xl mx-auto">
+            <div className="text-center mb-6">
+              <Badge variant="primary" className="mb-2">Buttons</Badge>
+              <Heading level="h3" size="lg" weight="semibold">Button Variants</Heading>
+            </div>
+            <div className="flex flex-wrap gap-3 justify-center">
               <Button variant="primary">Primary</Button>
               <Button variant="secondary">Secondary</Button>
               <Button variant="ghost">Ghost</Button>
+              <Button variant="primary" size="sm">Small</Button>
+              <Button variant="secondary" size="lg">Large</Button>
+            </div>
+            <div className="mt-6 pt-6 border-t border-slate-700/50">
+              <Heading level="h4" size="sm" weight="semibold" className="mb-3 text-slate-400">With Icons</Heading>
+              <div className="flex flex-wrap gap-3 justify-center">
+                <Button variant="primary">&#9889; Get Started</Button>
+                <Button variant="secondary">Learn More &#8594;</Button>
+                <Button variant="ghost">&#10084; Like</Button>
+              </div>
             </div>
           </Card>
+        )}
 
-          <Card padding="lg">
-            <Badge variant="success" size="sm" className="mb-2">Cards</Badge>
-            <Heading level="h3" size="lg" weight="semibold" className="mb-2">
-              Card Component
-            </Heading>
-            <Text color="muted" className="mb-4">
-              Flexible card layout with padding variants.
-            </Text>
-            <Card padding="md" className="bg-slate-800">
-              <Text>Card content here</Text>
+        {activeTab.value === 'cards' && (
+          <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+            <Card padding="lg" className="hover:border-ember-500/50 transition-colors">
+              <Badge variant="success" className="mb-3">Analytics</Badge>
+              <Heading level="h3" size="lg" weight="semibold" className="mb-2">
+                Revenue Growth
+              </Heading>
+              <div className="text-3xl font-bold text-ember-400 mb-1">$45,231</div>
+              <Text color="muted" className="text-sm">+20.1% from last month</Text>
+              <div className="mt-4 h-2 rounded-full bg-slate-700 overflow-hidden">
+                <div className="h-full w-3/4 rounded-full bg-gradient-to-r from-ember-500 to-amber-500" />
+              </div>
             </Card>
-          </Card>
+            <Card padding="lg" className="hover:border-ember-500/50 transition-colors">
+              <Badge variant="info" className="mb-3">Users</Badge>
+              <Heading level="h3" size="lg" weight="semibold" className="mb-2">
+                Active Users
+              </Heading>
+              <div className="text-3xl font-bold text-blue-400 mb-1">2,338</div>
+              <Text color="muted" className="text-sm">+15.3% from last month</Text>
+              <div className="mt-4 h-2 rounded-full bg-slate-700 overflow-hidden">
+                <div className="h-full w-1/2 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500" />
+              </div>
+            </Card>
+          </div>
+        )}
 
-          <Card padding="lg">
-            <Badge variant="info" size="sm" className="mb-2">Forms</Badge>
-            <Heading level="h3" size="lg" weight="semibold" className="mb-2">
-              Form Inputs
-            </Heading>
-            <Text color="muted" className="mb-4">
-              Styled input with label support.
-            </Text>
-            <Input
-              label="Email"
-              placeholder="Enter your email"
-              value={email.value}
-              onChange={(e) => { email.value = e.currentTarget.value; }}
-            />
+        {activeTab.value === 'forms' && (
+          <Card padding="xl" className="max-w-md mx-auto">
+            <div className="text-center mb-6">
+              <Badge variant="info" className="mb-2">Forms</Badge>
+              <Heading level="h3" size="lg" weight="semibold">Newsletter Signup</Heading>
+            </div>
+            <div className="space-y-4">
+              <Input
+                label="Name"
+                placeholder="John Doe"
+              />
+              <Input
+                label="Email"
+                type="email"
+                placeholder="you@example.com"
+                value={email.value}
+                onChange={(e) => { email.value = e.currentTarget.value; }}
+              />
+              <Button variant="primary" className="w-full shadow-lg shadow-ember-500/20">
+                Subscribe &#10148;
+              </Button>
+            </div>
           </Card>
-        </div>
+        )}
       </section>
 
-      <section className="text-center py-16 bg-slate-800/50 rounded-xl">
-        <Heading level="h2" size="2xl" weight="semibold" className="mb-4">
-          Ready to get started?
-        </Heading>
-        <Text color="muted" className="max-w-xl mx-auto mb-6">
-          Install dependencies and start building your next project with EmberKit.
-        </Text>
-        <Button variant="primary" size="lg">
-          Create Project &#8594;
-        </Button>
+      {/* CTA */}
+      <section className="relative py-20">
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <div className="w-[500px] h-[200px] rounded-full bg-ember-500/10 blur-[100px]" />
+        </div>
+        <div className="relative z-10 text-center">
+          <Heading level="h2" size="2xl" weight="semibold" className="mb-4">
+            Ready to build something amazing?
+          </Heading>
+          <Text color="muted" className="max-w-xl mx-auto mb-8">
+            Start building your next project with EmberKit's powerful components and TypeScript-first API.
+          </Text>
+          <Button variant="primary" size="lg" className="shadow-lg shadow-ember-500/25 hover:shadow-ember-500/40 transition-shadow">
+            Create Project &#10148;
+          </Button>
+        </div>
       </section>
     </div>
   );
 };
 
-export default HomePage;`,
+export default HomePage;\`,
 
-  "src/routes/about.tsx": `import type { RouteComponent } from '@emberkit/core';
+  "src/routes/about.tsx": \`import type { RouteComponent } from '@emberkit/core';
 import { Head } from '@emberkit/core';
-import { Heading, Text, Button } from '@emberkit/ui';
+import { Heading, Text, Button, Card, Badge } from '@emberkit/ui';
 
 const AboutPage: RouteComponent = () => {
   return (
-    <div className="max-w-2xl mx-auto py-12">
+    <>
       <Head>
         <title>About - {{name}}</title>
       </Head>
-      <Heading level="h1" size="3xl" weight="bold" className="mb-6">
-        About {{name}}
-      </Heading>
-      <Text size="lg" color="muted" className="mb-8">
-        This project was created with EmberKit and the UI component library.
-        It demonstrates how to build modern, beautiful interfaces with our
-        pre-built components and Tailwind CSS.
-      </Text>
-      <div className="space-y-4">
-        <div className="flex items-center gap-3 p-4 bg-slate-800 rounded-lg">
-          <span className="text-ember-500 text-2xl">&#10003;</span>
-          <Text>TypeScript-first development</Text>
+      <div className="max-w-3xl mx-auto py-12 space-y-12">
+        {/* Header */}
+        <div className="text-center">
+          <Badge variant="primary" className="mb-4 inline-flex">About</Badge>
+          <Heading level="h1" size="3xl" weight="bold">
+            About{' '}
+            <span className="bg-gradient-to-r from-ember-400 to-ember-600 bg-clip-text text-transparent">{{name}}</span>
+          </Heading>
         </div>
-        <div className="flex items-center gap-3 p-4 bg-slate-800 rounded-lg">
-          <span className="text-ember-500 text-2xl">&#10003;</span>
-          <Text>Pre-built UI components</Text>
+
+        {/* Description */}
+        <Card padding="xl" className="border-ember-500/20">
+          <Text size="lg" color="muted" className="leading-relaxed">
+            This project was created with EmberKit and the UI component library.
+            It demonstrates how to build modern, beautiful interfaces with our
+            pre-built components and Tailwind CSS.
+          </Text>
+        </Card>
+
+        {/* Features */}
+        <div className="grid sm:grid-cols-2 gap-4">
+          {[
+            { icon: '&#128268;', title: 'TypeScript-first', desc: 'Full type safety with intelligent autocomplete' },
+            { icon: '&#127912;', title: 'UI Components', desc: 'Pre-built atoms, molecules, and organisms' },
+            { icon: '&#127752;', title: 'Tailwind CSS', desc: 'Utility-first styling with custom theme' },
+            { icon: '&#128726;', title: 'File Routing', desc: 'Automatic routes from your file structure' },
+          ].map((f) => (
+            <Card key={f.title} padding="lg" className="hover:border-ember-500/50 transition-all hover:-translate-y-0.5">
+              <div className="text-2xl mb-3">{f.icon}</div>
+              <Heading level="h3" size="md" weight="semibold" className="mb-1">
+                {f.title}
+              </Heading>
+              <Text color="muted" size="sm">{f.desc}</Text>
+            </Card>
+          ))}
         </div>
-        <div className="flex items-center gap-3 p-4 bg-slate-800 rounded-lg">
-          <span className="text-ember-500 text-2xl">&#10003;</span>
-          <Text>Tailwind CSS integration</Text>
-        </div>
-        <div className="flex items-center gap-3 p-4 bg-slate-800 rounded-lg">
-          <span className="text-ember-500 text-2xl">&#10003;</span>
-          <Text>File-based routing</Text>
+
+        {/* Tech Stack */}
+        <Card padding="xl">
+          <Heading level="h3" size="lg" weight="semibold" className="mb-4 text-center">
+            Tech Stack
+          </Heading>
+          <div className="flex flex-wrap gap-2 justify-center">
+            {['EmberKit', 'TypeScript', 'Tailwind CSS', 'Vite', 'JSX'].map((tech) => (
+              <Badge key={tech} variant="primary" className="px-3 py-1.5">
+                {tech}
+              </Badge>
+            ))}
+          </div>
+        </Card>
+
+        {/* Back */}
+        <div className="text-center">
+          <Button variant="secondary">
+            &#8592; Back to Home
+          </Button>
         </div>
       </div>
-      <div className="mt-8">
-        <Button variant="secondary">&#8592; Back to Home</Button>
-      </div>
-    </div>
+    </>
   );
 };
 
-export default AboutPage;`,
+export default AboutPage;\`,
 };
