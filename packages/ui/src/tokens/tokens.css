@@ -3,8 +3,6 @@
  * These values extend/override Tailwind's default theme.
  */
 
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap");
-
 /* Scan compiled components when installed from npm (relative to dist/tokens/) */
 @source "../**/*.{js,jsx,ts,tsx}";
 
