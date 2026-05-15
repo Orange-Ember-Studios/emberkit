@@ -1,5 +1,11 @@
 # @emberkit/cli
 
+## 0.6.1-alpha.11
+
+### Patch Changes
+
+- Update all project templates to use createSignal() API instead of deprecated signal(). This fixes reactivity patterns in SaaS (pricing toggle), Dashboard (sidebar/search/settings), and With-UI templates.
+
 ## 0.6.1-alpha.10
 
 ### Patch Changes
