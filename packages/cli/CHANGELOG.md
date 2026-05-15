@@ -1,5 +1,11 @@
 # @emberkit/cli
 
+## 0.6.3
+
+### Patch Changes
+
+- Bump scaffold package pins to latest @emberkit releases
+
 ## 0.6.2
 
 ### Patch Changes
