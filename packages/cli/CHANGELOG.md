@@ -1,5 +1,17 @@
 # @emberkit/cli
 
+## 0.5.0
+
+### Minor Changes
+
+- Add new project templates and fix template signatures
+  - Add 5 new project templates: minimal, blog, saas, dashboard, api
+  - Fix code generation templates to use RouteComponent instead of FC
+  - Fix index template with virtual:emberkit-routes import and try/catch
+  - Extract project templates to separate files for better maintainability
+  - Remove dead starter.ts template
+  - All templates now include correct render() signature with routes config
+
 ## 0.4.0
 
 ### Minor Changes
