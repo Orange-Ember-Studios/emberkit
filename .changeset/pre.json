@@ -9,5 +9,7 @@
     "@emberkit/icons": "0.2.2",
     "@emberkit/ui": "0.2.4"
   },
-  "changesets": []
+  "changesets": [
+    "fix-pass-dynamic-route-params-to-component-prop-05bi8b"
+  ]
 }

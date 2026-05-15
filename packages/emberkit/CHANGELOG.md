@@ -1,5 +1,11 @@
 # @emberkit/core
 
+## 0.2.6-alpha.0
+
+### Patch Changes
+
+- fix: pass dynamic route params to component props
+
 ## 0.2.5
 
 ### Patch Changes

@@ -225,13 +225,13 @@ const HomePage: RouteComponent = () => {
             <p className="text-lg text-slate-600 mb-8">Choose the plan that works for your team</p>
             <div className="inline-flex items-center gap-3 p-1 bg-white rounded-lg border border-slate-200">
               <button
-                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${!annual() ? 'bg-brand-600 text-white' : 'text-slate-600'}`}
+                className={\`px-4 py-2 text-sm font-medium rounded-md transition-colors \${!annual() ? 'bg-brand-600 text-white' : 'text-slate-600'}\`}
                 onClick={() => { setAnnual(false); }}
               >
                 Monthly
               </button>
               <button
-                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${annual() ? 'bg-brand-600 text-white' : 'text-slate-600'}`}
+                className={\`px-4 py-2 text-sm font-medium rounded-md transition-colors \${annual() ? 'bg-brand-600 text-white' : 'text-slate-600'}\`}
                 onClick={() => { setAnnual(true); }}
               >
                 Annual <span className="text-brand-600 ml-1 font-semibold">-20%</span>

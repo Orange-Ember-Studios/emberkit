@@ -117,7 +117,7 @@ const Layout: RouteComponent = ({ children }) => {
 export default Layout;`,
 
   "src/routes/index.tsx": `import type { RouteComponent } from '@emberkit/core';
-import { signal } from '@emberkit/core';
+import { createSignal } from '@emberkit/core';
 import {
   Button,
   Card,
