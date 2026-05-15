@@ -1,5 +1,14 @@
 # @emberkit/cli
 
+## 0.6.0
+
+### Minor Changes
+
+- Refactored CLI templates:
+  - Split templates into individual files for better maintainability
+  - Organized project templates into separate directories
+  - Improved code generation utilities
+
 ## 0.5.3
 
 ### Patch Changes
