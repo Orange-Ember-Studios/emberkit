@@ -51,7 +51,7 @@ export function renderElementToHTML(element: JSXElement): string {
         props = (result as JSXElement).props ?? {};
       } else if (typeof result === 'string' || typeof result === 'number') {
         renderDepth--;
-        return String(result);
+        return typeof result === 'string' ? escapeHtml(result) : String(result);
       } else if (Array.isArray(result)) {
         const r = result.map((item) => renderToString(item as JSXElement | string)).join('');
         renderDepth--;
@@ -119,9 +119,9 @@ export function renderElementToHTML(element: JSXElement): string {
             return `${cssProp}: ${val}`;
           })
           .join('; ');
-        return ` ${key}="${styleStr}"`;
+        return ` ${key}="${escapeHtml(styleStr)}"`;
       }
-      return ` ${key}="${value}"`;
+      return ` ${key}="${typeof value === 'string' ? escapeHtml(value) : value}"`;
     })
     .join('');
 
@@ -143,9 +143,18 @@ export function renderElementToHTML(element: JSXElement): string {
   return `<${currentType}${attributes}${onclickAttr}>${innerHtml}</${currentType}>`;
 }
 
+export function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 export function renderToString(element: JSXElement | string | null | number | unknown[]): string {
   if (!element && element !== 0) return '';
-  if (typeof element === 'string') return element;
+  if (typeof element === 'string') return escapeHtml(element);
   if (typeof element === 'number') return String(element);
   if (Array.isArray(element))
     return element.map((item) => renderToString(item as JSXElement | string)).join('');
