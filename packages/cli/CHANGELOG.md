@@ -1,5 +1,11 @@
 # @emberkit/cli
 
+## 0.6.1-alpha.3
+
+### Patch Changes
+
+- Fix counter visibility in basic template. Change gradient colors from white-slate to ember-amber for better contrast on dark background.
+
 ## 0.6.1-alpha.2
 
 ### Patch Changes
