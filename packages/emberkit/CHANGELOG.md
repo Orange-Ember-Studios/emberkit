@@ -1,5 +1,11 @@
 # @emberkit/core
 
+## 0.2.4-alpha.0
+
+### Patch Changes
+
+- Fix vite-plugin-compression2 import by using dynamic import to avoid module resolution error when compression is not enabled
+
 ## 0.2.2-alpha.0
 
 ### Patch Changes

@@ -12,9 +12,9 @@
   },
   "dependencies": {
     "@emberkit/cli": "^0.2.3",
-    "@emberkit/core": "^0.2.3",
-    "@emberkit/icons": "^0.2.0",
-    "@emberkit/ui": "^0.2.2",
+    "@emberkit/core": "^0.2.4-alpha.0",
+    "@emberkit/icons": "^0.2.1-alpha.1",
+    "@emberkit/ui": "^0.2.3-alpha.1",
     "@tailwindcss/vite": "^4.3.0",
     "tailwindcss": "^4.3.0",
     "vite": "^6.0.0"
