@@ -1,5 +1,11 @@
 # @emberkit/cli
 
+## 0.6.1-alpha.8
+
+### Patch Changes
+
+- Fix documentation links to point to root domain (https://emberkit.orangeember.com) instead of /docs path.
+
 ## 0.6.1-alpha.7
 
 ### Patch Changes
