@@ -38,32 +38,32 @@
 
   /* View Transitions API animations */
   ::view-transition-old(root) {
-    animation: fade-out 0.3s ease-in-out forwards;
+    animation: smooth-fade-out 0.5s ease-in-out forwards;
   }
 
   ::view-transition-new(root) {
-    animation: fade-in 0.3s ease-in-out forwards;
+    animation: smooth-fade-in 0.5s ease-in-out forwards;
   }
 
-  @keyframes fade-out {
-    from {
+  @keyframes smooth-fade-out {
+    0% {
       opacity: 1;
-      transform: scale(1);
+      filter: blur(0px);
     }
-    to {
+    100% {
       opacity: 0;
-      transform: scale(1);
+      filter: blur(8px);
     }
   }
 
-  @keyframes fade-in {
-    from {
+  @keyframes smooth-fade-in {
+    0% {
       opacity: 0;
-      transform: scale(1);
+      filter: blur(8px);
     }
-    to {
+    100% {
       opacity: 1;
-      transform: scale(1);
+      filter: blur(0px);
     }
   }
 }
@@ -205,6 +205,7 @@
   /* ===== Links ===== */
   .md-content a {
     font-weight: 500;
+    color: var(--color-primary-400, oklch(72% 0.19 50));
     position: relative;
     transition: all 200ms ease-out;
   }
