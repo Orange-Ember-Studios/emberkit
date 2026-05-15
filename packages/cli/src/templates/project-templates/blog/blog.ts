@@ -170,7 +170,7 @@ const HomePage: RouteComponent = () => {
 
 export default HomePage;`,
 
-  "src/routes/[slug].tsx": `import type { RouteComponent, RouteParams } from '@emberkit/core';
+  "src/routes/[slug].tsx": `import type { RouteParams } from '@emberkit/core';
 import { Head } from '@emberkit/core';
 
 interface PostData {
@@ -226,11 +226,7 @@ const posts: Record<string, PostData> = {
   },
 };
 
-interface Params {
-  slug: string;
-}
-
-const PostPage: RouteComponent<Params> = ({ params }: RouteParams<Params>) => {
+export default function PostPage({ params }: RouteParams<{ slug: string }>) {
   const post = posts[params.slug];
 
   if (!post) {
@@ -264,9 +260,7 @@ const PostPage: RouteComponent<Params> = ({ params }: RouteParams<Params>) => {
       </article>
     </>
   );
-};
-
-export default PostPage;`,
+}`,
 
   "src/routes/about.tsx": `import type { RouteComponent } from '@emberkit/core';
 import { Head } from '@emberkit/core';
