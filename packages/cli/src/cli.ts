@@ -1,4 +1,5 @@
 import inquirer from "inquirer";
+import { getCliPackageVersion } from "./cli-package-version.js";
 import { dev } from "./commands/dev.js";
 import { build } from "./commands/build.js";
 import { preview } from "./commands/preview.js";
@@ -37,7 +38,7 @@ export async function runCLI(args: string[]): Promise<void> {
       break;
     case "--version":
     case "-v":
-      console.log("EmberKit CLI v0.6.0");
+      console.log(`EmberKit CLI v${getCliPackageVersion()}`);
       break;
     case "--help":
     case "-h":
@@ -52,7 +53,7 @@ export async function runCLI(args: string[]): Promise<void> {
 
 function showHelp(): void {
   console.log(`
-🔥 EmberKit CLI v0.6.0
+🔥 EmberKit CLI v${getCliPackageVersion()}
 
 Usage: emberkit <command> [options]
 
