@@ -15,7 +15,7 @@
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "pnpm build && changeset publish",
-    "prerelease": "changeset pre enter alpha"
+    "pre-alpha": "changeset pre enter alpha"
   },
   "devDependencies": {
     "@changesets/changelog-github": "^0.7.0",
