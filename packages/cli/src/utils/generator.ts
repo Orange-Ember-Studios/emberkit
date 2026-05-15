@@ -1,11 +1,20 @@
 import { existsSync, mkdirSync, writeFileSync } from "fs";
 import { dirname, join } from "path";
 import type { GeneratorOptions } from "../types.js";
-import {
-  getTemplate,
-  formatTemplate,
-  toKebabCase,
-} from "../templates/index.js";
+import { formatTemplate, toKebabCase } from "../templates/index.js";
+import { routeTemplate } from "../templates/route.js";
+import { componentTemplate } from "../templates/component.js";
+import { layoutTemplate } from "../templates/layout.js";
+import { errorBoundaryTemplate } from "../templates/errorBoundary.js";
+import { loaderTemplate } from "../templates/loader.js";
+import { actionTemplate } from "../templates/action.js";
+import { apiRouteTemplate } from "../templates/apiRoute.js";
+import { configTemplate } from "../templates/config.js";
+import { indexTemplate } from "../templates/entry.js";
+import { layoutRoutesTemplate } from "../templates/layoutRoutes.js";
+import { signalTemplate } from "../templates/signal.js";
+import { contextTemplate } from "../templates/context.js";
+import { formTemplate } from "../templates/form.js";
 
 export interface GenerateResult {
   success: boolean;
@@ -26,7 +35,23 @@ export async function generate(
     ...params,
   };
 
-  const templateContent = getTemplate(template);
+  const templates: Record<string, string> = {
+    route: routeTemplate,
+    component: componentTemplate,
+    layout: layoutTemplate,
+    error: errorBoundaryTemplate,
+    loader: loaderTemplate,
+    action: actionTemplate,
+    api: apiRouteTemplate,
+    config: configTemplate,
+    index: indexTemplate,
+    layoutRoutes: layoutRoutesTemplate,
+    signal: signalTemplate,
+    context: contextTemplate,
+    form: formTemplate,
+  };
+
+  const templateContent = templates[template] ?? routeTemplate;
   const content = formatTemplate(templateContent, formattedParams);
 
   try {
