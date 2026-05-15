@@ -1,5 +1,11 @@
 # @emberkit/cli
 
+## 0.2.5
+
+### Patch Changes
+
+- 2467e81: Add typecheck, lint, and formatting support to all packages.
+
 ## 0.2.1-alpha.0
 
 ### Patch Changes

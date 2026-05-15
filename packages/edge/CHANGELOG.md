@@ -1,5 +1,11 @@
 # @emberkit/edge
 
+## 0.2.2
+
+### Patch Changes
+
+- 2467e81: Add typecheck, lint, and formatting support to all packages.
+
 ## 0.2.2-alpha.0
 
 ### Patch Changes

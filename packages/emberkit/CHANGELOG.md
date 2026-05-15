@@ -1,5 +1,12 @@
 # @emberkit/core
 
+## 0.2.4
+
+### Patch Changes
+
+- a563b0d: Fix vite-plugin-compression2 import by using dynamic import to avoid module resolution error when compression is not enabled
+- 2467e81: Add typecheck, lint, and formatting support to all packages.
+
 ## 0.2.4-alpha.0
 
 ### Patch Changes

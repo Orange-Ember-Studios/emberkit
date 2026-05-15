@@ -1,5 +1,14 @@
 # @emberkit/icons
 
+## 0.2.1
+
+### Patch Changes
+
+- 2467e81: Add typecheck, lint, and formatting support to all packages.
+- Updated dependencies [a563b0d]
+- Updated dependencies [2467e81]
+  - @emberkit/core@0.2.4
+
 ## 0.2.1-alpha.1
 
 ### Patch Changes
