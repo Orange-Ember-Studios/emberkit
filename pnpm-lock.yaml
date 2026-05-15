@@ -36,17 +36,17 @@ importers:
   apps/docs:
     dependencies:
       '@emberkit/cli':
-        specifier: ^0.4.0
-        version: 0.4.0(@types/node@22.19.18)
+        specifier: workspace:*
+        version: link:../../packages/cli
       '@emberkit/core':
-        specifier: ^0.2.4
-        version: 0.2.4(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.60.3)
+        specifier: workspace:*
+        version: link:../../packages/emberkit
       '@emberkit/icons':
-        specifier: ^0.2.1
-        version: 0.2.1(@emberkit/core@0.2.4(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.60.3))
+        specifier: workspace:*
+        version: link:../../packages/icons
       '@emberkit/ui':
-        specifier: ^0.2.3
-        version: 0.2.3(@emberkit/core@0.2.4(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.60.3))(@emberkit/icons@0.2.1(@emberkit/core@0.2.4(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.60.3)))(tailwindcss@4.3.0)
+        specifier: workspace:*
+        version: link:../../packages/ui
       '@tailwindcss/vite':
         specifier: ^4.3.0
         version: 4.3.0(vite@6.4.2(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0))
@@ -302,25 +302,6 @@ packages:
   '@csstools/css-tokenizer@4.0.0':
     resolution: {integrity: sha512-QxULHAm7cNu72w97JUNCBFODFaXpbDg+dP8b/oWFAZ2MTRppA3U00Y2L1HqaS4J6yBqxwa/Y3nMBaxVKbB/NsA==}
     engines: {node: '>=20.19.0'}
-
-  '@emberkit/cli@0.4.0':
-    resolution: {integrity: sha512-JE1eodbvt/bAZ6ZT6HQ7juaj1JjgwW+DrVZN3HDziEmcv4+ny0Thvz9X/KStq/8cRJmX2TxbtYVjm15fk6VauA==}
-    hasBin: true
-
-  '@emberkit/core@0.2.4':
-    resolution: {integrity: sha512-19yGU6CdWEEAgVro9Jf7QHUbH+xE8ZvHPU5lrSKDB41THgYLl/AGSYFZQigYgmmTvkTfRfdLas6F4MJIxGf94w==}
-
-  '@emberkit/icons@0.2.1':
-    resolution: {integrity: sha512-pWkwXxuxTKibdIkSWKzVyzXCUlyfEbnKxr6fnTxqsmKApNgZ+62JsRzcXLGF/s9R6F1snTmudOu6oRt80uAd/Q==}
-    peerDependencies:
-      '@emberkit/core': 0.2.4
-
-  '@emberkit/ui@0.2.3':
-    resolution: {integrity: sha512-VC4mF8/lxSF+0XBtRe20uszRqSreW7CqSKwh/XhphFWXTZhkfhfIX3tb9oafn0bRNBytZNp7HFN7IZHgVqyc/A==}
-    peerDependencies:
-      '@emberkit/core': 0.2.4
-      '@emberkit/icons': 0.2.1
-      tailwindcss: ^4.0.0
 
   '@emnapi/runtime@1.10.0':
     resolution: {integrity: sha512-ewvYlk86xUoGI0zQRNq/mC+16R1QeDlKQy21Ki3oSYXNgLb45GV1P6A0M+/s6nyCuNDqe5VpaY84BzXGwVbwFA==}
@@ -3023,44 +3004,6 @@ snapshots:
       css-tree: 3.2.1
 
   '@csstools/css-tokenizer@4.0.0': {}
-
-  '@emberkit/cli@0.4.0(@types/node@22.19.18)':
-    dependencies:
-      commander: 11.1.0
-      inquirer: 9.3.8(@types/node@22.19.18)
-    transitivePeerDependencies:
-      - '@types/node'
-
-  '@emberkit/core@0.2.4(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.60.3)':
-    dependencies:
-      '@mdx-js/mdx': 3.1.1
-      remark-gfm: 4.0.1
-      vite: 6.4.2(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)
-      vite-plugin-compression2: 2.5.3(rollup@4.60.3)
-    transitivePeerDependencies:
-      - '@types/node'
-      - jiti
-      - less
-      - lightningcss
-      - rollup
-      - sass
-      - sass-embedded
-      - stylus
-      - sugarss
-      - supports-color
-      - terser
-      - tsx
-      - yaml
-
-  '@emberkit/icons@0.2.1(@emberkit/core@0.2.4(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.60.3))':
-    dependencies:
-      '@emberkit/core': 0.2.4(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.60.3)
-
-  '@emberkit/ui@0.2.3(@emberkit/core@0.2.4(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.60.3))(@emberkit/icons@0.2.1(@emberkit/core@0.2.4(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.60.3)))(tailwindcss@4.3.0)':
-    dependencies:
-      '@emberkit/core': 0.2.4(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.60.3)
-      '@emberkit/icons': 0.2.1(@emberkit/core@0.2.4(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.60.3))
-      tailwindcss: 4.3.0
 
   '@emnapi/runtime@1.10.0':
     dependencies:
