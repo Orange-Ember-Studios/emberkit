@@ -1,5 +1,11 @@
 # @emberkit/cli
 
+## 0.6.1-alpha.1
+
+### Patch Changes
+
+- Improve with-ui template: fix navbar layout (now horizontal), correct Tailwind theme config, better mobile responsiveness.
+
 ## 0.6.1-alpha.0
 
 ### Patch Changes
