@@ -36,17 +36,17 @@ importers:
   apps/docs:
     dependencies:
       '@emberkit/cli':
-        specifier: ^0.2.3
-        version: 0.2.3(@types/node@22.19.18)
+        specifier: ^0.4.0
+        version: 0.4.0(@types/node@22.19.18)
       '@emberkit/core':
-        specifier: ^0.2.3
-        version: 0.2.3(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)
+        specifier: ^0.2.4
+        version: 0.2.4(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.60.3)
       '@emberkit/icons':
-        specifier: ^0.2.0
-        version: 0.2.0(@emberkit/core@0.2.3(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0))
+        specifier: ^0.2.1
+        version: 0.2.1(@emberkit/core@0.2.4(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.60.3))
       '@emberkit/ui':
-        specifier: ^0.2.2
-        version: 0.2.2(@emberkit/core@0.2.3(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0))(@emberkit/icons@0.2.0(@emberkit/core@0.2.3(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)))(tailwindcss@4.3.0)
+        specifier: ^0.2.3
+        version: 0.2.3(@emberkit/core@0.2.4(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.60.3))(@emberkit/icons@0.2.1(@emberkit/core@0.2.4(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.60.3)))(tailwindcss@4.3.0)
       '@tailwindcss/vite':
         specifier: ^4.3.0
         version: 4.3.0(vite@6.4.2(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0))
@@ -87,6 +87,9 @@ importers:
       vite:
         specifier: ^6.0.0
         version: 6.4.2(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)
+      vite-plugin-compression2:
+        specifier: ^2.5.3
+        version: 2.5.3(rollup@4.60.3)
     devDependencies:
       '@eslint/js':
         specifier: ^10.0.1
@@ -109,9 +112,6 @@ importers:
       typescript-eslint:
         specifier: ^8.59.3
         version: 8.59.3(eslint@10.3.0(jiti@2.7.0))(typescript@5.9.3)
-      vite-plugin-compression2:
-        specifier: ^2.5.3
-        version: 2.5.3(rollup@4.60.3)
       vitest:
         specifier: ^3.0.0
         version: 3.2.4(@types/debug@4.1.13)(@types/node@22.19.18)(jiti@2.7.0)(jsdom@29.1.1)(lightningcss@1.32.0)
@@ -303,23 +303,23 @@ packages:
     resolution: {integrity: sha512-QxULHAm7cNu72w97JUNCBFODFaXpbDg+dP8b/oWFAZ2MTRppA3U00Y2L1HqaS4J6yBqxwa/Y3nMBaxVKbB/NsA==}
     engines: {node: '>=20.19.0'}
 
-  '@emberkit/cli@0.2.3':
-    resolution: {integrity: sha512-3NmSalFzDpaK1CCFQBDvlabMf9AWNg2sy1CmbsK7EYKQz9g9v89yl3vChC60PcM8irCdeJ332JGyJznwRoZK4w==}
+  '@emberkit/cli@0.4.0':
+    resolution: {integrity: sha512-JE1eodbvt/bAZ6ZT6HQ7juaj1JjgwW+DrVZN3HDziEmcv4+ny0Thvz9X/KStq/8cRJmX2TxbtYVjm15fk6VauA==}
     hasBin: true
 
-  '@emberkit/core@0.2.3':
-    resolution: {integrity: sha512-yeiQpEKwXxFQ2FhfQgX57nMubiNLyElhzdBRjz9osyeAKuK2I2E8tDvjtwtkyCrnuQijhXCWGlAcAG/UftFRcA==}
+  '@emberkit/core@0.2.4':
+    resolution: {integrity: sha512-19yGU6CdWEEAgVro9Jf7QHUbH+xE8ZvHPU5lrSKDB41THgYLl/AGSYFZQigYgmmTvkTfRfdLas6F4MJIxGf94w==}
 
-  '@emberkit/icons@0.2.0':
-    resolution: {integrity: sha512-lFNNwBmsZvSPE8Y3izoH4jozF/OSlS5W7bBzJ2/22IGP55i627jwkJXRTgBdcf8Xyd7Tsyp0UUPZ2tAFMIUVpA==}
+  '@emberkit/icons@0.2.1':
+    resolution: {integrity: sha512-pWkwXxuxTKibdIkSWKzVyzXCUlyfEbnKxr6fnTxqsmKApNgZ+62JsRzcXLGF/s9R6F1snTmudOu6oRt80uAd/Q==}
     peerDependencies:
-      '@emberkit/core': workspace:*
+      '@emberkit/core': 0.2.4
 
-  '@emberkit/ui@0.2.2':
-    resolution: {integrity: sha512-FtuilDffnCmvE6FWJUne0lQyCjy7JGv0HvUf64dl/k+eGobOt91jmctXelp/FMK7DPoylSk/SVYSAPjUO6ARtQ==}
+  '@emberkit/ui@0.2.3':
+    resolution: {integrity: sha512-VC4mF8/lxSF+0XBtRe20uszRqSreW7CqSKwh/XhphFWXTZhkfhfIX3tb9oafn0bRNBytZNp7HFN7IZHgVqyc/A==}
     peerDependencies:
-      '@emberkit/core': ^0.2.1
-      '@emberkit/icons': ^0.2.0
+      '@emberkit/core': 0.2.4
+      '@emberkit/icons': 0.2.1
       tailwindcss: ^4.0.0
 
   '@emnapi/runtime@1.10.0':
@@ -3024,23 +3024,25 @@ snapshots:
 
   '@csstools/css-tokenizer@4.0.0': {}
 
-  '@emberkit/cli@0.2.3(@types/node@22.19.18)':
+  '@emberkit/cli@0.4.0(@types/node@22.19.18)':
     dependencies:
       commander: 11.1.0
       inquirer: 9.3.8(@types/node@22.19.18)
     transitivePeerDependencies:
       - '@types/node'
 
-  '@emberkit/core@0.2.3(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)':
+  '@emberkit/core@0.2.4(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.60.3)':
     dependencies:
       '@mdx-js/mdx': 3.1.1
       remark-gfm: 4.0.1
       vite: 6.4.2(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)
+      vite-plugin-compression2: 2.5.3(rollup@4.60.3)
     transitivePeerDependencies:
       - '@types/node'
       - jiti
       - less
       - lightningcss
+      - rollup
       - sass
       - sass-embedded
       - stylus
@@ -3050,14 +3052,14 @@ snapshots:
       - tsx
       - yaml
 
-  '@emberkit/icons@0.2.0(@emberkit/core@0.2.3(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0))':
+  '@emberkit/icons@0.2.1(@emberkit/core@0.2.4(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.60.3))':
     dependencies:
-      '@emberkit/core': 0.2.3(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)
+      '@emberkit/core': 0.2.4(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.60.3)
 
-  '@emberkit/ui@0.2.2(@emberkit/core@0.2.3(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0))(@emberkit/icons@0.2.0(@emberkit/core@0.2.3(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)))(tailwindcss@4.3.0)':
+  '@emberkit/ui@0.2.3(@emberkit/core@0.2.4(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.60.3))(@emberkit/icons@0.2.1(@emberkit/core@0.2.4(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.60.3)))(tailwindcss@4.3.0)':
     dependencies:
-      '@emberkit/core': 0.2.3(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)
-      '@emberkit/icons': 0.2.0(@emberkit/core@0.2.3(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0))
+      '@emberkit/core': 0.2.4(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.60.3)
+      '@emberkit/icons': 0.2.1(@emberkit/core@0.2.4(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.60.3))
       tailwindcss: 4.3.0
 
   '@emnapi/runtime@1.10.0':
