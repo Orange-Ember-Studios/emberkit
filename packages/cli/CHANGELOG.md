@@ -1,5 +1,11 @@
 # @emberkit/cli
 
+## 0.6.1-alpha.0
+
+### Patch Changes
+
+- Share boilerplate via `_shared/base` builders, wire `emberkit generate`, dedupe template formatting, add `.gitignore` to dashboard/api templates, fix `--version` string.
+
 ## 0.6.0
 
 ### Minor Changes

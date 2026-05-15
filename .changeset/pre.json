@@ -9,5 +9,7 @@
     "@emberkit/icons": "0.2.2",
     "@emberkit/ui": "0.2.4"
   },
-  "changesets": []
+  "changesets": [
+    "cli-release-templates"
+  ]
 }
