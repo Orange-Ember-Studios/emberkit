@@ -1,6 +1,7 @@
 import type { JSXElementProps, JSXNode, DOMElement, JSXElement } from './types.js';
 import { renderToString, getHandler, clearHandlers } from './helpers/render.js';
 import { getSignalByIndex } from '../signals/helpers/core.js';
+import { matchRoute } from './helpers/match.js';
 
 export function createElement(
   type: string | ((props: JSXElementProps) => JSXNode),
@@ -194,33 +195,8 @@ export function render(
     return;
   }
 
-  function matchRoute(pathname: string): (typeof routes)[number] | undefined {
-    const normalized = pathname === '/' ? '/' : pathname.replace(/\/$/, '');
-    for (const route of routes) {
-      const routePath = route.path === '/' ? '/' : route.path.replace(/\/$/, '');
-      if (routePath === normalized) return route;
-      if (routePath !== '/' && normalized.startsWith(routePath + '/')) return route;
-      if (routePath !== '/' && routePath.includes(':')) {
-        const routeParts = routePath.split('/');
-        const pathParts = normalized.split('/');
-        if (routeParts.length === pathParts.length) {
-          let match = true;
-          for (let i = 0; i < routeParts.length; i++) {
-            if (routeParts[i].startsWith(':')) continue;
-            if (routeParts[i] !== pathParts[i]) {
-              match = false;
-              break;
-            }
-          }
-          if (match) return route;
-        }
-      }
-    }
-    return undefined;
-  }
-
   async function renderCurrentRoute() {
-    const matched = matchRoute(window.location.pathname);
+    const matched = matchRoute(routes, window.location.pathname);
     if (matched) {
       const mod = await matched.component();
 
