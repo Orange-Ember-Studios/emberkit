@@ -3,6 +3,8 @@
  * Each template composes from these instead of duplicating identical config files.
  */
 
+import { EMBERKIT_PACKAGE_VERSIONS as V } from "../../../emberkit-package-versions.js";
+
 export interface PackageJsonOptions {
   hasTailwind?: boolean;
   hasUI?: boolean;
@@ -11,11 +13,14 @@ export interface PackageJsonOptions {
 export function buildPackageJson(options: PackageJsonOptions = {}): string {
   const { hasTailwind = false, hasUI = false } = options;
 
-  const deps: Record<string, string> = { "@emberkit/core": "^0.2.6-alpha.0" };
-  if (hasUI) deps["@emberkit/ui"] = "^0.3.0-alpha.1";
+  const deps: Record<string, string> = { "@emberkit/core": V.core };
+  if (hasUI) {
+    deps["@emberkit/ui"] = V.ui;
+    deps["@emberkit/icons"] = V.icons;
+  }
 
   const devDeps: Record<string, string> = {
-    "@emberkit/cli": "^0.6.1-alpha.11",
+    "@emberkit/cli": V.cli,
     typescript: "^5.7.0",
     vite: "^6.0.0",
   };
