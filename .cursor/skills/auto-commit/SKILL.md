@@ -1,4 +1,10 @@
 ---
+name: auto-commit
+description: Auto-commit all uncommitted changes using semantic commit notation
+disable-model-invocation: true
+---
+
+---
 description: Auto-commit all uncommitted changes using semantic commit notation
 ---
 

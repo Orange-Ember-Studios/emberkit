@@ -1,4 +1,10 @@
 ---
+name: publish
+description: Publish a new version of all packages using changesets
+disable-model-invocation: true
+---
+
+---
 description: Publish a new version of all packages using changesets
 ---
 
