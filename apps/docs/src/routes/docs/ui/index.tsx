@@ -1,6 +1,9 @@
 import type { RouteComponent } from "@emberkit/core";
 import { createSignal } from "@emberkit/core";
 import {
+  CodeBlock,
+} from "@emberkit/ui/molecules";
+import {
   Button,
   Icon,
   Text,
@@ -26,30 +29,6 @@ type PropRow = {
   desc: string;
 };
 
-function CopyCodeBlock({ code }: { code: string }) {
-  return (
-    <div class="relative mt-4 rounded-xl border border-white/10 bg-black/35">
-      <pre class="m-0 overflow-x-auto p-4 pr-20 text-xs font-mono leading-relaxed text-surface-700">
-        <code>{code}</code>
-      </pre>
-      <button
-        type="button"
-        class="absolute top-2 right-2 rounded-lg border border-white/10 bg-surface-200/40 px-2.5 py-1 text-xs font-medium text-surface-600 transition-colors hover:text-surface-900"
-        onClick={(e: MouseEvent) => {
-          void navigator.clipboard.writeText(code);
-          const t = e.currentTarget as HTMLButtonElement;
-          const prev = t.textContent;
-          t.textContent = "Copied";
-          setTimeout(() => {
-            t.textContent = prev ?? "Copy";
-          }, 1500);
-        }}
-      >
-        Copy
-      </button>
-    </div>
-  );
-}
 
 function PropsTable({ rows }: { rows: PropRow[] }) {
   return (
@@ -257,11 +236,13 @@ const UIContent: RouteComponent = () => {
               ).
             </Text>
             <DocSubheading>package.json</DocSubheading>
-            <CopyCodeBlock
+            <CodeBlock
+              language="bash"
               code={`pnpm add @emberkit/ui @emberkit/core @emberkit/icons tailwindcss`}
             />
             <DocSubheading>globals.css (example)</DocSubheading>
-            <CopyCodeBlock
+            <CodeBlock
+              language="css"
               code={`@import "tailwindcss";
 @import "@emberkit/ui/tokens.css";
 @source "./src/**/*.{tsx,ts,jsx}";`}
@@ -285,7 +266,7 @@ const UIContent: RouteComponent = () => {
               <code class="font-mono text-primary-400">package.json exports</code>{" "}
               so installs from npm resolve without monorepo path hacks.
             </Text>
-            <CopyCodeBlock
+            <CodeBlock
               code={`import { Button, Input, Text } from "@emberkit/ui/atoms";
 import { Card, Alert, Modal } from "@emberkit/ui/molecules";
 import { DataTable, Header } from "@emberkit/ui/organisms";
@@ -386,7 +367,7 @@ import type { ButtonProps } from "@emberkit/ui/atoms";`}
               </Button>
             </div>
             <DocSubheading>Example</DocSubheading>
-            <CopyCodeBlock
+            <CodeBlock
               code={`import { Button } from "@emberkit/ui/atoms";
 
 <Button variant="primary" size="md" onClick={() => alert("ok")}>
@@ -513,7 +494,7 @@ import type { ButtonProps } from "@emberkit/ui/atoms";`}
               </div>
             </div>
             <DocSubheading>Example</DocSubheading>
-            <CopyCodeBlock
+            <CodeBlock
               code={`import { Icon } from "@emberkit/ui/atoms";
 
 <Icon name="zap" size={24} className="text-primary-400" />`}
@@ -666,7 +647,7 @@ import type { ButtonProps } from "@emberkit/ui/atoms";`}
               <Badge size="sm">Small</Badge>
             </div>
             <DocSubheading>Example</DocSubheading>
-            <CopyCodeBlock
+            <CodeBlock
               code={`import { Badge } from "@emberkit/ui/atoms";
 
 <Badge variant="success" size="md">Beta</Badge>`}
@@ -715,7 +696,7 @@ import type { ButtonProps } from "@emberkit/ui/atoms";`}
               <Input placeholder="Large" size="lg" />
             </div>
             <DocSubheading>Example</DocSubheading>
-            <CopyCodeBlock
+            <CodeBlock
               code={`import { Input } from "@emberkit/ui/atoms";
 
 <Input name="email" type="email" placeholder="you@example.com" />
@@ -850,7 +831,7 @@ import type { ButtonProps } from "@emberkit/ui/atoms";`}
               />
             </div>
             <DocSubheading>Example</DocSubheading>
-            <CopyCodeBlock
+            <CodeBlock
               code={`import { Card, Button } from "@emberkit/ui/molecules";
 import { Text } from "@emberkit/ui/atoms";
 
@@ -937,7 +918,7 @@ import { Text } from "@emberkit/ui/atoms";
               />
             </div>
             <DocSubheading>Example</DocSubheading>
-            <CopyCodeBlock
+            <CodeBlock
               code={`import { FormField } from "@emberkit/ui/molecules";
 
 <FormField
@@ -1010,7 +991,7 @@ import { Text } from "@emberkit/ui/atoms";
               </Alert>
             </div>
             <DocSubheading>Example</DocSubheading>
-            <CopyCodeBlock
+            <CodeBlock
               code={`import { Alert } from "@emberkit/ui/molecules";
 
 <Alert variant="info" title="Note" dismissible onDismiss={() => {}}>
@@ -1091,7 +1072,7 @@ import { Text } from "@emberkit/ui/atoms";
                 <Text>Code content here.</Text>
               </div>
             </div>
-            <CopyCodeBlock
+            <CodeBlock
               code={`import { Tabs } from "@emberkit/ui/molecules";
 import { createSignal } from "@emberkit/core";
 
@@ -1238,7 +1219,7 @@ const [tab, setTab] = createSignal("a");
                 molecules.
               </Text>
             </Modal>
-            <CopyCodeBlock
+            <CodeBlock
               code={`import { Modal, Button } from "@emberkit/ui/molecules";
 import { createSignal } from "@emberkit/core";
 import { Text } from "@emberkit/ui/atoms";
@@ -1329,7 +1310,7 @@ const [open, setOpen] = createSignal(false);
                 options={[{ value: "", label: "Option" }]}
               />
             </div>
-            <CopyCodeBlock
+            <CodeBlock
               code={`import { Select } from "@emberkit/ui/molecules";
 
 <Select
@@ -1433,7 +1414,7 @@ const [open, setOpen] = createSignal(false);
                 { name: "Bob Johnson", role: "PM", status: "Inactive" },
               ]}
             />
-            <CopyCodeBlock
+            <CodeBlock
               code={`import { DataTable } from "@emberkit/ui/organisms";
 
 <DataTable
@@ -1505,7 +1486,7 @@ const [open, setOpen] = createSignal(false);
               totalPages={10}
               onPageChange={(p) => setPage(p)}
             />
-            <CopyCodeBlock
+            <CodeBlock
               code={`import { Pagination } from "@emberkit/ui/organisms";
 import { createSignal } from "@emberkit/core";
 

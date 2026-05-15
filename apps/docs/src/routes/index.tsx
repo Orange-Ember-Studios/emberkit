@@ -1,7 +1,7 @@
 import type { RouteComponent } from '@emberkit/core';
 import { IconZap, IconPackage, IconTarget, IconType, IconArrowRight } from '@emberkit/icons';
 import { useNavigate } from '@emberkit/core';
-import { CodeBlock } from '../components/code-block';
+import { CodeBlock } from '@emberkit/ui/molecules';
 
 const HomePage: RouteComponent = () => {
   const navigate = useNavigate();
