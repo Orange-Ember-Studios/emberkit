@@ -1,5 +1,15 @@
 # @emberkit/cli
 
+## 0.5.1
+
+### Patch Changes
+
+- Fix --template flag parsing and add interactive wizard for create command
+  - Add --template / -t flag parsing (was previously ignored)
+  - Add interactive prompts when no project name is provided
+  - Users can now select templates via terminal wizard
+  - Add detailed help text for create command
+
 ## 0.5.0
 
 ### Minor Changes
