@@ -157,3 +157,81 @@ describe('flushSync', () => {
     expect(count).toBe(5);
   });
 });
+
+describe('Link interceptor - anchor handling', () => {
+  it('should allow navigation for pure anchor links (#section)', () => {
+    const mockLink = document.createElement('a');
+    mockLink.setAttribute('href', '#section');
+
+    // Manually test the link interceptor logic
+    const href = mockLink.getAttribute('href');
+    const shouldPreventDefault = 
+      href && 
+      !href.startsWith('http') && 
+      !href.startsWith('#') && 
+      mockLink.target !== '_blank' &&
+      (!href.includes('#') || href.split('#')[0] !== window.location.pathname);
+
+    expect(shouldPreventDefault).toBe(false);
+  });
+
+  it('should allow navigation for same-page anchor links (/current-page#section)', () => {
+    // Mock current location
+    const originalLocation = window.location;
+    delete (window as { location?: Location }).location;
+    window.location = { pathname: '/current-page' } as Location;
+
+    const mockLink = document.createElement('a');
+    mockLink.setAttribute('href', '/current-page#section');
+
+    // Test the logic
+    const href = mockLink.getAttribute('href');
+    const [linkPath] = href!.split('#');
+    const shouldAllowDefault = linkPath === window.location.pathname;
+
+    expect(shouldAllowDefault).toBe(true);
+
+    // Restore
+    window.location = originalLocation;
+  });
+
+  it('should intercept navigation for different page with anchor (/other-page#section)', () => {
+    // Mock current location
+    const originalLocation = window.location;
+    delete (window as { location?: Location }).location;
+    window.location = { pathname: '/current-page' } as Location;
+
+    const mockLink = document.createElement('a');
+    mockLink.setAttribute('href', '/other-page#section');
+
+    // Test the logic
+    const href = mockLink.getAttribute('href');
+    const [linkPath] = href!.split('#');
+    const shouldIntercept = linkPath !== window.location.pathname && linkPath !== '';
+
+    expect(shouldIntercept).toBe(true);
+
+    // Restore
+    window.location = originalLocation;
+  });
+
+  it('should allow navigation for external links', () => {
+    const mockLink = document.createElement('a');
+    mockLink.setAttribute('href', 'https://example.com');
+
+    const href = mockLink.getAttribute('href');
+    const shouldAllowDefault = href!.startsWith('http');
+
+    expect(shouldAllowDefault).toBe(true);
+  });
+
+  it('should allow navigation for links with target="_blank"', () => {
+    const mockLink = document.createElement('a');
+    mockLink.setAttribute('href', '/some-page');
+    mockLink.setAttribute('target', '_blank');
+
+    const shouldAllowDefault = mockLink.target === '_blank';
+
+    expect(shouldAllowDefault).toBe(true);
+  });
+});

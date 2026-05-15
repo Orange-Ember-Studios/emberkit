@@ -242,8 +242,22 @@ export function render(
     const link = (e.target as HTMLElement).closest('a');
     if (!link) return;
     const href = link.getAttribute('href');
-    if (!href || href.startsWith('http') || href.startsWith('#') || link.target === '_blank')
-      return;
+    if (!href || href.startsWith('http') || link.target === '_blank') return;
+
+    // Handle anchor links
+    if (href.startsWith('#')) return; // Pure anchor link (e.g., #section)
+
+    // Check if link is to an anchor on the same page (e.g., /current-page#section)
+    if (href.includes('#')) {
+      const [linkPath] = href.split('#');
+      const currentPath = window.location.pathname;
+      
+      // If the path portion matches current page, it's a same-page anchor
+      if (linkPath === currentPath || linkPath === '') {
+        return; // Allow default browser behavior to scroll to anchor
+      }
+    }
+
     e.preventDefault();
     history.pushState(null, '', href);
     renderCurrentRoute();
