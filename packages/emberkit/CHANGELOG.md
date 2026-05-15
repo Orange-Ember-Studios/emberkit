@@ -1,5 +1,11 @@
 # @emberkit/core
 
+## 0.2.7
+
+### Patch Changes
+
+- Escape text nodes and string attributes in SSR HTML output
+
 ## 0.2.6
 
 ## 0.2.6-alpha.0
