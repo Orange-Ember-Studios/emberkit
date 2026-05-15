@@ -1,5 +1,7 @@
 # @emberkit/core
 
+## 0.2.6
+
 ## 0.2.6-alpha.0
 
 ### Patch Changes

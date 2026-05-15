@@ -1,5 +1,7 @@
 # @emberkit/cli
 
+## 0.6.1
+
 ## 0.6.1-alpha.12
 
 ### Patch Changes

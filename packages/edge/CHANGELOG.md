@@ -1,5 +1,7 @@
 # @emberkit/edge
 
+## 0.2.3
+
 ## 0.2.3-alpha.0
 
 ### Patch Changes
