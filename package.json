@@ -12,9 +12,10 @@
     "build": "pnpm -r build",
     "dev": "pnpm --filter @emberkit/docs dev",
     "build:cli": "pnpm --filter @emberkit/cli build",
+    "sync:cli-template-versions": "node scripts/sync-cli-template-versions.mjs",
     "changeset": "changeset",
     "changeset:add": "node scripts/create-changeset.mjs",
-    "version-packages": "changeset version",
+    "version-packages": "changeset version && pnpm sync:cli-template-versions",
     "release": "pnpm build && changeset publish",
     "pre-alpha": "changeset pre enter alpha"
   },
