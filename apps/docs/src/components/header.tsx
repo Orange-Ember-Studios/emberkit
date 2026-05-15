@@ -21,7 +21,7 @@ const Header: RouteComponent = () => {
       if (!backdrop) {
         const overlay = document.createElement('div');
         overlay.setAttribute('data-sidebar-backdrop', '');
-        overlay.className = 'fixed inset-0 z-30 bg-black/50 backdrop-blur-sm';
+        overlay.className = 'fixed inset-0 z-[90] bg-black/50 backdrop-blur-sm lg:hidden';
         overlay.onclick = () => toggleSidebar();
         document.body.appendChild(overlay);
       }
@@ -60,7 +60,7 @@ const Header: RouteComponent = () => {
           <span className="bg-gradient-to-r from-orange-400 to-orange-500 bg-clip-text text-transparent transition-all duration-300 hover:from-orange-300 hover:to-orange-400">EmberKit</span>
         </a>
       </div>
-      <nav className="flex gap-6 max-sm:hidden">
+      <nav className="hidden sm:flex gap-6">
         <a
           href="/docs/introduction"
           onClick={(e) => {

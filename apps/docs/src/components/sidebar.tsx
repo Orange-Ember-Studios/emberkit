@@ -62,8 +62,20 @@ const Sidebar: RouteComponent = () => {
   return (
     <aside
       data-sidebar
-      className="fixed top-16 left-0 z-40 h-[calc(100vh-4rem)] w-[260px] overflow-y-auto border-r border-white/5 bg-[#0b0f19] px-4 py-6 transition-transform duration-300 -translate-x-full lg:translate-x-0"
+      className="fixed top-0 lg:top-16 left-0 z-[100] lg:z-40 h-screen lg:h-[calc(100vh-4rem)] w-[260px] overflow-y-auto border-r border-white/5 bg-[#0b0f19] px-4 py-6 transition-transform duration-300 -translate-x-full lg:translate-x-0"
     >
+      <div className="mb-8 flex items-center justify-between lg:hidden">
+        <div className="flex items-center gap-2 text-xl font-bold text-white">
+          <span className="text-2xl drop-shadow-[0_0_8px_rgba(249,115,22,0.4)]">🔥</span>
+          <span className="bg-gradient-to-r from-orange-400 to-orange-500 bg-clip-text text-transparent">EmberKit</span>
+        </div>
+        <button onClick={closeSidebar} className="text-gray-400 hover:text-white transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 6L6 18"/><path d="M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
       {docs.map((section) => (
         <div key={section.title} className="mb-8">
           <h3 className="mb-3 px-3 text-xs font-semibold uppercase tracking-widest text-gray-400 transition-colors duration-200">{section.title}</h3>
