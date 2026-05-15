@@ -34,16 +34,64 @@ function attachEventHandlers(container: Element): void {
   });
 }
 
+interface RouteProps {
+  params: Record<string, string>;
+  query: Record<string, string | string[]>;
+  request: Request;
+}
+
+function parseQueryString(searchString: string): Record<string, string | string[]> {
+  const query: Record<string, string | string[]> = {};
+  const params = new URLSearchParams(searchString);
+
+  for (const [key, value] of params) {
+    if (key in query) {
+      const existing = query[key];
+      if (Array.isArray(existing)) {
+        existing.push(value);
+      } else {
+        query[key] = [existing as string, value];
+      }
+    } else {
+      query[key] = value;
+    }
+  }
+
+  return query;
+}
+
+function extractParamsFromPath(routePath: string, pathname: string): Record<string, string> {
+  const params: Record<string, string> = {};
+
+  const routeParts = routePath === '/' ? [] : routePath.split('/').filter((p) => p);
+  const pathParts = pathname === '/' ? [] : pathname.split('/').filter((p) => p);
+
+  for (let i = 0; i < routeParts.length; i++) {
+    const routePart = routeParts[i];
+    if (routePart.startsWith(':')) {
+      const paramName = routePart.slice(1);
+      if (pathParts[i] !== undefined) {
+        params[paramName] = decodeURIComponent(pathParts[i]);
+      }
+    }
+  }
+
+  return params;
+}
+
 function renderToTarget(
   layout: (props: Record<string, unknown>) => JSXNode,
   target: Element,
   routeComponent?: (props: Record<string, unknown>) => JSXNode,
+  routeProps?: RouteProps,
 ): void {
   clearHandlers();
 
+  const componentProps = routeComponent && routeProps ? routeProps : {};
+
   const jsxElement: JSXElement = {
     type: layout,
-    props: routeComponent ? { children: [createElement(routeComponent, {})] } : {},
+    props: routeComponent ? { children: [createElement(routeComponent, componentProps)] } : {},
   } as JSXElement;
 
   const html = renderToString(jsxElement);
@@ -175,7 +223,13 @@ export function render(
     const matched = matchRoute(window.location.pathname);
     if (matched) {
       const mod = await matched.component();
-      renderToTarget(layout, target, mod.default);
+
+      const params = extractParamsFromPath(matched.path, window.location.pathname);
+      const query = parseQueryString(window.location.search);
+      const request = new Request(window.location.href);
+
+      const routeProps: RouteProps = { params, query, request };
+      renderToTarget(layout, target, mod.default, routeProps);
     } else {
       renderToTarget(layout, target);
     }
