@@ -1,96 +1,23 @@
+import {
+  buildPackageJson,
+  buildTsConfig,
+  buildViteConfig,
+  buildIndexHtml,
+  buildEntryFile,
+  GITIGNORE,
+} from "../_shared/base.js";
+
+const INTER_FONT =
+  "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap";
+
 export const withUiTemplate: Record<string, string> = {
-  "package.json": `{
-  "name": "{{name}}",
-  "version": "0.1.0",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "dev": "emberkit dev",
-    "build": "emberkit build",
-    "preview": "emberkit preview",
-    "lint": "eslint src --ext .ts,.tsx",
-    "format": "prettier --write \"src/**/*.{ts,tsx}\"
-  },
-  "dependencies": {
-    "@emberkit/core": "^0.2.4",
-    "@emberkit/ui": "^0.2.3"
-  },
-  "devDependencies": {
-    "@emberkit/cli": "^0.2.4",
-    "typescript": "^5.7.0",
-    "vite": "^6.0.0",
-    "tailwindcss": "^4.0.0",
-    "@tailwindcss/vite": "^4.0.0"
-  }
-}`,
+  "package.json": buildPackageJson({ hasTailwind: true, hasUI: true }),
+  "tsconfig.json": buildTsConfig(),
+  "vite.config.ts": buildViteConfig(true),
+  "index.html": buildIndexHtml({ fonts: [INTER_FONT] }),
+  ".gitignore": GITIGNORE,
 
-  "tsconfig.json": `{
-  "compilerOptions": {
-    "target": "ES2022",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "jsx": "react-jsx",
-    "jsxImportSource": "@emberkit/core",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "paths": {
-      "@/*": ["./src/*"]
-    }
-  },
-  "include": ["src"],
-  "exclude": ["node_modules", "dist"]
-}`,
-
-  "vite.config.ts": `import { defineConfig } from 'vite';
-import { emberkitVitePlugin } from '@emberkit/core/vite-plugin';
-import tailwindcss from '@tailwindcss/vite';
-
-export default defineConfig({
-  plugins: [emberkitVitePlugin(), tailwindcss()],
-  server: {
-    port: 3000,
-    host: 'localhost',
-  },
-  esbuild: {
-    jsxImportSource: '@emberkit/core',
-  },
-});`,
-
-  "index.html": `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{name}}</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-</head>
-<body id="app">
-  <script type="module" src="/src/index.tsx"></script>
-</body>
-</html>`,
-
-  "src/index.tsx": `import { render } from '@emberkit/core';
-import { routes } from 'virtual:emberkit-routes';
-import App from './routes/_layout';
-import './styles.css';
-
-const root = document.getElementById('app');
-
-if (root) {
-  try {
-    render(App, root, { routes });
-  } catch (error) {
-    console.error('[entry] Render error:', error);
-  }
-}`,
+  "src/index.tsx": buildEntryFile({ hasLayout: true, hasCss: true }),
 
   "src/styles.css": `@import "tailwindcss";
 
@@ -232,7 +159,7 @@ const HomePage: RouteComponent = () => {
             { icon: '&#128303;', title: 'TypeScript First', desc: 'Full type safety with intelligent autocomplete' },
             { icon: '&#128726;', title: 'File-Based Routing', desc: 'Routes automatically created from your file structure' },
           ].map((f, i) => (
-            <Card key={f.title} padding="lg" className="relative group hover:border-ember-500/50 transition-all duration-300 hover:-translate-y-1" style={{ animationDelay: \`\[PHONE REDACTED]ms\` }}>
+            <Card key={f.title} padding="lg" className="relative group hover:border-ember-500/50 transition-all duration-300 hover:-translate-y-1" style={{ animationDelay: \`\${i * 100}ms\` }}>
               <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-ember-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
               <div className="relative">
                 <div className="w-12 h-12 rounded-xl bg-ember-500/10 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">
@@ -267,7 +194,7 @@ const HomePage: RouteComponent = () => {
             ].map((tab) => (
               <button
                 key={tab.id}
-                className={\`px-4 py-2 text-sm font-medium rounded-md transition-all \$\{activeTab.value === tab.id ? 'bg-ember-500 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'\}}\`}
+                className={\`px-4 py-2 text-sm font-medium rounded-md transition-all \${activeTab.value === tab.id ? 'bg-ember-500 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}\`}
                 onClick={() => { activeTab.value = tab.id; }}
               >
                 {tab.label}

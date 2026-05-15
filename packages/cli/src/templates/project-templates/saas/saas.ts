@@ -1,94 +1,23 @@
+import {
+  buildPackageJson,
+  buildTsConfig,
+  buildViteConfig,
+  buildIndexHtml,
+  buildEntryFile,
+  GITIGNORE,
+} from "../_shared/base.js";
+
+const INTER_FONT =
+  "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap";
+
 export const saasTemplate: Record<string, string> = {
-  "package.json": `{
-  "name": "{{name}}",
-  "version": "0.1.0",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "dev": "emberkit dev",
-    "build": "emberkit build",
-    "preview": "emberkit preview"
-  },
-  "dependencies": {
-    "@emberkit/core": "^0.2.4",
-    "@emberkit/ui": "^0.2.3"
-  },
-  "devDependencies": {
-    "@emberkit/cli": "^0.2.4",
-    "typescript": "^5.7.0",
-    "vite": "^6.0.0",
-    "tailwindcss": "^4.0.0",
-    "@tailwindcss/vite": "^4.0.0"
-  }
-}`,
+  "package.json": buildPackageJson({ hasTailwind: true, hasUI: true }),
+  "tsconfig.json": buildTsConfig(),
+  "vite.config.ts": buildViteConfig(true),
+  "index.html": buildIndexHtml({ fonts: [INTER_FONT] }),
+  ".gitignore": GITIGNORE,
 
-  "tsconfig.json": `{
-  "compilerOptions": {
-    "target": "ES2022",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "jsx": "react-jsx",
-    "jsxImportSource": "@emberkit/core",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "paths": {
-      "@/*": ["./src/*"]
-    }
-  },
-  "include": ["src"],
-  "exclude": ["node_modules", "dist"]
-}`,
-
-  "vite.config.ts": `import { defineConfig } from 'vite';
-import { emberkitVitePlugin } from '@emberkit/core/vite-plugin';
-import tailwindcss from '@tailwindcss/vite';
-
-export default defineConfig({
-  plugins: [emberkitVitePlugin(), tailwindcss()],
-  server: {
-    port: 3000,
-    host: 'localhost',
-  },
-  esbuild: {
-    jsxImportSource: '@emberkit/core',
-  },
-});`,
-
-  "index.html": `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{name}}</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-</head>
-<body id="app">
-  <script type="module" src="/src/index.tsx"></script>
-</body>
-</html>`,
-
-  "src/index.tsx": `import { render } from '@emberkit/core';
-import { routes } from 'virtual:emberkit-routes';
-import App from './routes/_layout';
-import './styles.css';
-
-const root = document.getElementById('app');
-
-if (root) {
-  try {
-    render(App, root, { routes });
-  } catch (error) {
-    console.error('[entry] Render error:', error);
-  }
-}`,
+  "src/index.tsx": buildEntryFile({ hasLayout: true, hasCss: true }),
 
   "src/styles.css": `@import "tailwindcss";
 
@@ -296,13 +225,13 @@ const HomePage: RouteComponent = () => {
             <p className="text-lg text-slate-600 mb-8">Choose the plan that works for your team</p>
             <div className="inline-flex items-center gap-3 p-1 bg-white rounded-lg border border-slate-200">
               <button
-                className={\`px-4 py-2 text-sm font-medium rounded-md transition-colors \$\{!annual.value ? 'bg-brand-600 text-white' : 'text-slate-600'\}\`}
+                className={\`px-4 py-2 text-sm font-medium rounded-md transition-colors \${!annual.value ? 'bg-brand-600 text-white' : 'text-slate-600'}\`}
                 onClick={() => { annual.value = false; }}
               >
                 Monthly
               </button>
               <button
-                className={\`px-4 py-2 text-sm font-medium rounded-md transition-colors \$\{annual.value ? 'bg-brand-600 text-white' : 'text-slate-600'\}\`}
+                className={\`px-4 py-2 text-sm font-medium rounded-md transition-colors \${annual.value ? 'bg-brand-600 text-white' : 'text-slate-600'}\`}
                 onClick={() => { annual.value = true; }}
               >
                 Annual <span className="text-brand-600 ml-1 font-semibold">-20%</span>
@@ -314,7 +243,7 @@ const HomePage: RouteComponent = () => {
               <Card
                 key={plan.name}
                 padding="lg"
-                className={\`relative \$\{plan.popular ? 'border-brand-500 shadow-lg' : ''\}\`}
+                className={\`relative \${plan.popular ? 'border-brand-500 shadow-lg' : ''}\`}
               >
                 {plan.popular && (
                   <Badge variant="primary" className="absolute -top-3 left-6">Most Popular</Badge>
@@ -523,17 +452,17 @@ const AboutPage: RouteComponent = () => {
       <div className="max-w-3xl mx-auto px-6 py-16">
         <h1 className="text-4xl font-bold mb-6">About {{name}}</h1>
         <div className="prose prose-slate">
-          <p class="text-lg text-slate-600 mb-6">
+          <p className="text-lg text-slate-600 mb-6">
             We're on a mission to make software development faster and more enjoyable.
             Our platform provides everything you need to build, deploy, and scale modern web applications.
           </p>
-          <h2 class="text-2xl font-bold mt-8 mb-4">Our Story</h2>
-          <p class="text-slate-600 mb-4">
+          <h2 className="text-2xl font-bold mt-8 mb-4">Our Story</h2>
+          <p className="text-slate-600 mb-4">
             Founded in 2026, {{name}} was born from the frustration of dealing with complex,
             bloated frameworks. We believe in simplicity, performance, and developer experience.
           </p>
-          <h2 class="text-2xl font-bold mt-8 mb-4">Values</h2>
-          <ul class="list-disc pl-6 space-y-2 text-slate-600">
+          <h2 className="text-2xl font-bold mt-8 mb-4">Values</h2>
+          <ul className="list-disc pl-6 space-y-2 text-slate-600">
             <li>Developer experience first</li>
             <li>Performance is a feature</li>
             <li>Simplicity over complexity</li>
