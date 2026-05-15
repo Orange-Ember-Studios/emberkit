@@ -13,6 +13,7 @@
     "dev": "pnpm --filter @emberkit/docs dev",
     "build:cli": "pnpm --filter @emberkit/cli build",
     "changeset": "changeset",
+    "changeset:add": "node scripts/create-changeset.mjs",
     "version-packages": "changeset version",
     "release": "pnpm build && changeset publish",
     "pre-alpha": "changeset pre enter alpha"

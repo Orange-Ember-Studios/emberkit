@@ -16,7 +16,8 @@ Follow these steps:
 2. If there are uncommitted changes, ask the user to commit them first
 3. Run `git fetch origin` and verify we're on the `main` branch
 4. Check if there are any pending changesets by running `pnpm changeset status`
-5. If no changesets exist, ask the user if they want to create one with `pnpm changeset`
+5. If no changesets exist, suggest non-interactive
+   `pnpm changeset:add --message "…" @emberkit/pkg:patch` (or `--from-git main --bump patch`) or interactive `pnpm changeset`
 6. Run `pnpm version-packages` to bump versions based on changesets
 7. Run `git status` to see the version changes
 8. Create a commit with message: `chore: version packages`

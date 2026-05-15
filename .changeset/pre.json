@@ -9,14 +9,5 @@
     "@emberkit/icons": "0.2.2",
     "@emberkit/ui": "0.2.4"
   },
-  "changesets": [
-    "blog-route-params",
-    "cli-blog-api",
-    "cli-counter-fix",
-    "cli-counter-solid-color",
-    "cli-counter-value",
-    "cli-official-url",
-    "cli-signal-hydration",
-    "ui-design-tokens"
-  ]
+  "changesets": []
 }
