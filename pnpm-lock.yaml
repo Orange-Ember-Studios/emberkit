@@ -63,18 +63,40 @@ importers:
 
   packages/cli:
     dependencies:
-      commander:
-        specifier: ^11.1.0
-        version: 11.1.0
       inquirer:
         specifier: ^9.2.0
         version: 9.3.8(@types/node@22.19.18)
     devDependencies:
+      '@eslint/js':
+        specifier: ^10.0.1
+        version: 10.0.1(eslint@10.3.0(jiti@2.7.0))
       '@types/inquirer':
         specifier: ^9.0.3
         version: 9.0.9
+      eslint:
+        specifier: ^10.0.0
+        version: 10.3.0(jiti@2.7.0)
+      eslint-plugin-perfectionist:
+        specifier: ^5.9.0
+        version: 5.9.0(eslint@10.3.0(jiti@2.7.0))(typescript@5.9.3)
+      typescript-eslint:
+        specifier: ^8.59.3
+        version: 8.59.3(eslint@10.3.0(jiti@2.7.0))(typescript@5.9.3)
 
-  packages/edge: {}
+  packages/edge:
+    devDependencies:
+      '@eslint/js':
+        specifier: ^10.0.1
+        version: 10.0.1(eslint@10.3.0(jiti@2.7.0))
+      eslint:
+        specifier: ^10.0.0
+        version: 10.3.0(jiti@2.7.0)
+      eslint-plugin-perfectionist:
+        specifier: ^5.9.0
+        version: 5.9.0(eslint@10.3.0(jiti@2.7.0))(typescript@5.9.3)
+      typescript-eslint:
+        specifier: ^8.59.3
+        version: 8.59.3(eslint@10.3.0(jiti@2.7.0))(typescript@5.9.3)
 
   packages/emberkit:
     dependencies:
@@ -121,6 +143,18 @@ importers:
       '@emberkit/core':
         specifier: workspace:*
         version: link:../emberkit
+      '@eslint/js':
+        specifier: ^10.0.1
+        version: 10.0.1(eslint@10.3.0(jiti@2.7.0))
+      eslint:
+        specifier: ^10.0.0
+        version: 10.3.0(jiti@2.7.0)
+      eslint-plugin-perfectionist:
+        specifier: ^5.9.0
+        version: 5.9.0(eslint@10.3.0(jiti@2.7.0))(typescript@5.9.3)
+      typescript-eslint:
+        specifier: ^8.59.3
+        version: 8.59.3(eslint@10.3.0(jiti@2.7.0))(typescript@5.9.3)
 
   packages/ui:
     dependencies:
@@ -1407,10 +1441,6 @@ packages:
 
   comma-separated-tokens@2.0.3:
     resolution: {integrity: sha512-Fu4hJdvzeylCfQPp9SGWidpzrMs7tTrlu6Vb8XGaRGck8QSNZJJp538Wrb60Lax4fPwR64ViY468OIUTbRlGZg==}
-
-  commander@11.1.0:
-    resolution: {integrity: sha512-yPVavfyCcRhmorC7rWlkHn15b4wDVgVmBA7kV4QVBsF7kv/9TKJAbAXVTxvTnwP8HHKjRCJDClKbciiYS7p0DQ==}
-    engines: {node: '>=16'}
 
   cookie@1.1.1:
     resolution: {integrity: sha512-ei8Aos7ja0weRpFzJnEA9UHJ/7XQmqglbRwnf2ATjcB9Wq874VKH9kfjjirM6UhU2/E5fFYadylyhFldcqSidQ==}
@@ -3885,8 +3915,6 @@ snapshots:
   color-name@1.1.4: {}
 
   comma-separated-tokens@2.0.3: {}
-
-  commander@11.1.0: {}
 
   cookie@1.1.1: {}
 
