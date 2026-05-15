@@ -263,9 +263,14 @@ export interface IconProps {
 const Icon: FC<IconProps> = ({ name, size = 24, className, color }) => {
   const Component = registry[name];
   if (!Component) return null;
-  return (
-    <Component size={size} className={className ?? ""} color={color ?? ""} />
-  );
+  // Do not coerce missing color to "". @emberkit/icons uses (color ?? "currentColor")
+  // for stroke; empty string would produce stroke="" and hide outline icons.
+  // Omit `color` when undefined so exactOptionalPropertyTypes accepts the props object.
+  const iconProps =
+    color === undefined
+      ? { size, className: className ?? "" }
+      : { size, className: className ?? "", color };
+  return <Component {...iconProps} />;
 };
 
 export { Icon };
