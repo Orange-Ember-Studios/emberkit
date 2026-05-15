@@ -613,7 +613,9 @@ export async function create(options: CreateOptions): Promise<void> {
     kebabName: toKebabCase(name),
   };
 
-  for (const [filePath, content] of Object.entries(starterFiles)) {
+  const templateFiles = templateId === "with-ui" ? withUiTemplate : starterFiles;
+
+  for (const [filePath, content] of Object.entries(templateFiles)) {
     const fullPath = join(targetDir, filePath);
     const dir = join(targetDir, filePath.split("/").slice(0, -1).join("/"));
 
@@ -661,3 +663,330 @@ export async function create(options: CreateOptions): Promise<void> {
   console.log(`  ${DIM}To preview the build:${RESET}`);
   console.log(`    ${BRIGHT_CYAN}emberkit preview${RESET}\n`);
 }
+
+const withUiTemplate: Record<string, string> = {
+  "package.json": `{
+  "name": "{{name}}",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "emberkit dev",
+    "build": "emberkit build",
+    "preview": "emberkit preview",
+    "lint": "eslint src --ext .ts,.tsx",
+    "format": "prettier --write \\"src/**/*.{ts,tsx}\\"",
+    "build:css": "tailwindcss -i ./src/styles.css -o ./dist/styles.css"
+  },
+  "dependencies": {
+    "@emberkit/core": "^0.2.4",
+    "@emberkit/ui": "^0.2.3"
+  },
+  "devDependencies": {
+    "@emberkit/cli": "^0.2.4",
+    "typescript": "^5.7.0",
+    "vite": "^6.0.0",
+    "tailwindcss": "^3.4.0",
+    "postcss": "^8.4.0",
+    "autoprefixer": "^10.4.0"
+  }
+}`,
+
+  "tsconfig.json": `{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "jsxImportSource": "@emberkit/core",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
+}`,
+
+  "tailwind.config.js": `/** @type {import('tailwindcss').Config} */
+export default {
+  content: ['./src/**/*.{js,ts,jsx,tsx}', './index.html'],
+  theme: {
+    extend: {
+      colors: {
+        ember: {
+          50: '#fff7ed',
+          100: '#ffedd5',
+          200: '#fed7aa',
+          300: '#fdba74',
+          400: '#fb923c',
+          500: '#f97316',
+          600: '#ea580c',
+          700: '#c2410c',
+          800: '#9a3412',
+          900: '#7c2d12',
+        },
+      },
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+      },
+    },
+  },
+  plugins: [],
+};`,
+
+  "postcss.config.js": `export default {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+};`,
+
+  "emberkit.config.ts": `import { defineConfig } from '@emberkit/core';
+
+export default defineConfig({
+  mode: 'spa',
+  build: {
+    outDir: 'dist',
+    target: 'esnext',
+  },
+});`,
+
+  "vite.config.ts": `import { defineConfig } from 'vite';
+import { emberkitVitePlugin } from '@emberkit/core/vite-plugin';
+import tailwindcss from '@tailwindcss/vite';
+
+export default defineConfig({
+  plugins: [emberkitVitePlugin(), tailwindcss()],
+  server: {
+    port: 3000,
+    host: 'localhost',
+  },
+  esbuild: {
+    jsxImportSource: '@emberkit/core',
+  },
+});`,
+
+  "index.html": `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{name}}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="/styles.css" rel="stylesheet">
+</head>
+<body>
+  <div id="app"></div>
+  <script type="module" src="/src/index.tsx"></script>
+</body>
+</html>`,
+
+  "src/index.tsx": `import { render } from '@emberkit/core';
+import App from './routes/_layout';
+
+const root = document.getElementById('app');
+
+if (root) {
+  render(App, root);
+}`,
+
+  "src/styles.css": `@import "tailwindcss";
+
+:root {
+  --color-bg: #0f172a;
+  --color-bg-secondary: #1e293b;
+  --color-text: #e2e8f0;
+  --color-text-muted: #94a3b8;
+  --color-primary: #f97316;
+  --color-primary-hover: #ea580c;
+  --color-border: #334155;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}`,
+
+  "src/routes/_layout.tsx": `import type { RouteComponent } from '@emberkit/core';
+import { Head } from '@emberkit/core';
+import { DefaultLayout } from '@emberkit/ui';
+
+const Layout: RouteComponent = ({ children }) => {
+  return (
+    <>
+      <Head>
+        <title>{{name}}</title>
+        <meta name="description" content="Built with EmberKit UI" />
+      </Head>
+      <DefaultLayout
+        logo={<span className="text-ember-500 font-bold text-xl">🔥 {{name}}</span>}
+        navItems={[
+          { label: 'Home', href: '/' },
+          { label: 'About', href: '/about' },
+          { label: 'Docs', href: 'https://emberkit.dev/docs', external: true },
+        ]}
+      >
+        {children}
+      </DefaultLayout>
+    </>
+  );
+};
+
+export default Layout;`,
+
+  "src/routes/index.tsx": `import type { RouteComponent } from '@emberkit/core';
+import { Button, Card, Heading, Text, Badge, Input } from '@emberkit/ui';
+import { signal } from '@emberkit/core';
+
+const HomePage: RouteComponent = () => {
+  const email = signal('');
+
+  return (
+    <div className="space-y-16">
+      <section className="text-center py-16">
+        <Heading level="h1" size="4xl" weight="bold" className="mb-4">
+          Welcome to <span className="text-ember-500">{{name}}</span>
+        </Heading>
+        <Text size="xl" color="muted" className="max-w-2xl mx-auto mb-8">
+          A modern starter template with EmberKit UI components and Tailwind CSS.
+          Build beautiful interfaces with our pre-built component library.
+        </Text>
+        <div className="flex gap-4 justify-center">
+          <Button variant="primary" size="lg">
+            Get Started
+          </Button>
+          <Button variant="secondary" size="lg">
+            View Docs
+          </Button>
+        </div>
+      </section>
+
+      <section>
+        <Heading level="h2" size="2xl" weight="semibold" className="mb-8 text-center">
+          UI Components
+        </Heading>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Card padding="lg">
+            <Badge variant="primary" size="sm" className="mb-2">Button</Badge>
+            <Heading level="h3" size="lg" weight="semibold" className="mb-2">
+              Button Variants
+            </Heading>
+            <Text color="muted" className="mb-4">
+              Primary, secondary, ghost, and more button styles.
+            </Text>
+            <div className="flex gap-2 flex-wrap">
+              <Button variant="primary">Primary</Button>
+              <Button variant="secondary">Secondary</Button>
+              <Button variant="ghost">Ghost</Button>
+            </div>
+          </Card>
+
+          <Card padding="lg">
+            <Badge variant="success" size="sm" className="mb-2">Cards</Badge>
+            <Heading level="h3" size="lg" weight="semibold" className="mb-2">
+              Card Component
+            </Heading>
+            <Text color="muted" className="mb-4">
+              Flexible card layout with padding variants.
+            </Text>
+            <Card padding="md" className="bg-slate-800">
+              <Text>Card content here</Text>
+            </Card>
+          </Card>
+
+          <Card padding="lg">
+            <Badge variant="info" size="sm" className="mb-2">Forms</Badge>
+            <Heading level="h3" size="lg" weight="semibold" className="mb-2">
+              Form Inputs
+            </Heading>
+            <Text color="muted" className="mb-4">
+              Styled input with label support.
+            </Text>
+            <Input
+              label="Email"
+              placeholder="Enter your email"
+              value={email.value}
+              onChange={(e) => { email.value = e.currentTarget.value; }}
+            />
+          </Card>
+        </div>
+      </section>
+
+      <section className="text-center py-16 bg-slate-800/50 rounded-xl">
+        <Heading level="h2" size="2xl" weight="semibold" className="mb-4">
+          Ready to get started?
+        </Heading>
+        <Text color="muted" className="max-w-xl mx-auto mb-6">
+          Install dependencies and start building your next project with EmberKit.
+        </Text>
+        <Button variant="primary" size="lg">
+          Create Project →
+        </Button>
+      </section>
+    </div>
+  );
+};
+
+export default HomePage;`,
+
+  "src/routes/about.tsx": `import type { RouteComponent } from '@emberkit/core';
+import { Head } from '@emberkit/core';
+import { Heading, Text, Button } from '@emberkit/ui';
+
+const AboutPage: RouteComponent = () => {
+  return (
+    <div className="max-w-2xl mx-auto py-12">
+      <Head>
+        <title>About - {{name}}</title>
+      </Head>
+      <Heading level="h1" size="3xl" weight="bold" className="mb-6">
+        About {{name}}
+      </Heading>
+      <Text size="lg" color="muted" className="mb-8">
+        This project was created with EmberKit and the UI component library.
+        It demonstrates how to build modern, beautiful interfaces with our
+        pre-built components and Tailwind CSS.
+      </Text>
+      <div className="space-y-4">
+        <div className="flex items-center gap-3 p-4 bg-slate-800 rounded-lg">
+          <span className="text-ember-500 text-2xl">✓</span>
+          <Text>TypeScript-first development</Text>
+        </div>
+        <div className="flex items-center gap-3 p-4 bg-slate-800 rounded-lg">
+          <span className="text-ember-500 text-2xl">✓</span>
+          <Text>Pre-built UI components</Text>
+        </div>
+        <div className="flex items-center gap-3 p-4 bg-slate-800 rounded-lg">
+          <span className="text-ember-500 text-2xl">✓</span>
+          <Text>Tailwind CSS integration</Text>
+        </div>
+        <div className="flex items-center gap-3 p-4 bg-slate-800 rounded-lg">
+          <span className="text-ember-500 text-2xl">✓</span>
+          <Text>File-based routing</Text>
+        </div>
+      </div>
+      <div className="mt-8">
+        <Button variant="secondary">← Back to Home</Button>
+      </div>
+    </div>
+  );
+};
+
+export default AboutPage;`,
+};
