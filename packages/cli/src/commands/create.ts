@@ -30,7 +30,7 @@ const BRIGHT_YELLOW = "\x1b[93m";
 
 const ORANGE_BG = "\x1b[48;5;208m";
 
-const TEMPLATES = [
+export const TEMPLATES = [
   { id: "basic", name: "Basic", desc: "Simple starter with Tailwind CSS", files: starterFiles },
   { id: "with-ui", name: "With UI", desc: "Starter with EmberKit UI components", files: withUiTemplate },
   { id: "minimal", name: "Minimal", desc: "Barebones project, no CSS framework", files: minimalTemplate },
