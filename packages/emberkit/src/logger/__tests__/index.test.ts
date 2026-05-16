@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { createLogger } from '../helpers/create-logger.js';
+import { createLogger } from '../helpers/create-logger-node.js';
 import type { Logger } from '../types.js';
 
 describe('Logger', () => {

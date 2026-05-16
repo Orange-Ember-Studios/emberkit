@@ -1,5 +1,5 @@
 import type { Logger, LogLevel } from '../logger/types.js';
-import { createLogger } from '../logger/helpers/create-logger.js';
+import { createLogger } from '../logger/node.js';
 
 export interface DevServerOptions {
   port?: number;

@@ -44,6 +44,18 @@
     "./jsx-dev-runtime": {
       "import": "./dist/jsx-dev-runtime.js",
       "types": "./dist/jsx-dev-runtime.d.ts"
+    },
+    "./logger": {
+      "browser": {
+        "types": "./dist/logger/browser.d.ts",
+        "import": "./dist/logger/browser.js"
+      },
+      "types": "./dist/logger/node.d.ts",
+      "import": "./dist/logger/node.js"
+    },
+    "./logger/node": {
+      "types": "./dist/logger/node.d.ts",
+      "import": "./dist/logger/node.js"
     }
   },
   "scripts": {

@@ -1,19 +1,19 @@
-// Server-only HTTP logger export
-// This file should only be imported in server contexts, not browser
+import pinoHttp from 'pino-http';
+import type { Logger } from './types.js';
+import { createLogger } from './helpers/create-logger-node.js';
 
-export function createHttpLogger(loggerInstance?: import('./types.js').Logger) {
-  // Lazy load pino modules only when called (server-side)
-  const pinoHttp = require('pino-http');
-  const { createLogger: create } = require('./helpers/create-logger.js');
-
-  const logger = loggerInstance ?? create({ name: '@emberkit/http' });
+/**
+ * HTTP request logger middleware (Node only). Pass a pino-backed logger from {@link createLogger} on the server.
+ */
+export function createHttpLogger(loggerInstance?: Logger): ReturnType<typeof pinoHttp> {
+  const log = loggerInstance ?? createLogger({ name: '@emberkit/http' });
 
   return pinoHttp(
     {
-      logger: logger as any,
+      logger: log as any,
       customErrorMessage: (error: Error) => error.message,
       customSuccessMessage: () => 'Request processed',
     },
-    logger as any,
+    log as any,
   );
 }
