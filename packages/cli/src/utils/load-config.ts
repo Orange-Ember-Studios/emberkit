@@ -25,7 +25,7 @@ async function transpileAndImport<T>(
 
   try {
     // esbuild is always available as a transitive dependency of Vite
-    const { build: esbuild } = await import("esbuild") as typeof import("esbuild");
+    const { build: esbuild } = await import("esbuild");
 
     await esbuild({
       entryPoints: [filePath],
