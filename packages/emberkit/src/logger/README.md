@@ -11,10 +11,34 @@ A comprehensive logging system for EmberKit with configurable log levels, transp
 - 🌍 Request/response HTTP logging
 - ♿ Works with the dev server and custom implementations
 
+## Import path (important)
+
+`@emberkit/core` does **not** bundle `createLogger` on the main entry, so **pino is never loaded in the browser**. Import from the logger subpath instead:
+
+```ts
+import { createLogger } from '@emberkit/core/logger';
+```
+
+Bundlers use the **`browser`** export in client builds (console-backed logger) and the **Node** implementation for SSR/dev servers (pino).
+
+Logger **types** still come from the main package:
+
+```ts
+import type { Logger, LogLevel, LoggerOptions } from '@emberkit/core';
+```
+
+On **Node only**, `@emberkit/core/logger` also exports `createHttpLogger` and `logger`. Do not import those from client-only modules.
+
+To force the **pino** implementation in a monorepo (where `@emberkit/core` may alias to `src/`), import:
+
+```ts
+import { createLogger, createHttpLogger } from '@emberkit/core/logger/node';
+```
+
 ## Basic Usage
 
 ```typescript
-import { createLogger } from '@emberkit/core';
+import { createLogger } from '@emberkit/core/logger';
 
 // Create a logger with default options
 const logger = createLogger();
@@ -38,7 +62,8 @@ logger.debug('Detailed debug information', { userId: 123 });
 ## Configuration
 
 ```typescript
-import { createLogger, type LoggerOptions } from '@emberkit/core';
+import { createLogger } from '@emberkit/core/logger';
+import type { LoggerOptions } from '@emberkit/core';
 
 // Create a logger with custom options
 const logger = createLogger({
@@ -47,8 +72,8 @@ const logger = createLogger({
   transport: false, // Disable transport (basic pino only)
 });
 
-// With custom transport
-const logger = createLogger({
+// With custom transport (Node / pino only; ignored in browser builds)
+const prodLogger = createLogger({
   name: 'my-app',
   level: 'info',
   transport: {
@@ -78,7 +103,7 @@ requestLogger.info('Request received'); // Includes requestId and userId
 Use the HTTP logger middleware with dev servers:
 
 ```typescript
-import { createHttpLogger } from '@emberkit/core';
+import { createHttpLogger } from '@emberkit/core/logger';
 
 const httpLogger = createHttpLogger();
 
@@ -92,6 +117,7 @@ The dev server automatically logs all requests:
 
 ```typescript
 import { createDevServer } from '@emberkit/core';
+import { createLogger } from '@emberkit/core/logger';
 
 // With default logging (info level)
 const server = await createDevServer({
@@ -136,11 +162,8 @@ logger
 
 ## Environment-Based Configuration
 
-The logger automatically adjusts output based on environment:
-
-- **Development**: Pretty-printed output with colors (if `pino-pretty` is installed)
-- **Production**: JSON-formatted output for log aggregation
-- **CI/Testing**: Basic pino output (no fancy formatting)
+- **Browser builds** (`import` + `browser` condition): `console` only; `transport` is ignored.
+- **Node / SSR** (default `./logger` export): **pino** — pretty-print in dev when `pino-pretty` is available, JSON in production.
 
 ## Type Safety
 
@@ -148,6 +171,7 @@ Full TypeScript support with proper types:
 
 ```typescript
 import type { Logger, LogLevel } from '@emberkit/core';
+import { createLogger } from '@emberkit/core/logger';
 
 const createAppLogger = (): Logger => {
   return createLogger({ level: 'info' });
