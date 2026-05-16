@@ -19,6 +19,7 @@ export function createSignal<T>(
 ): [() => T, (newValue: T | ((prev: T) => T)) => void] & Signal<T> {
   let value = initialValue;
   const subs = new Set<(v: T) => void>();
+  const equals = options.equals ?? ((a: T, b: T) => a === b);
 
   const idx = sigIndex++;
 
@@ -29,7 +30,7 @@ export function createSignal<T>(
 
   function setter(newValue: T | ((prev: T) => T)): void {
     const next = typeof newValue === 'function' ? (newValue as (prev: T) => T)(value) : newValue;
-    if (value === next) return;
+    if (equals(value, next)) return;
     value = next;
     if (subs.size > 0) {
       const fns = [...subs];
@@ -50,7 +51,7 @@ export function createSignal<T>(
     },
     set value(newValue: T | ((prev: T) => T)) {
       const next = typeof newValue === 'function' ? (newValue as (prev: T) => T)(value) : newValue;
-      if (value === next) return;
+      if (equals(value, next)) return;
       value = next;
       if (subs.size > 0) {
         const fns = [...subs];

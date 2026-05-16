@@ -1,6 +1,8 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import {
   DataCache,
+  buildCacheHeader,
+  parseCacheHeader,
   // createCache,
   getCached,
   setCache,

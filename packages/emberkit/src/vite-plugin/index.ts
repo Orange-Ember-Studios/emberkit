@@ -252,7 +252,7 @@ export default function MDComponent(props) {
   return { code: componentCode };
 }
 
-async function transformMDX(code: string, id: string): Promise<{ code: string } | null> {
+async function transformMDX(code: string, _id: string): Promise<{ code: string } | null> {
   const frontmatterMatch = code.match(/^---\n([\s\S]*?)\n---\n?/);
 
   let frontmatter: Record<string, unknown> = {};
@@ -264,41 +264,12 @@ async function transformMDX(code: string, id: string): Promise<{ code: string } 
     content = code.slice(frontmatterMatch[0].length);
   }
 
-  // Extract code blocks before MDX compilation to preserve syntax
-  const codeBlocks: { html: string; index: number }[] = [];
-  const processedContent = content.replace(
-    /```(\w*)\n([\s\S]*?)```/g,
-    (_match, lang, blockCode) => {
-      const html = renderCodeBlock(lang, blockCode);
-      codeBlocks.push({ html, index: codeBlocks.length });
-      return `<CodeBlock_${codeBlocks.length - 1} />`;
-    },
-  );
-
-  const compiled = await compile(processedContent, {
-    outputFormat: 'program',
-    development: false,
+  const compiled = await compile(content, {
     jsx: false,
     jsxImportSource: '@emberkit/core',
     remarkPlugins: [remarkGfm],
+    development: false,
   });
-
-  let compiledCode = String(compiled);
-
-  // Build code block component definitions
-  const codeBlockComponents = codeBlocks
-    .map((block) => {
-      const escapedHtml = JSON.stringify(block.html);
-      return `function CodeBlock_${block.index}() {
-  return createElement('div', { 
-    dangerouslySetInnerHTML: { __html: ${escapedHtml} }
-  });
-}`;
-    })
-    .join('\n\n');
-
-  // Rename the MDX default export so we can wrap it
-  compiledCode = compiledCode.replace('export default function MDXContent', 'function _MDXContent');
 
   const exportLines: string[] = [];
 
@@ -317,73 +288,12 @@ async function transformMDX(code: string, id: string): Promise<{ code: string } 
 
   exportLines.push(`export const metadata = ${JSON.stringify(frontmatter)};`);
 
-  // Build components override object
-  const componentsOverride =
-    codeBlocks.length > 0
-      ? `
-const _codeBlockComponents = {
-  ${codeBlocks.map((b) => `CodeBlock_${b.index}`).join(', ')}
-};
-`
-      : '';
+  const body =
+    typeof compiled === 'object' && compiled !== null && 'value' in compiled
+      ? String((compiled as { value: string }).value)
+      : String(compiled);
 
-  const componentCode = `
-import { createElement } from '@emberkit/core';
-
-${exportLines.join('\n')}
-
-${codeBlockComponents}
-${componentsOverride}
-
-${compiledCode}
-
-function _GfmTable(props) {
-  return createElement('div', { className: 'table-wrapper' },
-    createElement('table', { className: 'gfm-table' }, props.children)
-  );
-}
-
-function _GfmUl(props) {
-  return createElement('ul', { className: 'task-list' }, props.children);
-}
-
-function _GfmLi(props) {
-  return createElement('li', { className: 'task-item' }, props.children);
-}
-
-function _GfmDel(props) {
-  return createElement('span', { className: 'strikethrough' }, props.children);
-}
-
-function _GfmSup(props) {
-  return createElement('span', { className: 'footnote-ref' }, props.children);
-}
-
-export default function MDXComponent(props) {
-  const components = {
-    ...(props.components || {}),
-    ${codeBlocks.map((b) => `CodeBlock_${b.index}`).join(', ')}
-  };
-  
-  return createElement('div', {
-    className: 'md-content md-doc',
-    'data-file': ${JSON.stringify(id)},
-    children: createElement(_MDXContent, { 
-      ...props, 
-      components: {
-        ...components,
-        table: _GfmTable,
-        ul: _GfmUl,
-        li: _GfmLi,
-        del: _GfmDel,
-        sup: _GfmSup,
-      }
-    })
-  });
-}
-`;
-
-  return { code: componentCode };
+  return { code: `${exportLines.join('\n')}\n${body}` };
 }
 
 function parseFrontmatter(content: string): Record<string, unknown> {
@@ -468,9 +378,8 @@ function renderCodeBlock(lang: string, code: string): string {
     highlighted = highlightHTML(highlighted);
   } else if (lang === 'css' || lang === 'scss' || lang === 'sass' || lang === 'less') {
     highlighted = highlightCSS(highlighted);
-  } else if (lang === 'markdown' || lang === 'md') {
-    highlighted = highlightMarkdown(highlighted);
   } else {
+    // Markdown (and unknown) fenced blocks: literal source only — do not tokenize as markdown/HTML.
     highlighted = escapeHtml(highlighted);
   }
 
@@ -1074,34 +983,6 @@ function highlightCSS(code: string): string {
   }
 
   return tokens.join('');
-}
-
-function highlightMarkdown(code: string): string {
-  return code
-    .split('\n')
-    .map((line) => {
-      const escaped = escapeHtml(line);
-      // Frontmatter delimiter
-      if (/^---$/.test(line)) return `<span class="op">${escaped}</span>`;
-      // Headings
-      const headingM = line.match(/^(#{1,6})\s(.+)/);
-      if (headingM) {
-        return `<span class="kw">${escapeHtml(headingM[1])}</span> <span class="tag">${escapeHtml(headingM[2])}</span>`;
-      }
-      // Bold / italic markers (keep simple — just colour the line)
-      if (/^\s*[-*+]\s/.test(line)) {
-        return `<span class="op">${escapeHtml(line.match(/^(\s*[-*+])/)![1])}</span>${escapeHtml(line.slice(line.match(/^(\s*[-*+])/)![1].length))}`;
-      }
-      // Blockquote
-      if (/^>/.test(line)) return `<span class="cm">${escaped}</span>`;
-      // Frontmatter key: value
-      const fmM = line.match(/^([\w-]+):\s*(.*)/);
-      if (fmM) {
-        return `<span class="attr">${escapeHtml(fmM[1])}</span><span class="op">:</span> <span class="str">${escapeHtml(fmM[2])}</span>`;
-      }
-      return escaped;
-    })
-    .join('\n');
 }
 
 function processTables(html: string): string {
