@@ -341,15 +341,14 @@ async function transformMDX(code: string, _id: string): Promise<{ code: string }
       ? String((compiled as { value: string }).value)
       : String(compiled);
 
-  // Rename the @mdx-js/mdx default export so we can wrap it with the
-  // md-doc / md-content styling containers that the docs CSS targets.
+  body = enhanceMDXCodeBlocks(body);
+  body = enhanceMDXHeadings(body);
+
   body = body.replace(
     /export default function MDXContent/,
     'function _MDXContent',
   );
 
-  // Wrapper re-exports the component with the styling containers.
-  // We reuse _jsx/_jsxs already imported by the compiled output.
   const wrapper = `
 export default function MDXComponent(props) {
   var p = props ?? {};
@@ -364,6 +363,48 @@ export default function MDXComponent(props) {
 `;
 
   return { code: insertAfterLeadingImports(body + wrapper, exportLines.join('\n')) };
+}
+
+/** Add `id` attributes to headings with simple text children for anchor linking. */
+function enhanceMDXHeadings(jsCode: string): string {
+  const headingRe =
+    /_jsx\(_components\.(h[1-6]),\s*\{\s*children:\s*("(?:[^"\\]|\\.)*")\s*\}\)/g;
+
+  return jsCode.replace(headingRe, (_match, tag: string, textStr: string) => {
+    const text: string = JSON.parse(textStr);
+    const id = text
+      .toLowerCase()
+      .replace(/[^\w]+/g, '-')
+      .replace(/^-|-$/g, '');
+    return `_jsx(_components.${tag}, { id: ${JSON.stringify(id)}, children: ${textStr} })`;
+  });
+}
+
+/**
+ * Post-process the compiled MDX JS output to replace plain `<pre><code>`
+ * blocks with syntax-highlighted code blocks that include copy buttons
+ * and `data-lang` attributes — matching the HTML that the `.md` transform
+ * produces via `renderCodeBlock`.
+ */
+function enhanceMDXCodeBlocks(jsCode: string): string {
+  const codeBlockRe =
+    /_jsx\(_components\.pre,\s*\{\s*children:\s*_jsx\(_components\.code,\s*\{(?:\s*className:\s*"language-([^"]+)",)?\s*children:\s*("(?:[^"\\]|\\.)*")\s*\}\)\s*\}\)/g;
+
+  return jsCode.replace(codeBlockRe, (_match, lang: string | undefined, codeStr: string) => {
+    const rawCode: string = JSON.parse(codeStr);
+    const language = lang ?? '';
+
+    const fullHtml = renderCodeBlock(language, rawCode);
+    const innerHtml = fullHtml.replace(/^<pre[^>]*>/, '').replace(/<\/pre>$/, '');
+
+    const attrs: string[] = [];
+    if (language) {
+      attrs.push(`"data-lang": ${JSON.stringify(language)}`);
+    }
+    attrs.push(`dangerouslySetInnerHTML: { __html: ${JSON.stringify(innerHtml)} }`);
+
+    return `_jsx("pre", { ${attrs.join(', ')} })`;
+  });
 }
 
 function parseFrontmatter(content: string): Record<string, unknown> {
