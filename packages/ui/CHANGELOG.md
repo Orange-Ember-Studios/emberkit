@@ -1,5 +1,14 @@
 # @emberkit/ui
 
+## 2.0.1
+
+### Patch Changes
+
+- edf551b: Read VERSION from package.json at build time
+- Updated dependencies [edf551b]
+  - @emberkit/core@0.4.2
+  - @emberkit/icons@2.0.2
+
 ## 2.0.0
 
 ### Patch Changes

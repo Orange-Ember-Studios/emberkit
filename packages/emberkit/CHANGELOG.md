@@ -1,5 +1,11 @@
 # @emberkit/core
 
+## 0.4.2
+
+### Patch Changes
+
+- edf551b: Read VERSION from package.json at build time
+
 ## 0.4.1
 
 ### Patch Changes
