@@ -1,8 +1,6 @@
 import { createServer, type UserConfig, type LogLevel } from "vite";
-import { join } from "path";
-import { existsSync } from "fs";
-import { pathToFileURL } from "url";
 import { mergeEmberkitViteConfig } from "../utils/merge-emberkit-vite.js";
+import { loadEmberKitConfig, loadViteConfig } from "../utils/load-config.js";
 
 const COLORS = {
   reset: "\x1b[0m",
@@ -54,44 +52,6 @@ function log(level: "info" | "warn" | "error" | "success" | "debug", message: st
   console.log(output);
 }
 
-async function loadEmberKitConfig(root: string): Promise<Record<string, unknown> | null> {
-  const configPath = join(root, "emberkit.config.ts");
-  const configPathJs = join(root, "emberkit.config.js");
-  
-  const finalPath = existsSync(configPath) ? configPath : existsSync(configPathJs) ? configPathJs : null;
-  
-  if (!finalPath) {
-    return null;
-  }
-  
-  try {
-    const configUrl = pathToFileURL(finalPath).href;
-    const mod = await import(configUrl);
-    return mod.default || mod;
-  } catch {
-    return null;
-  }
-}
-
-async function loadViteConfig(root: string): Promise<UserConfig | null> {
-  const viteConfigPath = join(root, "vite.config.ts");
-  const viteConfigPathJs = join(root, "vite.config.js");
-  
-  const finalPath = existsSync(viteConfigPath) ? viteConfigPath : existsSync(viteConfigPathJs) ? viteConfigPathJs : null;
-  
-  if (!finalPath) {
-    return null;
-  }
-  
-  try {
-    const configUrl = pathToFileURL(finalPath).href;
-    const mod = await import(configUrl);
-    const config = mod.default || mod;
-    return typeof config === "function" ? config({ mode: "development", command: "serve" }) : config;
-  } catch {
-    return null;
-  }
-}
 
 export async function dev(_args: string[]): Promise<void> {
   const root = process.cwd();
@@ -102,7 +62,7 @@ export async function dev(_args: string[]): Promise<void> {
   log("info", "Initializing development server...");
   
   const emberkitConfig = await loadEmberKitConfig(root);
-  const viteFileConfig = await loadViteConfig(root);
+  const viteFileConfig = await loadViteConfig(root, "serve");
   const viteConfig = mergeEmberkitViteConfig(emberkitConfig, viteFileConfig);
   
   if (emberkitConfig) {

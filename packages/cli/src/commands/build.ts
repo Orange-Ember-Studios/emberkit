@@ -4,6 +4,7 @@ import { existsSync, readFileSync, writeFileSync, mkdirSync } from "fs";
 import { pathToFileURL } from "url";
 import { cliBrand } from "../brand.js";
 import { mergeEmberkitViteConfig } from "../utils/merge-emberkit-vite.js";
+import { loadEmberKitConfig, loadViteConfig } from "../utils/load-config.js";
 
 const COLORS = {
   reset: "\x1b[0m",
@@ -35,51 +36,6 @@ function log(level: "info" | "warn" | "error" | "success", message: string) {
   console.log(`${prefix} ${levelLabel} ${emberTag} ${message}`);
 }
 
-async function loadEmberKitConfig(root: string): Promise<Record<string, unknown> | null> {
-  const configPaths = [
-    join(root, "emberkit.config.ts"),
-    join(root, "emberkit.config.js"),
-    join(root, "emberkit.config.mjs"),
-  ];
-  
-  for (const configPath of configPaths) {
-    if (existsSync(configPath)) {
-      try {
-        const configUrl = pathToFileURL(configPath).href;
-        const mod = await import(configUrl);
-        return mod.default || mod;
-      } catch {
-        continue;
-      }
-    }
-  }
-  
-  return null;
-}
-
-async function loadViteConfig(root: string): Promise<UserConfig | null> {
-  const viteConfigPaths = [
-    join(root, "vite.config.ts"),
-    join(root, "vite.config.js"),
-  ];
-  
-  for (const configPath of viteConfigPaths) {
-    if (existsSync(configPath)) {
-      try {
-        const configUrl = pathToFileURL(configPath).href;
-        const mod = await import(configUrl);
-        const config = mod.default || mod;
-        return typeof config === "function" 
-          ? config({ mode: "production", command: "build" }) 
-          : config;
-      } catch {
-        continue;
-      }
-    }
-  }
-  
-  return null;
-}
 
 export async function build(_args: string[]): Promise<void> {
   const root = process.cwd();
