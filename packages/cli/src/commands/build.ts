@@ -160,11 +160,15 @@ async function buildClient(
   viteConfig: UserConfig | null,
   customLogger: any,
 ): Promise<void> {
+  // Ensure plugins from viteConfig are included
+  const plugins = viteConfig?.plugins ? (Array.isArray(viteConfig.plugins) ? viteConfig.plugins : [viteConfig.plugins]) : [];
+  
   const clientConfig: InlineConfig = {
     ...viteConfig,
     root,
     customLogger,
     logLevel: "silent",
+    plugins,
     build: {
       ...(viteConfig?.build || {}),
       outDir,
@@ -176,6 +180,7 @@ async function buildClient(
         },
       },
     },
+    ssr: undefined,
   };
   
   await viteBuild(clientConfig);
