@@ -1,6 +1,6 @@
 {
   "name": "@emberkit/core",
-  "version": "0.2.10",
+  "version": "0.3.0",
   "type": "module",
   "private": false,
   "description": "Lightweight TypeScript-first JSX framework core",

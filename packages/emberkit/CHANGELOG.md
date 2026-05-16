@@ -1,5 +1,11 @@
 # @emberkit/core
 
+## 0.3.0
+
+### Minor Changes
+
+- 85ae98e: Add comprehensive pino-based logging system with request tracking and audit trails
+
 ## 0.2.10
 
 ### Patch Changes
