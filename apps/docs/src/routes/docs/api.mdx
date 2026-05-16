@@ -269,15 +269,7 @@ generateBreadcrumbs(items: Array<{ name: string; url: string }>): string
 
 Generates JSON-LD BreadcrumbList schema.
 
-## SSR
-
-### renderSSR
-
-```typescript
-renderSSR(element: JSXNode, options?: SSRRenderOptions): string
-```
-
-Renders a JSX element to an HTML string.
+## SSR & head
 
 ### renderToHTMLString
 
@@ -285,18 +277,47 @@ Renders a JSX element to an HTML string.
 renderToHTMLString(element: JSXNode | null): string
 ```
 
-Converts a JSX element tree to an HTML string.
+Converts a JSX element tree to an HTML fragment. Text and string attributes are HTML-escaped.
 
-### createHtmlDocument
+### drainHeadContent
 
 ```typescript
-createHtmlDocument(
-  body: string,
-  options?: { title?: string; lang?: string; meta?: Record<string, string> }
-): string
+drainHeadContent(): string
 ```
 
-Wraps body content in a full HTML document.
+Returns and clears tags registered by `<Head>` during the current render pass. Use in custom `entry-server` handlers.
+
+### RouteParams
+
+```typescript
+interface RouteParams<T extends Record<string, string> = Record<string, string>> {
+  params: T;
+  query: Record<string, string | string[]>;
+  request: Request;
+}
+```
+
+Props shape for dynamic route components (SSR and client).
+
+### LoaderFunction
+
+```typescript
+type LoaderFunction<T = unknown> = (
+  context: LoaderContext
+) => Promise<LoaderResult<T>> | LoaderResult<T>;
+```
+
+`LoaderContext` includes `params`, `query`, and `request`. Use with `createLoaderData()` for success results.
+
+## Config
+
+### defineConfig
+
+```typescript
+defineConfig(config: Record<string, unknown>): Record<string, unknown>
+```
+
+Used in `emberkit.config.ts` for `mode`, `server`, `build`, and nested `vite` options. See [SSR & SSG](/docs/ssr).
 
 ## Next Steps
 

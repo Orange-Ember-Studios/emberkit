@@ -57,7 +57,7 @@ unsub();
 ```
 
 <Alert variant="info" title="How it works">
-  This is the foundation for EmberKit's zero-JS DOM binding — the hydration system uses <code>subscribe</code> internally to update specific DOM elements when a signal changes, without re-rendering the whole page.
+  Hydration uses <code>subscribe</code> to update bound DOM nodes. See [Hydration](/docs/hydration).
 </Alert>
 
 ## Computed Values with createMemo
@@ -98,7 +98,7 @@ Effects can return a cleanup function:
 createEffect(() => {
   const handler = () => console.log('resize');
   window.addEventListener('resize', handler);
-  
+
   return () => {
     window.removeEventListener('resize', handler);
   };
@@ -130,115 +130,35 @@ batch(() => {
 const [count, setCount] = createSignal(0);
 
 createEffect(() => {
-  // count() is tracked here
   console.log(count());
-  
+
   untrack(() => {
-    // this read is NOT tracked
     console.log(count());
   });
 });
 ```
 
-## DOM Binding with data-ek-bind
+## DOM binding (signals → DOM)
 
-Signals can drive DOM updates directly — no re-render needed. The framework embeds the signal's identity into the HTML, and a tiny hydration script connects the signal to its DOM element at load time.
-
-### Basic usage — textContent
-
-Pass the signal getter directly as `data-ek-bind`. The element's `textContent` updates automatically when the signal changes:
+Signals pair with `data-ek-bind` so updates hit specific nodes instead of re-rendering the tree:
 
 ```tsx
-import { createSignal } from '@emberkit/core';
-
 const [count, setCount] = createSignal(0);
-
 return <span data-ek-bind={count}>{count()}</span>;
 ```
 
-### Show / Hide with CSS classes
-
-Add `data-ek-show` and `data-ek-hide` to toggle CSS classes based on truthiness:
-
-```tsx
-const [open, setOpen] = createSignal(false);
-
-return (
-  <div>
-    <button onClick={() => setOpen(true)}>Open</button>
-    <div data-ek-bind={open} data-ek-show="opacity-100" data-ek-hide="opacity-0 pointer-events-none" class="opacity-0 pointer-events-none">
-      Panel content
-    </div>
-  </div>
-);
-```
-
-### Components can accept signals directly
-
-Components detect signal props automatically and apply bindings internally:
-
-```tsx
-// Modal detects `open` is a signal and auto-wires data-ek-bind + show/hide
-<Modal open={open} onClose={() => setOpen(false)} />
-```
-
-**How it works:**
-
-1. **SSR** — The full HTML is rendered with `data-ek-bind="0"` (the signal's auto-assigned index). The initial class reflects the closed state. Zero JavaScript is needed to see the page.
-
-2. **Hydration** — After the HTML is injected, the framework scans for `[data-ek-bind]` elements, finds the matching signal via a global registry, and calls `signal.subscribe()` to register a DOM update callback.
-
-3. **Interaction** — When the button is clicked, `setOpen(true)` fires. The subscriber toggles the CSS classes on the bound element — no re-render.
-
-**Supported attributes:**
-
-<Card variant="outline">
-  <table>
-    <thead>
-      <tr><th>Attribute</th><th>Purpose</th></tr>
-    </thead>
-    <tbody>
-      <tr><td><code>data-ek-bind</code></td><td>Accepts the signal getter directly (<code>data-ek-bind={'{count}'}</code>)</td></tr>
-      <tr><td><code>data-ek-show</code></td><td>Classes to add when signal value is truthy</td></tr>
-      <tr><td><code>data-ek-hide</code></td><td>Classes to add when signal value is falsy</td></tr>
-      <tr><td><code>data-ek-show-when</code></td><td>Only show when signal equals this string value (for tabs, etc.)</td></tr>
-      <tr><td><code>data-ek-hide-class</code></td><td>Class to toggle when using <code>data-ek-show-when</code> (defaults to <code>"hidden"</code>)</td></tr>
-    </tbody>
-  </table>
-</Card>
-
-### Tabs Example
-
-```tsx
-const [tab, setTab] = createSignal('preview');
-
-<Tabs activeTab={tab()} onChange={(id) => setTab(id)} />
-<div data-ek-bind={tab} data-ek-show-when="preview">Preview panel</div>
-<div data-ek-bind={tab} data-ek-show-when="code" class="hidden">Code panel</div>
-```
+All binding attributes (`data-ek-show`, `data-ek-hide`, `data-ek-show-when`, …) are documented in [Hydration](/docs/hydration).
 
 ### Components accepting signals
 
-Interactive components detect when a prop is a signal (has `__idx`/`subscribe`) and auto-apply bindings. Accepting signals is optional — components also accept plain values for SSR-only use.
+Components may detect signal props and wire bindings internally. Pass a signal or a plain boolean for SSR-only output:
 
-**In component implementation:**
 ```tsx
-// Modal checks if `open` is a signal
-const isSignal = (val: unknown) => typeof val === 'function' && (val as any).__idx != null;
-const openVal = isSignal(open) ? open() : open;
-const bindAttr = isSignal(open) ? { 'data-ek-bind': open, 'data-ek-show': 'opacity-100', 'data-ek-hide': 'opacity-0 pointer-events-none' } : {};
-
-return <div class={...openVal ? 'opacity-100' : 'opacity-0 pointer-events-none'} ...bindAttr />;
-```
-
-**In consumer code:**
-```tsx
-// Pass signal — component handles binding
 <Modal open={open} onClose={() => setOpen(false)} />
-
-// Or pass plain boolean — no binding, SSR only
 <Modal open={true} />
 ```
+
+See [Components](/docs/components#static-vs-interactive).
 
 ## Complete Example
 
@@ -259,9 +179,8 @@ function Counter() {
       <p>Count: {count()}</p>
       <p>Doubled: {doubled.value}</p>
       <p>{isEven.value ? 'Even' : 'Odd'}</p>
-      <button onClick={() => setCount(c => c + 1)}>Increment</button>
-      <button onClick={() => setCount(0)}>Reset</button>
-      {/* Live DOM binding — no re-render */}
+      <button type="button" onClick={() => setCount((c) => c + 1)}>Increment</button>
+      <button type="button" onClick={() => setCount(0)}>Reset</button>
       <span data-ek-bind={count}>{count()}</span>
     </div>
   );
@@ -270,7 +189,7 @@ function Counter() {
 
 ## Next Steps
 
+- [Hydration](/docs/hydration) — `data-ek-bind` reference
 - [Context](/docs/context) — Share signals across components
-- [Components](/docs/components) — Component patterns
-- [Routing](/docs/routing) — Route loaders and data fetching
-- [UI Components](/docs/ui) — See signal hydration in action (Modal, Tabs, Counter)
+- [Components](/docs/components) — Static vs interactive components
+- [UI Components](/docs/ui) — Modal, Tabs, Counter demos

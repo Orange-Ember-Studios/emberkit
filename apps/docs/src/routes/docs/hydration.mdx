@@ -100,7 +100,7 @@ const [open, setOpen] = createSignal(false);
 
 ## What Gets Hydrated
 
-Only elements with `data-ek-bind` or event handlers (`data-ekclick`) receive JavaScript. Everything else stays as pure HTML.
+Only elements with `data-ek-bind` or event handlers receive JavaScript. Click handlers are serialized as `data-ekclick` attributes and wired on load. Everything else stays as pure HTML.
 
 ```tsx
 function App() {

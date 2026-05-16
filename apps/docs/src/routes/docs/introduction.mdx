@@ -2,67 +2,59 @@ import { Badge, Alert, Card, Text } from '@emberkit/ui';
 
 # Introduction
 
-<Text color="muted" className="mb-6">EmberKit is a <strong>minimalist, TypeScript-first JSX framework</strong> built for three principles:</Text>
+<Text color="muted" className="mb-6">EmberKit is a <strong>minimalist, TypeScript-first JSX framework</strong> built around three principles — <strong>speed first</strong>, then minimal weight, then zero JavaScript by default.</Text>
 
 ## Speed
 
-Sub-50ms server-side rendering with streaming support. Optimized for fast Time-to-First-Byte (TTFB).
+Performance is the top priority. EmberKit optimizes the full path from server to screen:
+
+- **Server-rendered HTML** — Pages ship as markup in dev and production (`hybrid`, `ssr`, `static`). Users see content before JavaScript runs.
+- **Pre-rendered static routes** — In `hybrid` and `static` modes, fixed paths become HTML at build time for CDN-fast TTFB and First Contentful Paint.
+- **Selective hydration** — No virtual DOM reconciliation on the client. Signals update bound nodes via `data-ek-bind`; only interactive regions load JS.
+- **Targeted updates** — When state changes, the runtime touches specific DOM nodes instead of re-rendering component trees.
+
+See [SSR & SSG](/docs/ssr) for modes and the build pipeline.
 
 ## Weight
 
-Under 10KB runtime, fully tree-shakeable. Pay only for what you use. No heavy dependencies.
+A tree-shakeable runtime focused on routing, signals, and DOM binding — not a large reconciler. You pay for what you use. Static pages can ship **no framework JS** at all when they have no handlers or bindings.
 
 ## Zero JS by Default
 
-Only interactive elements receive hydration. Static content stays static HTML, reducing bundle size dramatically.
+Static markup stays HTML. Interactivity is opt-in:
 
-## Why EmberKit?
+- `data-ek-bind` — connect signals to DOM nodes ([Hydration](/docs/hydration))
+- Event handlers — wired after load via `data-ekclick`
+- Components with `onClick` or bindings — only those regions hydrate
 
-Most frameworks ship 40-100KB of JavaScript by default, even for simple static pages. EmberKit takes a different approach:
-
-- **Selective Hydration**: Only components with event handlers get client-side JavaScript
-- **File-Based Routing**: No configuration needed, conventions over config
-- **View Transitions API**: Native page transitions without JavaScript
-- **Edge Ready**: Deploy to Cloudflare Workers, Deno Deploy, or any Node environment
-
-## Core Philosophy
-
-```typescript
-// Your code
-function Button({ children }) {
-  return <button className="btn">{children}</button>;
+```tsx
+function Hero() {
+  return <h1>Hello</h1>; // fast paint, no client JS
 }
 
-// Result: Pure HTML, no JavaScript hydration needed
-// <button class="btn">Click me</button>
-```
-
-Only when you add interactivity:
-
-```typescript
 function Counter() {
   const [count, setCount] = createSignal(0);
-
   return (
-    // This button gets hydrated, the rest stays static
-    <button onClick={() => setCount(c => c + 1)}>
-      Count: {count()}
-    </button>
+    <>
+      <span data-ek-bind={count}>{count()}</span>
+      <button type="button" onClick={() => setCount((n) => n + 1)}>+</button>
+    </>
   );
 }
 ```
 
-## Quick Comparison
+## At a glance
 
-| Feature | EmberKit | React | Next.js |
-|---------|----------|-------|---------|
-| Runtime Size | ~8KB | ~45KB | ~95KB |
-| Zero-JS Pages | Native | Manual | Manual |
-| File Routing | Native | External | Built-in |
-| TypeScript | First-class | Supported | Supported |
+| | |
+|--|--|
+| Routing | `src/routes/` file conventions |
+| Rendering | Hybrid default: pre-render static paths, SSR for dynamic routes |
+| State | Signals + targeted DOM updates |
+| Tooling | `emberkit dev`, `build`, `preview`, `serve` |
 
 ## Next Steps
 
-- [Installation](/docs/installation) - Set up your first project
-- [Quick Start](/docs/quick-start) - Build your first page
-- [Core Concepts](/docs/components) - Learn the fundamentals
+- [Installation](/docs/installation) — Create a project
+- [Quick Start](/docs/quick-start) — First routes and signals
+- [SSR & SSG](/docs/ssr) — How speed is delivered in each mode
+- [Hydration](/docs/hydration) — Selective client interactivity

@@ -6,16 +6,22 @@ import { Badge, Alert, Card, Text } from '@emberkit/ui';
 
 # Quick Start
 
-<Text color="muted" className="mb-6">Build your first EmberKit page in 5 minutes.</Text>
+<Text color="muted" className="mb-6">Build your first EmberKit app in a few minutes.</Text>
 
-## Create Your First Route
+## 1. Create a project
 
-Routes live in `src/routes/`. Create `index.tsx`:
+```bash
+npx @emberkit/cli@latest create my-app
+cd my-app && pnpm install && pnpm dev
+```
+
+## 2. Add a route
+
+Routes live in `src/routes/`. Edit `index.tsx` or add new files:
 
 ```tsx
-import { render } from '@emberkit/core';
-
-function HomePage() {
+// src/routes/index.tsx
+export default function HomePage() {
   return (
     <main>
       <h1>Welcome to EmberKit</h1>
@@ -23,29 +29,24 @@ function HomePage() {
     </main>
   );
 }
-
-render(<HomePage />, document.getElementById('app')!);
 ```
 
-## Add Dynamic Routes
+The layout in `src/routes/_layout.tsx` wraps every page. The client entry (`src/index.tsx`) calls `render()` with `virtual:emberkit-routes`.
 
-Create `[slug].tsx` for dynamic paths:
+## 3. Dynamic routes
 
 ```tsx
-import type { Loader } from '@emberkit/loader';
+// src/routes/blog/[slug].tsx
+import type { RouteParams } from '@emberkit/core';
 
-export const loader: Loader = async ({ params }) => {
-  return { slug: params.slug };
-};
-
-export default function PostPage({ data }: { data: { slug: string } }) {
-  return <h1>Post: {data.slug}</h1>;
+export default function PostPage({ params }: RouteParams<{ slug: string }>) {
+  return <h1>Post: {params.slug}</h1>;
 }
 ```
 
-## Use Signals for State
+Navigate to `/blog/hello-world` — `params.slug` is available on the server and client.
 
-Signals store state and automatically update the DOM without re-rendering. Use `data-ek-bind` to connect a signal to an element:
+## 4. Signals and hydration
 
 ```tsx
 import { createSignal } from '@emberkit/core';
@@ -58,45 +59,27 @@ function Counter() {
       <p>
         Count: <span data-ek-bind={count}>{count()}</span>
       </p>
-      <button onClick={() => setCount(c => c + 1)}>
-        Increment
-      </button>
+      <button onClick={() => setCount((c) => c + 1)}>Increment</button>
     </div>
   );
 }
 ```
 
 <Alert variant="info" title="How it works">
-  The <code>span</code> renders with the initial count value in the HTML. 
-  When the button is clicked, <code>setCount</code> updates the signal, and only the <code>span</code>'s <code>textContent</code> changes — no re-render of the whole component.
+  SSR writes the initial count into HTML with <code>data-ek-bind</code>. After load, only the bound <code>span</code> updates when the signal changes. See [Hydration](/docs/hydration) for all binding attributes.
 </Alert>
 
-### DOM Binding Patterns
+## 5. Navigation
 
 ```tsx
-// textContent sync (default)
-<span data-ek-bind={name}>{name()}</span>
-
-// Class toggle (show/hide)
-<div data-ek-bind={open} data-ek-show="opacity-100" data-ek-hide="opacity-0 pointer-events-none">
-
-// String match (tabs)
-<div data-ek-bind={tab} data-ek-show-when="preview">Preview</div>
-```
-
-See [Hydration](/docs/hydration) for the full reference.
-
-## Add Navigation
-
-```tsx
-import { navigate, Link } from '@emberkit/core';
+import { navigate } from '@emberkit/core';
 
 function Nav() {
   return (
     <nav>
-      <Link href="/">Home</Link>
-      <Link href="/about">About</Link>
-      <button onClick={() => navigate('/contact')}>
+      <a href="/">Home</a>
+      <a href="/about">About</a>
+      <button type="button" onClick={() => navigate('/contact')}>
         Contact
       </button>
     </nav>
@@ -104,34 +87,35 @@ function Nav() {
 }
 ```
 
-## Add a Layout
+Use standard `<a href>` for SSR-friendly links, or `navigate()` for programmatic routing with optional View Transitions.
 
-Create `_layout.tsx` to wrap all routes:
+## 6. Page metadata
 
 ```tsx
-export default function Layout({ children }) {
-  return (
-    <div className="app">
-      <header>
-        <nav>...</nav>
-      </header>
-      <main>{children}</main>
-      <footer>...</footer>
-    </div>
-  );
+export const metadata = {
+  title: 'About — My App',
+  description: 'About our team',
+};
+
+export default function About() {
+  return <h1>About</h1>;
 }
 ```
 
-## Build for Production
+Or use `<Head>` from `@emberkit/core` inside components — see [Head](/docs/head).
+
+## 7. Build for production
 
 ```bash
-pnpm build
+pnpm build      # Output in dist/ (mode from emberkit.config.ts)
+pnpm preview    # Local preview server
 ```
 
-Output will be in `dist/`.
+Set `mode: 'static'` in `emberkit.config.ts` for a fully static export, or `hybrid` (default) for static pages plus SSR for dynamic routes. See [SSR & SSG](/docs/ssr).
 
 ## What's Next?
 
-- [Components](/docs/components) - Learn about component patterns
-- [Routing](/docs/routing) - Deep dive into file-based routing
-- [Signals](/docs/signals) - Reactive state management
+- [Routing](/docs/routing) — Layouts, loaders, API routes, error pages
+- [SSR & SSG](/docs/ssr) — Rendering modes and build pipeline
+- [Signals](/docs/signals) — Reactive state
+- [Components](/docs/components) — Static vs interactive UI

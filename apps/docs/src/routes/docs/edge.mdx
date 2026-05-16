@@ -2,34 +2,50 @@ import { Badge, Alert, Card, Text } from '@emberkit/ui';
 
 # Edge Deployment
 
-<Text color="muted" className="mb-6">EmberKit is designed for edge-first deployment. Your app runs in 300+ locations worldwide with sub-50ms latency.</Text>
+<Text color="muted" className="mb-6">Deploy EmberKit apps to edge runtimes or traditional Node servers. Pre-rendered static output works on any CDN; dynamic routes use the SSR bundle from <code className="text-primary-400">dist/server/entry-server.js</code>.</Text>
 
 ## Supported Platforms
 
 <Card variant="outline">
   <table>
     <thead>
-      <tr><th>Platform</th><th>Runtime</th><th>Status</th></tr>
+      <tr><th>Platform</th><th>Runtime</th><th>Typical setup</th></tr>
     </thead>
     <tbody>
-      <tr><td>Cloudflare Workers</td><td>V8 isolates</td><td><Badge variant="success">Supported</Badge></td></tr>
-      <tr><td>Deno Deploy</td><td>Deno</td><td><Badge variant="success">Supported</Badge></td></tr>
-      <tr><td>Node.js</td><td>Node 18+</td><td><Badge variant="success">Supported</Badge></td></tr>
-      <tr><td>Bun</td><td>Bun</td><td><Badge variant="success">Supported</Badge></td></tr>
+      <tr><td>Static CDN</td><td>—</td><td><code>mode: 'static'</code> or hybrid pre-render → upload <code>dist/</code></td></tr>
+      <tr><td>Node.js 18+</td><td>Node</td><td><code>emberkit serve</code> after <code>emberkit build</code></td></tr>
+      <tr><td>Cloudflare Workers</td><td>V8 isolates</td><td><code>@emberkit/edge</code> adapter + Wrangler</td></tr>
+      <tr><td>Deno Deploy</td><td>Deno</td><td><code>@emberkit/edge</code> Deno adapter</td></tr>
+      <tr><td>Bun</td><td>Bun</td><td>Run SSR entry or static <code>dist/</code></td></tr>
     </tbody>
   </table>
 </Card>
 
-## Cloudflare Workers
+## Node production server
 
-### Setup
+After building with `ssr` or `hybrid` mode:
 
 ```bash
-pnpm add -D wrangler
+pnpm build
+pnpm exec emberkit serve
 ```
 
-```typescript
-// wrangler.toml
+`serve` reads `dist/ssr-manifest.json`, serves pre-rendered HTML, and falls back to `dist/server/entry-server.js` for dynamic routes.
+
+For a lighter local check:
+
+```bash
+pnpm preview   # emberkit preview
+```
+
+## Cloudflare Workers
+
+```bash
+pnpm add -D wrangler @emberkit/edge
+```
+
+```toml
+# wrangler.toml
 name = "my-app"
 main = "dist/_worker.js"
 compatibility_date = "2025-01-01"
@@ -38,7 +54,7 @@ compatibility_date = "2025-01-01"
 bucket = "dist"
 ```
 
-### Deploy
+Wire the Cloudflare adapter from `@emberkit/edge` to your worker entry (see package README). Static assets from `dist/` can be served from the site bucket; SSR handlers call your render function per request.
 
 ```bash
 pnpm build
@@ -47,97 +63,50 @@ pnpm wrangler deploy
 
 ## Deno Deploy
 
-### Setup
-
-```typescript
-// deno.json
-{
-  "tasks": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
-  "compilerOptions": {
-    "jsx": "react-jsx",
-    "jsxImportSource": "@emberkit/core"
-  }
-}
-```
-
-### Deploy
+Use `@emberkit/edge` Deno adapter with a built `dist/` output, or serve pre-rendered static files only:
 
 ```bash
-deployctl deploy --project=my-app --prod dist/index.js
+deployctl deploy --project=my-app ./dist
 ```
 
-## Node.js
+## Bundle size helpers
 
-```bash
-pnpm build
-node dist/server.js
-```
-
-## Bundle Size Analysis
-
-EmberKit includes tools to analyze your edge bundle:
+`@emberkit/edge` includes utilities for edge bundle checks:
 
 ```typescript
-import { analyzeBundle } from '@emberkit/edge';
+import { analyzeBundle, minifyHTML, StaticPage } from '@emberkit/edge';
 
-const code = await readFile('dist/bundle.js');
-const stats = analyzeBundle(code);
+const stats = analyzeBundle(workerCode);
+// stats.size, stats.warnings, stats.errors (8KB hard limit constant)
 
-if (stats.warnings.length) {
-  console.warn('Bundle warnings:', stats.warnings);
-}
-if (stats.errors.length) {
-  console.error('Bundle errors:', stats.errors);
-}
-```
-
-### Size Limits
-
-| Metric | Limit | Description |
-|--------|-------|-------------|
-| Warning | 1KB | Bundle approaching limit |
-| Maximum | 8KB | Hard limit for edge runtime |
-
-## HTML Optimization
-
-```typescript
-import { minifyHTML } from '@emberkit/edge';
-
-const minified = minifyHTML('<div>  <p>  Hello  </p>  </div>');
-// "<div><p> Hello </p></div>"
-```
-
-## Static Page Generation
-
-The edge adapter supports static page generation for SSG:
-
-```typescript
-import { StaticPage } from '@emberkit/edge';
+const html = minifyHTML('<div>  <p>  Hello  </p>  </div>');
 
 const page = new StaticPage('<html>...</html>');
 page.addStyle('/styles/main.css');
 page.addScript('/app.js');
-page.setTitle('My Page');
-page.setMeta('description', 'Page description');
-
-const html = page.render();
+const output = page.toHTML();
 ```
 
-## Performance
+Constants: `EDGE_BUNDLE_SIZE_WARNING` (1KB), `MAX_BUNDLE_SIZE` (8KB).
 
-Edge deployment with EmberKit typically achieves:
+## Deployment patterns
 
-- **TTFB**: < 50ms globally
-- **FCP**: < 200ms (SSR + selective hydration)
-- **TTI**: < 500ms (only interactive components load JS)
-- **Bundle**: < 10KB total (framework + app code)
+| App type | Config | Host |
+|----------|--------|------|
+| Marketing / docs | `static` or `hybrid` | Netlify, Cloudflare Pages, S3 |
+| Mixed static + dynamic | `hybrid` | CDN for static + Node/Worker for SSR |
+| Authenticated app | `spa` or `ssr` | Any static host + API |
+
+## Performance goals
+
+Speed is EmberKit’s first principle. Edge-friendly deployments combine:
+
+- **Pre-rendered HTML** for static routes — low TTFB and fast First Contentful Paint at the CDN
+- **SSR at the edge** only where routes need per-request data
+- **Selective hydration** — small client bundles via `data-ek-bind` and minimal JS on content pages
 
 ## Next Steps
 
-- [SSR](/docs/ssr) - Server-side rendering modes
-- [Hydration](/docs/hydration) - Selective hydration
-- [SEO & Meta](/docs/meta) - Edge-rendered meta tags
+- [SSR & SSG](/docs/ssr) — Rendering modes and build output
+- [Hydration](/docs/hydration) — Client bindings
+- [SEO & Meta](/docs/meta) — Meta tags and JSON-LD

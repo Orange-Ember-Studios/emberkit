@@ -78,55 +78,28 @@ function TodoList({ items }: { items: string[] }) {
 
 ## Static vs Interactive
 
-EmberKit makes a key distinction:
-
 <Alert variant="info" title="Key Concept">
-  <strong>Static components</strong> (no event handlers, no signal bindings) render to pure HTML with zero JavaScript.<br />
-  <strong>Interactive components</strong> (with <code>onClick</code>, <code>onChange</code>, etc. or <code>data-ek-bind</code>) receive targeted client-side hydration.
+  <strong>Static</strong> — no handlers, no <code>data-ek-bind</code>: pure HTML, no client JS.<br />
+  <strong>Interactive</strong> — <code>onClick</code> / <code>data-ek-bind</code>: targeted hydration after SSR.
 </Alert>
 
 ```tsx
-// Static: renders to <h1>Hello</h1>, no JS shipped
 function Title() {
   return <h1>Hello</h1>;
 }
 
-// Interactive via event handler (data-ekclick)
 function Counter() {
   const [count, setCount] = createSignal(0);
   return (
     <div>
-      <button onClick={() => setCount(c => c + 1)}>+</button>
+      <button type="button" onClick={() => setCount((c) => c + 1)}>+</button>
       <span data-ek-bind={count}>{count()}</span>
     </div>
   );
 }
-
-// Interactive via signal binding only (no events, still gets JS)
-function LiveTime() {
-  const [time, setTime] = createSignal(new Date().toLocaleTimeString());
-  setInterval(() => setTime(new Date().toLocaleTimeString()), 1000);
-  return <p data-ek-bind={time}>{time()}</p>;
-}
 ```
 
-Components can accept signals directly — the component decides whether to apply bindings:
-
-```tsx
-// Consumer passes the signal, component handles binding
-<Modal open={open} onClose={() => setOpen(false)} />
-
-// Component implementation
-function Modal({ open, onClose }: { open: (() => boolean) | boolean; onClose: () => void }) {
-  const isSignal = typeof open === 'function' && (open as any).__idx != null;
-  const openVal = isSignal ? (open as () => boolean)() : open;
-  const bindAttr = isSignal ? { 'data-ek-bind': open, 'data-ek-show': 'opacity-100', 'data-ek-hide': 'opacity-0 pointer-events-none' } : {};
-
-  return <div class={openVal ? 'opacity-100' : 'opacity-0 pointer-events-none'} {...bindAttr}>...</div>;
-}
-```
-
-See [Hydration](/docs/hydration) for the complete `data-ek-bind` reference.
+Details: [Hydration](/docs/hydration). Signal props on components: [Signals](/docs/signals#components-accepting-signals).
 
 ## Props Interface
 
@@ -158,4 +131,5 @@ function Button({ children, variant = 'primary', size = 'md', disabled, onClick 
 
 - [Routing](/docs/routing) - File-based routing
 - [Signals](/docs/signals) - Reactive state
+- [SSR & SSG](/docs/ssr) - Rendering modes
 - [Context](/docs/context) - Shared state across components

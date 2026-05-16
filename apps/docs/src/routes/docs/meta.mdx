@@ -2,165 +2,15 @@ import { Badge, Alert, Card, Text } from '@emberkit/ui';
 
 # SEO & Meta
 
-<Text color="muted" className="mb-6">EmberKit provides built-in tools for managing meta tags, Open Graph, Twitter cards, and structured data.</Text>
+<Text color="muted" className="mb-6">Programmatic meta tag and JSON-LD generation for servers, scripts, and templates. For declarative <code className="text-primary-400">{'<head>'}</code> tags in components, use the <code className="text-primary-400">{'<Head>'}</code> component — documented in [Head](/docs/head).</Text>
 
-## The <code className="text-primary-400">{'<Head>'}</code> Component
+<Alert variant="info" title="Route metadata">
+  The default SSR pipeline also supports <code>export const metadata = {'{ title, description }'}</code> on route modules. See [SSR & SSG](/docs/ssr#route-metadata-built-in-ssr-head).
+</Alert>
 
-The recommended way to manage <code className="text-primary-400">{'<head>'}</code> tags is the <code className="text-primary-400">{'<Head>'}</code> component. It renders nothing in the body and automatically injects tags into <code className="text-primary-400">{'<head>'}</code> during SSR. On the client, it updates <code className="text-primary-400">document.head</code> directly.
+## generateMeta
 
-### With JSX Children
-
-Pass any <code className="text-primary-400">{'<head>'}</code> elements as children:
-
-```tsx
-import { Head } from '@emberkit/core';
-
-function MyPage() {
-  return (
-    <>
-      <Head>
-        <title>My Page - EmberKit</title>
-        <meta name="description" content="A page built with EmberKit" />
-        <meta name="keywords" content="emberkit, framework, typescript" />
-        <meta property="og:title" content="My Page" />
-        <meta property="og:image" content="https://example.com/og.png" />
-        <link rel="canonical" href="https://example.com/my-page" />
-      </Head>
-      <h1>Welcome to My Page</h1>
-      <p>Page content goes here.</p>
-    </>
-  );
-}
-```
-
-### With Shorthand Props
-
-For common use cases, use shorthand props instead of raw JSX:
-
-```tsx
-<Head
-  title="My Page - EmberKit"
-  description="A page built with EmberKit"
-  keywords={['emberkit', 'framework', 'typescript']}
-  author="EmberKit Team"
-  robots="index, follow"
-  canonical="https://example.com/my-page"
-/>
-```
-
-### Open Graph
-
-```tsx
-<Head
-  title="My Page"
-  description="Page description"
-  og={{
-    type: 'article',
-    title: 'My Page',
-    description: 'Page description for social sharing',
-    url: 'https://example.com/my-page',
-    image: 'https://example.com/og-image.png',
-    locale: 'en_US',
-    siteName: 'My Site',
-  }}
-/>
-```
-
-### Twitter Cards
-
-```tsx
-<Head
-  twitter={{
-    card: 'summary_large_image',
-    site: '@emberkit',
-    creator: '@author',
-    title: 'My Page',
-    description: 'Page description',
-    image: 'https://example.com/twitter-image.png',
-  }}
-/>
-```
-
-### Structured Data (JSON-LD)
-
-Use children for structured data scripts:
-
-```tsx
-import { generateArticleSchema } from '@emberkit/core';
-
-function ArticlePage() {
-  const schema = generateArticleSchema({
-    title: 'My Article',
-    description: 'Article description',
-    author: 'John Doe',
-    publishedAt: '2025-01-15',
-    url: 'https://example.com/article',
-  });
-
-  return (
-    <>
-      <Head>
-        <title>My Article</title>
-        <script type="application/ld+json">{schema}</script>
-      </Head>
-      <article>...</article>
-    </>
-  );
-}
-```
-
-### Multiple <code className="text-primary-400">{'<Head>'}</code> Components
-
-You can use multiple <code className="text-primary-400">{'<Head>'}</code> components (e.g., in a layout and a page). All tags are collected and injected into <code className="text-primary-400">{'<head>'}</code>:
-
-```tsx
-// _layout.tsx
-function Layout({ children }) {
-  return (
-    <>
-      <Head>
-        <meta name="theme-color" content="#0b0f19" />
-      </Head>
-      {children}
-    </>
-  );
-}
-
-// pages/about.tsx
-function AboutPage() {
-  return (
-    <>
-      <Head>
-        <title>About Us</title>
-        <meta name="description" content="About our team" />
-      </Head>
-      <h1>About</h1>
-    </>
-  );
-}
-```
-
-### How It Works
-
-<Card variant="outline">
-  <table>
-    <thead>
-      <tr><th>Context</th><th>Behavior</th></tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><strong>SSR</strong></td>
-        <td>Renders <code>null</code> in body, registers tags to an internal registry. <code>renderSSR()</code> drains the registry and injects tags into <code>{'<head>'}</code>.</td>
-      </tr>
-      <tr>
-        <td><strong>Client SPA</strong></td>
-        <td>Renders <code>null</code> in body, updates <code>document.head</code> directly. Uses <code>data-ek-head</code> attribute to track managed tags so re-renders replace rather than duplicate.</td>
-      </tr>
-    </tbody>
-  </table>
-</Card>
-
-## Basic Meta Tags
+`generateMeta` returns an HTML string of `<title>`, `<meta>`, Open Graph, Twitter, and canonical tags:
 
 ```tsx
 import { generateMeta } from '@emberkit/core';
@@ -174,22 +24,11 @@ const metaHtml = generateMeta({
 });
 ```
 
-This generates:
+Inject the result into your document `<head>` (custom server, static template, etc.).
 
-```html
-<title>My Page - EmberKit</title>
-<meta name="title" content="My Page - EmberKit">
-<meta name="description" content="A page built with EmberKit">
-<meta name="keywords" content="emberkit, framework, typescript">
-<meta name="author" content="EmberKit Team">
-<meta name="robots" content="index, follow">
-```
-
-## Open Graph
+### Open Graph
 
 ```tsx
-import { generateMeta } from '@emberkit/core';
-
 const metaHtml = generateMeta({
   title: 'My Page',
   description: 'Page description',
@@ -199,12 +38,7 @@ const metaHtml = generateMeta({
     type: 'article',
     url: 'https://example.com/my-page',
     images: [
-      {
-        url: 'https://example.com/og-image.png',
-        width: 1200,
-        height: 630,
-        alt: 'My Page',
-      },
+      { url: 'https://example.com/og-image.png', width: 1200, height: 630, alt: 'My Page' },
     ],
     locale: 'en_US',
     siteName: 'My Site',
@@ -212,7 +46,7 @@ const metaHtml = generateMeta({
 });
 ```
 
-## Twitter Cards
+### Twitter Cards
 
 ```tsx
 const metaHtml = generateMeta({
@@ -228,13 +62,12 @@ const metaHtml = generateMeta({
 });
 ```
 
-## Canonical URLs
+### Canonical URLs
 
 ```tsx
 const metaHtml = generateMeta({
   canonical: 'https://example.com/my-page',
 });
-// <link rel="canonical" href="https://example.com/my-page">
 ```
 
 ## Structured Data (JSON-LD)
@@ -243,18 +76,28 @@ const metaHtml = generateMeta({
 
 ```tsx
 import { generateArticleSchema } from '@emberkit/core';
+import { Head } from '@emberkit/core';
 
-const jsonLd = generateArticleSchema({
-  title: 'My Article',
-  description: 'Article description',
-  author: 'John Doe',
-  publishedAt: '2025-01-15',
-  url: 'https://example.com/article',
-  image: 'https://example.com/article.png',
-});
+function ArticlePage() {
+  const schema = generateArticleSchema({
+    title: 'My Article',
+    description: 'Article description',
+    author: 'John Doe',
+    publishedAt: '2025-01-15',
+    url: 'https://example.com/article',
+    image: 'https://example.com/article.png',
+  });
 
-// Inject in <head>:
-<script type="application/ld+json">{jsonLd}</script>
+  return (
+    <>
+      <Head>
+        <title>My Article</title>
+        <script type="application/ld+json">{schema}</script>
+      </Head>
+      <article>...</article>
+    </>
+  );
+}
 ```
 
 ### Product Schema
@@ -279,26 +122,12 @@ import { generateBreadcrumbs } from '@emberkit/core';
 const breadcrumbs = generateBreadcrumbs([
   { name: 'Home', url: 'https://example.com' },
   { name: 'Docs', url: 'https://example.com/docs' },
-  { name: 'SEO', url: 'https://example.com/docs/seo' },
+  { name: 'SEO', url: 'https://example.com/docs/meta' },
 ]);
-```
-
-## Merging Meta
-
-Combine default meta with page-specific overrides:
-
-```tsx
-import { mergeMeta, DEFAULT_META } from '@emberkit/core';
-
-const pageMeta = mergeMeta(DEFAULT_META, {
-  title: 'Contact Us',
-  description: 'Get in touch with our team',
-});
 ```
 
 ## Next Steps
 
-- [Head Component](/docs/head) — Declarative <code className="text-primary-400">{'<head>'}</code> management with <code className="text-primary-400">{'<Head>'}</code>
-- [SSR](/docs/ssr) - Server-side meta rendering
-- [Markdown/MDX](/docs/markdown) - Frontmatter meta
-- [Edge Deployment](/docs/edge) - Edge-rendered meta
+- [Head](/docs/head) — Declarative `<Head>` in JSX
+- [SSR & SSG](/docs/ssr) — Built-in `metadata` export and SSR pipeline
+- [Markdown/MDX](/docs/markdown) — Frontmatter for content pages

@@ -2,7 +2,7 @@ import { Badge, Alert, Card, Text, Heading } from '@emberkit/ui';
 
 # Head Component
 
-<Text color="muted" className="mb-6">The <code className="text-primary-400">{'<Head>'}</code> component lets you manage <code className="text-primary-400">{'<head>'}</code> tags declaratively from any component. It renders nothing in the page body — tags are injected into <code className="text-primary-400">{'<head>'}</code> during SSR and updated directly in the DOM on the client.</Text>
+<Text color="muted" className="mb-6">The <code className="text-primary-400">{'<Head>'}</code> component manages <code className="text-primary-400">{'<head>'}</code> tags from JSX. It renders nothing in the body; on the client it updates <code className="text-primary-400">document.head</code> directly. For programmatic HTML strings (Open Graph, JSON-LD helpers), see [SEO & Meta](/docs/meta). For route-level titles in the default SSR build, use <code className="text-primary-400">export const metadata</code> — [SSR & SSG](/docs/ssr#route-metadata-built-in-ssr-head).</Text>
 
 ## Basic Usage
 
@@ -192,7 +192,7 @@ During server-side rendering, <code className="text-primary-400">{'<Head>'}</cod
 2. Registers the HTML to an internal head content registry
 3. Returns `null` (nothing in the page body)
 
-After `renderToString()` completes, `renderSSR()` drains the registry and passes the collected tags to `createHtmlDocument()`, which injects them into <code className="text-primary-400">{'<head>'}</code>.
+During SSR, registered tags are available via `drainHeadContent()` from `@emberkit/core`. The built-in CLI server entry injects route `metadata` exports; use a custom `src/entry-server.tsx` if you need to merge `drainHeadContent()` into your HTML template.
 
 ### Client-Side Navigation
 

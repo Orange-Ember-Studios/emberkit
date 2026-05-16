@@ -2,185 +2,74 @@
 title: Built with EmberKit
 ---
 
-import { Badge, Alert, Card, Text, Heading } from '@emberkit/ui';
+import { Alert, Card, Text } from '@emberkit/ui';
 
 # Built with EmberKit
 
-<Text color="muted" className="mb-6">This documentation site is built entirely with EmberKit, showcasing the framework's capabilities in a real-world application.</Text>
+<Text color="muted" className="mb-6">This documentation site runs on EmberKit — chosen for <strong>speed</strong> (HTML-first delivery, minimal client JS on doc pages) and the same stack described in the guides below.</Text>
 
-## Why We Use EmberKit for Our Docs
+## Stack at a glance
 
-<Alert variant="info" title="Real-World Proof">By using EmberKit to build our own documentation, we demonstrate that the framework is production-ready.</Alert>
+| Piece | How this site uses it |
+|-------|------------------------|
+| **Speed** | SSR sends full HTML per request; MDX pages stay mostly static — fast FCP without hydrating every paragraph |
+| **Rendering** | `mode: 'ssr'` in `apps/docs/emberkit.config.ts` — HTML on every doc request in dev and production |
+| **Routes** | `src/routes/**/*.mdx` and `.tsx` under file-based routing |
+| **Layout** | `src/routes/_layout.tsx` with sidebar + MDX content |
+| **Interactivity** | `useNavigate`, signals, and `data-ek-bind` on the UI showcase — not on every doc page |
+| **Styling** | Tailwind 4 via `@tailwindcss/vite` |
+| **Tooling** | `emberkit dev` / `emberkit build` from the monorepo root |
 
-### Performance Benefits
+For rendering modes (hybrid, static, spa) and build artifacts, see [SSR & SSG](/docs/ssr) — the canonical reference.
 
-| Metric | Result |
-|--------|--------|
-| First Contentful Paint | &lt;50ms |
-| Time to Interactive | &lt;100ms |
-| Total Bundle Size | ~8KB runtime |
-| JavaScript Shipped | Minimal (zero-JS by default) |
+## What we do not duplicate here
 
-### Code Architecture
+The following are documented once elsewhere; this page only points to them:
 
-Our documentation site uses EmberKit's file-based routing:
+- **Hydration & `data-ek-bind`** → [Hydration](/docs/hydration)
+- **Signals API** → [Signals](/docs/signals)
+- **File routes & params** → [Routing](/docs/routing)
+- **`<Head>` & `generateMeta`** → [Head](/docs/head) and [SEO & Meta](/docs/meta)
+
+## Doc routes as MDX
+
+Content pages are MDX files compiled by the Vite plugin:
 
 ```
-src/routes/
-├── index.tsx          # Home page (this page)
-├── _layout.tsx        # Shared layout with sidebar
-└── docs/
-    ├── introduction.md
-    ├── built-with-emberkit.md  # You are here
-    ├── quick-start.md
-    └── ... (other docs)
+apps/docs/src/routes/docs/
+├── introduction.mdx
+├── ssr.mdx
+├── quick-start.mdx
+└── …
 ```
 
-## Key Features We Leverage
+Each file maps to `/docs/<name>` without a manual route table.
 
-### 1. File-Based Routing
+## Selective hydration in practice
 
-No routing configuration needed. Just create files:
+Most MDX pages are static HTML after SSR. Interactive pieces (homepage CTAs, sidebar navigation, UI component demos) use client handlers or signal bindings. That matches the model in [Components](/docs/components): only regions with `onClick` or `data-ek-bind` pay for client JS.
 
-```tsx
-// src/routes/index.tsx → /
-// src/routes/docs/introduction.md → /docs/introduction
-// src/routes/docs/built-with-emberkit.md → /docs/built-with-emberkit
-```
+## Local development
 
-### 2. Selective Hydration
-
-Most of this page is static content that doesn't need JavaScript. Only interactive elements like navigation buttons get hydrated:
-
-```tsx
-import { useNavigate } from '@emberkit/core';
-
-function NavigationButton() {
-  const navigate = useNavigate();
-  
-  // Only this button receives JavaScript
-  return (
-    <button onClick={() => navigate('/docs/quick-start')}>
-      Get Started
-    </button>
-  );
-}
-```
-
-### 3. Signals for State Management
-
-Simple, reactive state without complexity:
-
-```tsx
-import { createSignal } from '@emberkit/core';
-
-function SearchBar() {
-  const [query, setQuery] = createSignal('');
-  
-  return (
-    <input 
-      value={query()} 
-      onInput={(e) => setQuery(e.target.value)} 
-      placeholder="Search docs..."
-    />
-  );
-}
-```
-
-### 4. TypeScript-First
-
-Full type safety throughout the codebase:
-
-```tsx
-interface DocPage {
-  title: string;
-  content: string;
-  meta?: {
-    description?: string;
-  };
-}
-
-// Types enforced at compile time
-const page: DocPage = {
-  title: "Built with EmberKit",
-  content: "..."
-};
-```
-
-### 5. Edge Deployment
-
-This site deploys to Cloudflare Workers using `wrangler deploy`:
+From the repo root:
 
 ```bash
-# Build and deploy
-pnpm build
-pnpm deploy
+pnpm --filter docs dev    # or emberkit dev inside apps/docs
 ```
 
-## Development Experience
+View source on any doc URL — content should appear inside `#app` before JavaScript runs.
 
-### Hot Module Replacement
-
-Changes reflect instantly during development:
+## Production build
 
 ```bash
-pnpm dev
-# → Changes appear in &lt;100ms
+pnpm --filter docs build
+pnpm --filter docs preview   # emberkit preview
 ```
 
-### Zero Configuration
+Deploy `dist/` to your host, or run `emberkit serve` for SSR/hybrid-style routing. See [Edge Deployment](/docs/edge) for CDN and Workers patterns.
 
-No webpack, babel, or complex configs. Just:
+## Next steps
 
-```ts
-// emberkit.config.ts
-export default {
-  // Framework handles everything
-};
-```
-
-### Natural DX
-
-Write JSX components like you always do:
-
-```tsx
-function FeatureCard({ title, description }) {
-  return (
-    <div className="card">
-      <h3>{title}</h3>
-      <p>{description}</p>
-    </div>
-  );
-}
-```
-
-## Performance Benchmarks
-
-<div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-8">
-  <Card title="Before EmberKit" description="Static Site Generator" variant="outline">
-    <ul className="list-disc list-inside text-surface-500 space-y-1">
-      <li>First Contentful Paint: <span className="text-error-500 font-semibold">200ms</span></li>
-      <li>Total Bundle Size: <span className="text-error-500 font-semibold">45KB</span></li>
-      <li>Time to Interactive: <span className="text-error-500 font-semibold">300ms</span></li>
-    </ul>
-  </Card>
-  <Card title="After EmberKit" description="SSR + Selective Hydration" variant="outline">
-    <ul className="list-disc list-inside text-surface-500 space-y-1">
-      <li>First Contentful Paint: <span className="text-success-500 font-semibold">50ms</span> (75% faster)</li>
-      <li>Total Bundle Size: <span className="text-success-500 font-semibold">8KB</span> (82% smaller)</li>
-      <li>Time to Interactive: <span className="text-success-500 font-semibold">100ms</span> (67% faster)</li>
-    </ul>
-  </Card>
-</div>
-
-## Conclusion
-
-By using EmberKit to build our own documentation, we demonstrate that the framework is production-ready and delivers on its promises:
-
-- **Speed**: Sub-50ms SSR for fast page loads
-- **Minimal Weight**: ~8KB runtime compared to 40-100KB in other frameworks
-- **Zero JS by Default**: Static content stays static, only interactive elements get hydrated
-- **TypeScript-First**: Full type safety with excellent IDE support
-- **Developer Experience**: Simple APIs, file-based routing, no configuration needed
-
-Ready to build something with EmberKit? Check out the [Quick Start](/docs/quick-start) guide.
+- [SSR & SSG](/docs/ssr) — How builds and pre-rendering work
+- [Quick Start](/docs/quick-start) — Start your own project
+- [UI Components](/docs/ui) — Live examples of signal hydration

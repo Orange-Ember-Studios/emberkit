@@ -27,7 +27,7 @@ const HomePage: RouteComponent = () => {
         </div>
 
         <span className="mb-4 text-sm font-semibold uppercase tracking-[0.3em] text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-fuchsia-400 to-cyan-300 md:text-base animate-fade-in-down" style={{ animationDelay: '100ms', animation: 'fade-in-down 0.6s ease-out' }}>
-          Minimalist &middot; TypeScript &middot; Zero JS by Default
+          Speed First &middot; TypeScript &middot; Zero JS by Default
         </span>
 
         <h1 className="mb-6 text-5xl font-bold tracking-tight md:text-7xl lg:text-8xl animate-fade-in-down" style={{ animationDelay: '200ms', animation: 'fade-in-down 0.6s ease-out 200ms forwards', opacity: 0 }}>
@@ -35,7 +35,7 @@ const HomePage: RouteComponent = () => {
         </h1>
 
         <p className="mb-10 max-w-2xl text-lg leading-relaxed text-gray-300 md:text-2xl animate-fade-in-down" style={{ animationDelay: '300ms', animation: 'fade-in-down 0.6s ease-out 300ms forwards', opacity: 0 }}>
-          The TypeScript-first JSX framework built for speed, minimal weight, and zero JavaScript by default.
+          The TypeScript-first JSX framework where <strong className="text-white font-semibold">speed comes first</strong> — fast SSR, pre-rendered static routes, and selective hydration instead of shipping a heavy client runtime.
         </p>
 
         <div className="flex flex-col gap-4 sm:flex-row animate-fade-in-down" style={{ animationDelay: '400ms', animation: 'fade-in-down 0.6s ease-out 400ms forwards', opacity: 0 }}>
@@ -70,10 +70,10 @@ const HomePage: RouteComponent = () => {
 
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
             {[
-              { icon: <IconZap size={28} />, title: 'Lightning Fast', desc: 'Sub-50ms SSR with streaming support. Optimized for performance from the ground up.' },
-              { icon: <IconPackage size={28} />, title: 'Under 10KB', desc: 'Minimal runtime that is fully tree-shakeable. Pay only for what you use.' },
-              { icon: <IconTarget size={28} />, title: 'Zero JS Default', desc: 'Only interactive elements receive hydration. Static content stays static.' },
-              { icon: <IconType size={28} />, title: 'TypeScript First', desc: 'Full type safety with excellent IDE support. Catch errors before they happen.' },
+              { icon: <IconZap size={28} />, title: 'Built for Speed', desc: 'SSR and pre-rendered HTML for fast TTFB and paint. Targeted signal updates — no full-tree client re-renders.' },
+              { icon: <IconPackage size={28} />, title: 'Minimal Weight', desc: 'Sub-10KB runtime goal, tree-shakeable. Static pages can ship zero framework JavaScript.' },
+              { icon: <IconTarget size={28} />, title: 'Zero JS Default', desc: 'Only interactive regions hydrate. Static content stays pure HTML.' },
+              { icon: <IconType size={28} />, title: 'TypeScript First', desc: 'File-based routes, typed params, and JSX with @emberkit/core.' },
             ].map((f, i) => (
               <div 
                 key={f.title}
@@ -104,26 +104,25 @@ const HomePage: RouteComponent = () => {
               <div className="h-3 w-3 rounded-full bg-green-500/80 transition-all duration-300 hover:scale-125" />
               <span className="ml-3 text-xs font-medium text-gray-400 transition-colors duration-300">counter.tsx</span>
             </div>
-            <CodeBlock code={`import { createSignal, render } from '@emberkit/core';
+            <CodeBlock code={`import { createSignal } from '@emberkit/core';
 
 function Counter() {
   const [count, setCount] = createSignal(0);
 
   return (
-    <button onClick={() => setCount(c => c + 1)}>
-      Count: {count()}
-    </button>
+  <div>
+    <span data-ek-bind={count}>{count()}</span>
+    <button type="button" onClick={() => setCount((n) => n + 1)}>+</button>
+  </div>
   );
-}
-
-render(<Counter />, document.body);`} language="tsx" />
+}`} language="tsx" />
           </div>
 
           <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3">
             {[
-              { label: 'Runtime Size', value: '~8KB', color: 'text-orange-400' },
-              { label: 'SSR Time', value: '<50ms', color: 'text-emerald-400' },
-              { label: 'JS Shipped', value: '0 by default', color: 'text-amber-400' },
+              { label: 'TTFB', value: 'HTML first', color: 'text-emerald-400' },
+              { label: 'Runtime', value: '~8KB goal', color: 'text-orange-400' },
+              { label: 'Client JS', value: 'selective', color: 'text-amber-400' },
             ].map((s, i) => (
               <div 
                 key={s.label}
@@ -148,7 +147,7 @@ render(<Counter />, document.body);`} language="tsx" />
             Ready to build?
           </h2>
           <p className="mb-8 text-lg text-gray-400 transition-colors duration-300 hover:text-gray-300">
-            Get started in minutes with file-based routing, signals, and zero-config builds.
+            Fast by design: server HTML, pre-rendered static routes, and hydration only where you need interactivity.
           </p>
           <button
             className="rounded-full bg-gradient-to-r from-orange-500 to-orange-700 px-8 py-4 text-xl font-bold text-white shadow-lg transition-all duration-300 hover:scale-[1.03] hover:from-orange-400 hover:to-orange-500 hover:shadow-[0_0_30px_rgba(249,115,22,0.4)] active:scale-95"

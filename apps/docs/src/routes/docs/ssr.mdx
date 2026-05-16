@@ -2,33 +2,62 @@ import { Badge, Alert, Card, Text } from '@emberkit/ui';
 
 # SSR & SSG
 
-<Text color="muted" className="mb-6">EmberKit supports multiple rendering modes: Server-Side Rendering (SSR), Static Site Generation (SSG), and client-side SPA.</Text>
+<Text color="muted" className="mb-6">EmberKit ships four rendering modes controlled by <code className="text-primary-400">emberkit.config.ts</code>. The Vite plugin handles SSR during development; the CLI builds client and server bundles and can pre-render static routes at build time.</Text>
 
 ## Rendering Modes
 
 <Card variant="outline">
   <table>
     <thead>
-      <tr><th>Mode</th><th>Description</th><th>Use Case</th></tr>
+      <tr><th>Mode</th><th>Build output</th><th>Runtime</th><th>Best for</th></tr>
     </thead>
     <tbody>
-      <tr><td><code>static</code></td><td>Pre-renders all pages at build time</td><td>Marketing sites, blogs</td></tr>
-      <tr><td><code>ssr</code></td><td>Renders on every request</td><td>Dynamic pages, APIs</td></tr>
-      <tr><td><code>spa</code></td><td>Client-side only</td><td>Dashboards, admin panels</td></tr>
-      <tr><td><code>hybrid</code></td><td>Mix of SSR and static (default)</td><td>Most apps</td></tr>
+      <tr>
+        <td><code>hybrid</code> <Badge variant="outline">default</Badge></td>
+        <td>Client + server bundle + <code>ssr-manifest.json</code>; static routes pre-rendered to HTML files</td>
+        <td>Pre-rendered HTML for static paths; SSR for dynamic routes (<code>[param]</code>)</td>
+        <td>Most apps (docs, marketing + dynamic pages)</td>
+      </tr>
+      <tr>
+        <td><code>static</code></td>
+        <td>Same as hybrid, but <strong>all</strong> non-dynamic routes pre-rendered at build time</td>
+        <td>Static files only (no server required)</td>
+        <td>Blogs, marketing sites, documentation</td>
+      </tr>
+      <tr>
+        <td><code>ssr</code></td>
+        <td>Client + server bundle + manifest; no pre-render step</td>
+        <td>Every HTML request rendered on the server</td>
+        <td>Personalized or frequently changing content</td>
+      </tr>
+      <tr>
+        <td><code>spa</code></td>
+        <td>Client bundle only</td>
+        <td>Client-side routing; dev server skips SSR middleware</td>
+        <td>Dashboards, admin panels, fully client-driven apps</td>
+      </tr>
     </tbody>
   </table>
 </Card>
 
+### How routes are classified
+
+During `emberkit build`, each file under `src/routes/` becomes a manifest entry:
+
+- **Static route** — path has no dynamic segments (e.g. `/`, `/about`, `/docs/installation`)
+- **Dynamic route** — path contains a segment parameter (e.g. `/blog/:slug` from `[slug].tsx`)
+
+In **hybrid** mode, static routes are written to `dist/.../index.html` at build time. Dynamic routes are rendered at request time via `dist/server/entry-server.js`.
+
 ## Configuration
 
-Set the mode in `emberkit.config.ts`:
+Create `emberkit.config.ts` in your project root (or run `emberkit generate config`):
 
 ```typescript
 import { defineConfig } from '@emberkit/core';
 
 export default defineConfig({
-  mode: 'ssr',  // 'static' | 'ssr' | 'spa' | 'hybrid'
+  mode: 'hybrid', // 'static' | 'ssr' | 'spa' | 'hybrid'
   server: {
     port: 3000,
     host: 'localhost',
@@ -37,84 +66,192 @@ export default defineConfig({
     outDir: 'dist',
     target: 'esnext',
   },
+  // Optional: merge extra Vite options
+  vite: {
+    plugins: [/* emberkitVitePlugin(), tailwindcss(), … */],
+  },
 });
 ```
 
-## SSR (Server-Side Rendering)
-
-SSR renders your app on the server for each request. The HTML is sent to the browser, then hydrated with JavaScript.
+Register the Vite plugin in `vite.config.ts` (included in CLI templates):
 
 ```typescript
-import { renderSSR } from '@emberkit/core';
+import { defineConfig } from 'vite';
+import { emberkitVitePlugin } from '@emberkit/core/vite-plugin';
 
-const html = renderSSR(<App />);
-// Returns fully rendered HTML string
-```
-
-### SSR with HTML Document
-
-```typescript
-import { renderToHTMLString, createHtmlDocument } from '@emberkit/core';
-
-const body = renderToHTMLString(<App />);
-const document = createHtmlDocument(body, {
-  title: 'My Page',
-  lang: 'en',
-  meta: { description: 'Page description' },
+export default defineConfig({
+  plugins: [emberkitVitePlugin()],
+  esbuild: {
+    jsxImportSource: '@emberkit/core',
+  },
 });
 ```
 
-### Streaming SSR
+The plugin reads `emberkit.config.ts` for `mode`, `routeDir`, markdown options, and compression. If no config file exists, **hybrid** is the default.
 
-For large pages, use streaming to send HTML progressively:
-
-```typescript
-import { createStreamingRenderer } from '@emberkit/core';
-
-const renderer = createStreamingRenderer();
-const stream = renderer.renderToStream(<App />);
-```
-
-## SSG (Static Site Generation)
-
-SSG pre-renders all routes at build time. The output is pure HTML files with no server required.
+## Development
 
 ```bash
-# Build static output
-pnpm build
-# Output in dist/ — ready for any static host
+pnpm dev   # emberkit dev — Vite + HMR
 ```
 
-### When to Use SSG
+For every mode except `spa`, the dev server runs SSR middleware on HTML navigations:
 
-- Marketing pages
-- Blog posts
-- Documentation sites
-- Any page where content doesn't change per-request
+1. Skips assets, HMR, and non-HTML requests
+2. Loads the virtual SSR entry and calls `render(url, server)`
+3. Injects rendered markup into `index.html` at `#app` (or `<body id="app">`)
 
-## Hybrid Mode
+View the page source in the browser to confirm server-rendered HTML before hydration.
 
-The default mode. Static pages are pre-rendered, dynamic pages use SSR:
+## Production Build
+
+```bash
+pnpm build   # emberkit build
+```
+
+| Mode | Steps |
+|------|--------|
+| `spa` | Client bundle → `dist/` |
+| `ssr` | Client bundle → SSR bundle → `ssr-manifest.json` |
+| `hybrid` | Client → SSR → manifest → pre-render **static** routes |
+| `static` | Client → SSR → manifest → pre-render **all** non-dynamic routes |
+
+Build artifacts:
+
+```
+dist/
+├── index.html              # Client shell (and / for pre-rendered home)
+├── assets/                 # JS, CSS, hashed chunks
+├── ssr-manifest.json       # mode, routes[], isStatic flags
+├── server/
+│   └── entry-server.js     # SSR renderer (unless you provide src/entry-server.tsx)
+└── about/
+    └── index.html          # Pre-rendered static route (hybrid/static)
+```
+
+### Preview and production servers
+
+```bash
+pnpm preview   # emberkit preview — quick local check (default port 4173)
+pnpm serve     # emberkit serve — production server using ssr-manifest.json
+```
+
+**Preview** serves static files and calls `entry-server.js` for SSR modes.
+
+**Serve** resolves requests in order: static asset → pre-rendered `path/index.html` → SSR (for `ssr` mode, or dynamic routes in `hybrid`) → SPA fallback to root `index.html`.
+
+<Alert variant="info" title="Custom server entry">
+  Add <code>src/entry-server.ts</code> or <code>src/entry-server.tsx</code> to replace the generated SSR shim. Export <code>render(url)</code> returning <code>{'{ html, status }'}</code> or an HTML string.
+</Alert>
+
+## Route metadata (built-in SSR head)
+
+The default server entry injects optional route exports into <code>{'<head>'}</code>:
+
+```tsx
+// src/routes/about.tsx
+export const metadata = {
+  title: 'About — My App',
+  description: 'Learn more about us',
+};
+
+export default function AboutPage() {
+  return <main><h1>About</h1></main>;
+}
+```
+
+For declarative head tags from components, use the <code>{'<Head>'}</code> component — it updates the DOM on the client and registers tags during render. See [Head](/docs/head) for details.
+
+## Custom error pages
+
+Place these in `src/routes/` (not nested under a segment):
+
+| File | When used |
+|------|-----------|
+| `404.tsx` | No route matches |
+| `500.tsx` | Uncaught error while rendering a route |
+
+```tsx
+// src/routes/404.tsx
+export default function NotFound() {
+  return (
+    <main>
+      <h1>404</h1>
+      <p>Page not found</p>
+    </main>
+  );
+}
+```
+
+## Dynamic route props
+
+SSR passes `params` to the matched route component:
+
+```tsx
+// src/routes/blog/[slug].tsx
+import type { RouteParams } from '@emberkit/core';
+
+export default function Post({ params }: RouteParams<{ slug: string }>) {
+  return <article><h1>{params.slug}</h1></article>;
+}
+```
+
+On the client, the runtime also provides `params`, `query`, and `request` via `RouteParams`. See [Routing](/docs/routing).
+
+## Low-level HTML APIs
+
+These utilities live in `@emberkit/core` for custom servers and tests:
+
+### renderToHTMLString
 
 ```typescript
-export default defineConfig({
-  mode: 'hybrid',
-});
+import { renderToHTMLString } from '@emberkit/core';
+
+const fragment = renderToHTMLString(<Page />);
+// HTML fragment (body content only)
 ```
 
-## Edge Deployment
+`renderToHTMLString` escapes text and string attributes for safe SSR output.
 
-SSR works at the edge. See [Edge Deployment](/docs/edge) for deploying to Cloudflare Workers, Deno Deploy, and more.
+### Head registry
 
-## Performance
+```typescript
+import { drainHeadContent } from '@emberkit/core';
 
-- Sub-50ms TTFB for SSR
-- Streaming support for large pages
-- Automatic code splitting
-- Selective hydration via `data-ek-bind` (only bound elements get JS)
+// After rendering components that use <Head>:
+const headTags = drainHeadContent();
+```
+
+Use this in a custom `entry-server` when you need full `<Head>` support in SSR.
+
+<Alert variant="warning" title="Internal helpers">
+  <code>renderSSR</code>, <code>createHtmlDocument</code>, and <code>createStreamingRenderer</code> exist in the core package for advanced integrations but are not part of the public <code>@emberkit/core</code> export surface today. Prefer the CLI pipeline or <code>renderToHTMLString</code> + <code>drainHeadContent</code> for custom servers.
+</Alert>
+
+## Hydration after SSR
+
+Server HTML includes `data-ek-bind` indices and `data-ekclick` handler ids for interactive regions. The client entry reconnects signals and events without re-rendering the full tree. Details: [Hydration](/docs/hydration).
+
+## Performance (why speed is the goal)
+
+EmberKit’s rendering modes exist to minimize time-to-content and client work:
+
+| Technique | Speed benefit |
+|-----------|----------------|
+| SSR / pre-render | Users see HTML immediately; no empty shell waiting for JS |
+| `static` / `hybrid` pre-render | Static paths served from disk or CDN — very low TTFB |
+| Selective hydration | Smaller JS parse/execute; faster Time to Interactive on content-heavy pages |
+| Signal DOM binding | Updates skip virtual DOM diffing — only bound nodes change |
+
+Speed is the framework’s first principle; weight and zero-JS defaults support it. See [Introduction](/docs/introduction).
+
+## Edge deployment
+
+Deploy pre-rendered `dist/` to any static host, or run `entry-server.js` on Node, Bun, or edge adapters. See [Edge Deployment](/docs/edge).
 
 ## Next Steps
 
-- [Hydration](/docs/hydration) - Client-side interactivity
-- [Edge Deployment](/docs/edge) - Deploy SSR to the edge
-- [Components](/docs/components) - Static vs interactive components
+- [Hydration](/docs/hydration) — Selective client interactivity
+- [Routing](/docs/routing) — File-based routes, layouts, loaders
+- [Head](/docs/head) — Declarative `<head>` management
+- [Edge Deployment](/docs/edge) — Cloudflare Workers and Deno
