@@ -40,7 +40,7 @@ export {
 } from './meta/index.js';
 export type { MetaData, OpenGraphData, TwitterCardData } from './meta/index.js';
 
-export type { FC, RouteComponent, RouteChildren } from './runtime/types.js';
+export type { FC, RouteComponent, RouteChildren, RouteParams } from './runtime/types.js';
 
 export type { Logger, LoggerOptions, LogLevel, RequestLog, ResponseLog } from './logger/types.js';
 
