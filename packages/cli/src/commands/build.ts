@@ -431,7 +431,7 @@ async function buildSSR(
       },
     },
     ssr: {
-      noExternal: true,
+      noExternal: ['virtual:emberkit-routes'],
     },
   };
   
