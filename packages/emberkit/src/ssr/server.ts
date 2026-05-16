@@ -204,9 +204,9 @@ export async function prerenderRoutes(
       await writeFile(filePath, html, 'utf-8');
 
       prerendered.set(route.path, filePath);
-      console.log(`  ✓ Prerendered: ${route.path}`);
+      console.log(`  \x1b[38;5;51m✦\x1b[0m Prerendered: ${route.path}`);
     } catch (error) {
-      console.error(`  ✗ Failed to prerender: ${route.path}`, error);
+      console.error(`  \x1b[38;5;196m◆\x1b[0m Failed to prerender: ${route.path}`, error);
     }
   }
 
