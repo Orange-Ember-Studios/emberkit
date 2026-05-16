@@ -68,16 +68,16 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@emberkit/core": "workspace:^0.3.5",
-    "@emberkit/icons": "workspace:^1.0.5"
+    "@emberkit/core": "workspace:^0.3.6",
+    "@emberkit/icons": "workspace:^1.0.6"
   },
   "devDependencies": {
-    "@emberkit/core": "workspace:^0.3.5",
-    "@emberkit/icons": "workspace:^1.0.5"
+    "@emberkit/core": "workspace:^0.3.6",
+    "@emberkit/icons": "workspace:^1.0.6"
   },
   "peerDependencies": {
-    "@emberkit/core": "workspace:^0.3.5",
-    "@emberkit/icons": "workspace:^1.0.5",
+    "@emberkit/core": "workspace:^0.3.6",
+    "@emberkit/icons": "workspace:^1.0.6",
     "tailwindcss": "^4.0.0"
   }
 }
