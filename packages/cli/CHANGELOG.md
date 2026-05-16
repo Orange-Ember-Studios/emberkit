@@ -1,5 +1,11 @@
 # @emberkit/cli
 
+## 0.6.7
+
+### Patch Changes
+
+- SSR production bundle, MDX compile, markdown fences, and test fixes
+
 ## 0.6.6
 
 ### Patch Changes

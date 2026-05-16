@@ -1,5 +1,11 @@
 # @emberkit/core
 
+## 0.3.4
+
+### Patch Changes
+
+- SSR production bundle, MDX compile, markdown fences, and test fixes
+
 ## 0.3.3
 
 ### Patch Changes
