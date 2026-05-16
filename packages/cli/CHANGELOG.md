@@ -1,5 +1,14 @@
 # @emberkit/cli
 
+## 0.6.8
+
+### Patch Changes
+
+- fix: ssr guard for effects, trailing slash route matching
+  - Skip createEffect execution during SSR (window undefined check)
+  - Make trailing slash optional in SSR route regex matching
+  - Prevents 404 flash on index routes and DOM errors in Node
+
 ## 0.6.7
 
 ### Patch Changes
