@@ -1,5 +1,11 @@
 # @emberkit/core
 
+## 0.3.2
+
+### Patch Changes
+
+- 326d105: Fix pino loading in browser; use @emberkit/core/logger subpath exports
+
 ## 0.3.1
 
 ### Patch Changes
