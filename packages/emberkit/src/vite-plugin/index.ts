@@ -1,7 +1,7 @@
 import type { Plugin, ViteDevServer } from 'vite';
 import type { EmberKitPluginOptions, EmberKitMode } from './types.js';
 import { DEFAULT_CONFIG } from './types.js';
-import { readdirSync, statSync, existsSync, readFileSync } from 'node:fs';
+import { readdirSync, statSync, existsSync } from 'node:fs';
 import { join, relative, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { compile } from '@mdx-js/mdx';
