@@ -3,8 +3,15 @@ import { IconGithub } from '@emberkit/icons';
 import { Icon } from '@emberkit/ui';
 import { useNavigate } from '@emberkit/core';
 
+const navLinks = [
+  { label: 'Docs', path: '/docs/introduction' },
+  { label: 'API', path: '/docs/api' },
+  { label: 'Examples', path: '/docs/examples' },
+];
+
 const Header: RouteComponent = () => {
   const navigate = useNavigate();
+  const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
 
   const toggleSidebar = () => {
     const sidebar = document.querySelector('[data-sidebar]');
@@ -37,13 +44,13 @@ const Header: RouteComponent = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 flex h-16 items-center justify-between border-b border-white/5 bg-[#0b0f19]/80 px-6 backdrop-blur-xl transition-all duration-300">
+    <header className="fixed top-0 left-0 right-0 z-50 flex h-16 items-center justify-between border-b border-white/[0.06] bg-[#0b0f19]/90 px-6 backdrop-blur-xl">
       <div className="flex items-center gap-3">
         <button
           onClick={() => toggleSidebar()}
-          className="flex h-10 w-10 items-center justify-center rounded-lg text-gray-300 transition-all duration-200 hover:bg-white/5 hover:text-white active:scale-95 lg:hidden"
+          className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-400 transition-all duration-200 hover:bg-white/5 hover:text-white active:scale-95 lg:hidden"
         >
-          <svg data-menu-icon xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg data-menu-icon xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M3 12h18"/>
             <path d="M3 6h18"/>
             <path d="M3 18h18"/>
@@ -55,54 +62,51 @@ const Header: RouteComponent = () => {
             e.preventDefault();
             navigate('/');
           }}
-          className="flex items-center gap-2 text-xl font-bold text-white no-underline transition-all duration-200 hover:opacity-80 cursor-pointer"
+          className="flex items-center gap-2.5 no-underline transition-opacity duration-200 hover:opacity-80 cursor-pointer"
         >
-          <span className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500/35 via-fuchsia-500/25 to-cyan-500/20 ring-1 ring-orange-400/40 shadow-[0_0_20px_rgba(249,115,22,0.35)]">
-            <Icon name="emberkit" size={26} className="text-orange-200 drop-shadow-[0_0_12px_rgba(251,113,133,0.55)]" />
+          <span className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500/35 via-fuchsia-500/25 to-cyan-500/20 ring-1 ring-orange-400/40 shadow-[0_0_18px_rgba(249,115,22,0.3)]">
+            <Icon name="emberkit" size={22} className="text-orange-200 drop-shadow-[0_0_10px_rgba(251,113,133,0.55)]" />
           </span>
-          <span className="bg-gradient-to-r from-orange-400 via-orange-500 to-fuchsia-400 bg-clip-text text-transparent transition-all duration-300 hover:from-orange-300 hover:via-orange-400 hover:to-fuchsia-300">EmberKit</span>
+          <span className="text-[1.0625rem] font-bold bg-gradient-to-r from-orange-400 via-orange-500 to-fuchsia-400 bg-clip-text text-transparent">EmberKit</span>
         </a>
+        <span className="hidden sm:inline-flex items-center rounded-full bg-orange-500/10 px-2 py-0.5 text-[0.625rem] font-semibold uppercase tracking-wider text-orange-500/80 ring-1 ring-orange-500/20">
+          v0.1.0
+        </span>
       </div>
-      <nav className="hidden sm:flex gap-6">
-        <a
-          href="/docs/introduction"
-          onClick={(e) => {
-            e.preventDefault();
-            navigate('/docs/introduction');
-          }}
-          className="text-sm font-medium uppercase tracking-widest text-gray-400 no-underline transition-all duration-200 hover:text-orange-400 hover:drop-shadow-[0_0_8px_rgba(249,115,22,0.3)] cursor-pointer"
-        >
-          Docs
-        </a>
-        <a
-          href="/docs/api"
-          onClick={(e) => {
-            e.preventDefault();
-            navigate('/docs/api');
-          }}
-          className="text-sm font-medium uppercase tracking-widest text-gray-400 no-underline transition-all duration-200 hover:text-orange-400 hover:drop-shadow-[0_0_8px_rgba(249,115,22,0.3)] cursor-pointer"
-        >
-          API
-        </a>
-        <a
-          href="/docs/examples"
-          onClick={(e) => {
-            e.preventDefault();
-            navigate('/docs/examples');
-          }}
-          className="text-sm font-medium uppercase tracking-widest text-gray-400 no-underline transition-all duration-200 hover:text-orange-400 hover:drop-shadow-[0_0_8px_rgba(249,115,22,0.3)] cursor-pointer"
-        >
-          Examples
-        </a>
+
+      <nav className="hidden sm:flex items-center gap-1">
+        {navLinks.map((link) => {
+          const docsBase = link.path.split('/').slice(0, 2).join('/');
+          const isActive = link.path !== '/' && currentPath.startsWith(docsBase);
+          return (
+            <a
+              key={link.path}
+              href={link.path}
+              onClick={(e) => {
+                e.preventDefault();
+                navigate(link.path);
+              }}
+              className={[
+                'px-3 py-1.5 rounded-md text-sm font-medium no-underline transition-all duration-200 cursor-pointer',
+                isActive
+                  ? 'text-orange-400 bg-orange-500/10'
+                  : 'text-gray-400 hover:text-gray-100 hover:bg-white/[0.04]',
+              ].join(' ')}
+            >
+              {link.label}
+            </a>
+          );
+        })}
       </nav>
-      <div className="flex items-center gap-4">
+
+      <div className="flex items-center gap-2">
         <a
           href="https://github.com"
-          className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-400 transition-all duration-200 hover:bg-white/5 hover:text-white hover:drop-shadow-[0_0_12px_rgba(249,115,22,0.3)] active:scale-95"
+          className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition-all duration-200 hover:bg-white/5 hover:text-white active:scale-95"
           target="_blank"
           rel="noopener"
         >
-          <IconGithub size={20} />
+          <IconGithub size={18} />
         </a>
       </div>
     </header>

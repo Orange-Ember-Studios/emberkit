@@ -44,6 +44,17 @@ const docs = [
   },
 ];
 
+const activePath = typeof window !== 'undefined' ? window.location.pathname : '';
+
+const setActiveLink = (path: string) => {
+  if (typeof document === 'undefined') return;
+  document.querySelectorAll('[data-sidebar-link]').forEach((el) => {
+    el.removeAttribute('data-active');
+  });
+  const link = document.querySelector(`[data-sidebar-link="${path}"]`);
+  if (link) link.setAttribute('data-active', 'true');
+};
+
 const Sidebar: RouteComponent = () => {
   const navigate = useNavigate();
 
@@ -80,28 +91,48 @@ const Sidebar: RouteComponent = () => {
       </div>
 
       {docs.map((section) => (
-        <div key={section.title} className="mb-8">
-          <h3 className="mb-3 px-3 text-xs font-semibold uppercase tracking-widest text-gray-400 transition-colors duration-200">{section.title}</h3>
-          <ul className="list-none space-y-1">
-            {section.items.map((item) => (
-              <li key={item.path}>
-                <a
-                  href={item.path}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    closeSidebar();
-                    navigate(item.path);
-                  }}
-                  className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-400 no-underline transition-all duration-200 hover:bg-white/5 hover:text-orange-400 hover:translate-x-1 cursor-pointer [&_svg]:shrink-0 [&_svg]:transition-all [&_svg]:duration-200 [&_svg]:text-gray-500 hover:[&_svg]:text-orange-400"
-                >
-                  <IconChevronRight size={16} />
-                  {item.title}
-                </a>
-              </li>
-            ))}
+        <div key={section.title} className="mb-7">
+          <h3 className="mb-2 px-3 text-[0.6875rem] font-semibold uppercase tracking-[0.1em] text-gray-500">{section.title}</h3>
+          <ul className="list-none space-y-0.5">
+            {section.items.map((item) => {
+              const isActive = activePath === item.path;
+              return (
+                <li key={item.path}>
+                  <a
+                    href={item.path}
+                    data-sidebar-link={item.path}
+                    data-active={isActive ? 'true' : undefined}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setActiveLink(item.path);
+                      closeSidebar();
+                      navigate(item.path);
+                    }}
+                    className={[
+                      'group flex items-center gap-2 rounded-lg px-3 py-2 text-sm no-underline transition-all duration-200 cursor-pointer',
+                      isActive
+                        ? 'bg-orange-500/10 font-semibold text-orange-400 ring-1 ring-orange-500/20'
+                        : 'font-medium text-gray-400 hover:bg-white/[0.04] hover:text-gray-100',
+                    ].join(' ')}
+                  >
+                    <span className={[
+                      'flex h-1.5 w-1.5 shrink-0 rounded-full transition-all duration-200',
+                      isActive
+                        ? 'bg-orange-400 shadow-[0_0_6px_rgba(251,146,60,0.6)]'
+                        : 'bg-gray-600 group-hover:bg-gray-400',
+                    ].join(' ')} />
+                    {item.title}
+                  </a>
+                </li>
+              );
+            })}
           </ul>
         </div>
       ))}
+
+      <div className="mt-6 border-t border-white/5 pt-6 px-3">
+        <span className="text-[0.6875rem] font-semibold text-gray-600 uppercase tracking-[0.1em]">v0.1.0 — Alpha</span>
+      </div>
     </aside>
   );
 };

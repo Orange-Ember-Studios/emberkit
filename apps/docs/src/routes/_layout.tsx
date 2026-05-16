@@ -8,8 +8,10 @@ const Layout: RouteComponent = ({ children }) => {
       <Header />
       <div className="flex flex-1 pt-16">
         <Sidebar />
-        <main className="flex-1 min-w-0 px-6 py-8 lg:ml-[260px] lg:px-16 lg:py-12">
-          {children}
+        <main className="md-content flex-1 min-w-0 px-6 py-10 lg:ml-[260px] lg:px-16 lg:py-14">
+          <div className="max-w-[800px]">
+            {children}
+          </div>
         </main>
       </div>
     </div>

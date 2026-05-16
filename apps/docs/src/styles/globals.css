@@ -159,15 +159,27 @@
   .md-content {
     font-size: 1rem;
     line-height: 1.75;
+    color: #d1d5db;
   }
 
   /* ===== Headings ===== */
   .md-content h1 {
-    font-size: 2.25rem;
+    font-size: 2.375rem;
     font-weight: 800;
-    letter-spacing: -0.025em;
-    line-height: 1.2;
-    margin: 0 0 1.5rem;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+    margin: 0 0 0.875rem;
+    color: #fff;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  /* Lead paragraph — first <p> right after h1 */
+  .md-content h1 + p {
+    font-size: 1.0625rem;
+    color: #9ca3af;
+    line-height: 1.8;
+    margin-bottom: 2.5rem;
   }
 
   .md-content h2 {
@@ -175,14 +187,19 @@
     font-weight: 700;
     letter-spacing: -0.02em;
     line-height: 1.3;
-    margin: 3rem 0 1rem;
+    margin: 3.5rem 0 1rem;
+    color: #f9fafb;
+    padding-left: 0.875rem;
+    border-left: 3px solid oklch(72% 0.19 50);
   }
 
   .md-content h3 {
-    font-size: 1.25rem;
+    font-size: 1.125rem;
     font-weight: 600;
     line-height: 1.4;
-    margin: 2rem 0 0.75rem;
+    margin: 2.25rem 0 0.75rem;
+    color: #fb923c;
+    letter-spacing: -0.01em;
   }
 
   .md-content h4,
@@ -191,11 +208,12 @@
     font-weight: 600;
     line-height: 1.4;
     margin: 1.5rem 0 0.5rem;
+    color: #e5e7eb;
   }
 
-  .md-content h4 { font-size: 1.125rem; }
-  .md-content h5 { font-size: 1rem; }
-  .md-content h6 { font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  .md-content h4 { font-size: 1rem; }
+  .md-content h5 { font-size: 0.9375rem; }
+  .md-content h6 { font-size: 0.8125rem; text-transform: uppercase; letter-spacing: 0.06em; color: #9ca3af; }
 
   /* ===== Paragraphs ===== */
   .md-content p {
@@ -205,49 +223,51 @@
   /* ===== Links ===== */
   .md-content a {
     font-weight: 500;
-    color: var(--color-primary-400, oklch(72% 0.19 50));
-    position: relative;
-    transition: all 200ms ease-out;
+    color: oklch(75% 0.19 50);
+    text-decoration: underline;
+    text-decoration-color: oklch(72% 0.19 50 / 0.35);
+    text-underline-offset: 3px;
+    transition: color 150ms ease-out, text-decoration-color 150ms ease-out;
   }
 
-  .md-content a::after {
-    content: '';
-    position: absolute;
-    bottom: -2px;
-    left: 0;
-    width: 0;
-    height: 2px;
-    background: currentColor;
-    transition: width 300ms ease-out;
-  }
-
-  .md-content a:hover::after {
-    width: 100%;
+  .md-content a:hover {
+    color: oklch(82% 0.19 50);
+    text-decoration-color: oklch(82% 0.19 50 / 0.7);
   }
 
   /* ===== Lists ===== */
   .md-content ul,
   .md-content ol {
     margin: 0.75rem 0 1.25rem;
-    padding-left: 1.5rem;
+    padding-left: 1.625rem;
   }
 
   .md-content li {
     margin-bottom: 0.5rem;
-    line-height: 1.7;
+    line-height: 1.75;
+    color: #d1d5db;
   }
 
   .md-content ul li {
     list-style-type: disc;
   }
 
+  .md-content ul li::marker {
+    color: oklch(72% 0.19 50);
+  }
+
   .md-content ol li {
     list-style-type: decimal;
   }
 
+  .md-content ol li::marker {
+    color: oklch(72% 0.19 50);
+    font-weight: 600;
+  }
+
   .md-content li > ul,
   .md-content li > ol {
-    margin: 0.25rem 0;
+    margin: 0.375rem 0;
   }
 
   /* ===== Inline Code ===== */
@@ -258,26 +278,16 @@
   }
 
   .md-content :not(pre) > code {
-    padding: 0.15em 0.4em;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 0.15em 0.45em;
+    background: rgba(251, 146, 60, 0.08);
+    border: 1px solid rgba(251, 146, 60, 0.15);
     border-radius: 0.375rem;
     font-size: 0.8125em;
+    color: #fca86a;
     word-break: break-word;
   }
 
   /* ===== Code Blocks ===== */
-  .md-content pre {
-    position: relative;
-    margin: 1.5rem 0;
-    border-radius: 0.75rem;
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    overflow: hidden;
-    background: #0d1117;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.03);
-  }
-
   pre code {
     tab-size: 2;
   }
@@ -286,7 +296,7 @@
     display: block;
     padding: 1.25rem 1.5rem;
     background: transparent;
-    color: #e5e7eb;
+    color: #e2e4e8;
     font-size: 0.8125rem;
     line-height: 1.85;
     overflow-x: auto;
@@ -304,7 +314,7 @@
   .md-content pre > code .num,
   pre code .num { color: #fbbf24; }
   .md-content pre > code .cm,
-  pre code .cm { color: #9ca3af; font-style: italic; }
+  pre code .cm { color: #6b7280; font-style: italic; }
   .md-content pre > code .type,
   pre code .type { color: #38bdf8; }
   .md-content pre > code .op,
@@ -323,12 +333,12 @@
   /* Copy button */
   .md-content pre > .copy-btn {
     position: absolute;
-    top: 0.5rem;
-    right: 5.5rem;
+    top: 0.55rem;
+    right: 5.75rem;
     display: flex;
     align-items: center;
     gap: 0.35rem;
-    padding: 0.3rem 0.6rem;
+    padding: 0.25rem 0.55rem;
     font-family: var(--font-sans);
     font-size: 0.6875rem;
     font-weight: 500;
@@ -364,41 +374,26 @@
     transform: scale(0.95);
   }
 
-  /* Language label */
-  .md-content pre[data-lang]::before {
-    content: attr(data-lang);
-    position: absolute;
-    top: 0.625rem;
-    right: 0.75rem;
-    padding: 0.2rem 0.625rem;
-    font-family: var(--font-mono);
-    font-size: 0.625rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: #fb923c;
-    background: oklch(249 0.113 22.87 / 0.15);
-    border: 1px solid oklch(249 0.113 22.87 / 0.2);
-    border-radius: 9999px;
-    z-index: 1;
-    pointer-events: none;
-  }
-
   /* Scrollbar */
-  .md-content pre > code::-webkit-scrollbar { height: 6px; }
+  .md-content pre > code::-webkit-scrollbar { height: 5px; }
   .md-content pre > code::-webkit-scrollbar-track { background: transparent; }
-  .md-content pre > code::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 3px; }
-  .md-content pre > code::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
+  .md-content pre > code::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.08); border-radius: 3px; }
+  .md-content pre > code::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.16); }
 
   /* ===== Blockquotes ===== */
   .md-content blockquote {
     position: relative;
-    margin: 1.5rem 0;
-    padding: 1rem 1.25rem 1rem 1.5rem;
+    margin: 2rem 0;
+    padding: 1.25rem 1.5rem 1.25rem 1.75rem;
     border-left: 3px solid oklch(72% 0.19 50);
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 0 0.5rem 0.5rem 0;
-    font-style: italic;
+    background: linear-gradient(
+      135deg,
+      oklch(72% 0.19 50 / 0.06) 0%,
+      oklch(72% 0.19 50 / 0.02) 100%
+    );
+    border-radius: 0 0.625rem 0.625rem 0;
+    font-style: normal;
+    color: #d1d5db;
   }
 
   .md-content blockquote p:last-child {
@@ -409,32 +404,44 @@
     font-style: normal;
   }
 
+  .md-content blockquote strong {
+    color: #fb923c;
+  }
+
   /* ===== Tables ===== */
   .md-content table {
     width: 100%;
-    margin: 1.5rem 0;
+    margin: 1.75rem 0;
     border-collapse: separate;
     border-spacing: 0;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 0.625rem;
     overflow: hidden;
     font-size: 0.875rem;
   }
 
   .md-content thead {
-    background: rgba(255, 255, 255, 0.04);
+    background: linear-gradient(
+      135deg,
+      rgba(251, 146, 60, 0.08) 0%,
+      rgba(255, 255, 255, 0.03) 100%
+    );
   }
 
   .md-content th {
     padding: 0.75rem 1rem;
     text-align: left;
     font-weight: 600;
+    color: #f3f4f6;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 0.8125rem;
+    letter-spacing: 0.02em;
   }
 
   .md-content td {
     padding: 0.75rem 1rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    color: #d1d5db;
   }
 
   .md-content tbody tr:last-child td {
@@ -442,7 +449,7 @@
   }
 
   .md-content tbody tr:hover {
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(251, 146, 60, 0.04);
     transition: background 200ms ease-out;
   }
 
@@ -454,9 +461,14 @@
   .md-content hr {
     border: none;
     height: 1px;
-    background: rgba(255, 255, 255, 0.08);
+    background: linear-gradient(
+      to right,
+      transparent,
+      rgba(255, 255, 255, 0.12) 20%,
+      rgba(255, 255, 255, 0.12) 80%,
+      transparent
+    );
     margin: 3rem 0;
-    transition: background 300ms ease-out;
   }
 
   /* ===== Images ===== */
@@ -476,10 +488,12 @@
   /* ===== Strong / Emphasis ===== */
   .md-content strong {
     font-weight: 700;
+    color: #fff;
   }
 
   .md-content em {
     font-style: italic;
+    color: #e5e7eb;
   }
 
   /* ===== Strikethrough ===== */
@@ -577,11 +591,63 @@
 
   .md-content dt {
     font-weight: 600;
+    color: #f3f4f6;
     margin-bottom: 0.25rem;
   }
 
   .md-content dd {
     margin-left: 1.5rem;
     margin-bottom: 1rem;
+    color: #9ca3af;
+  }
+
+  /* ===== Section footer / next-steps links ===== */
+  .md-content > ul:last-child,
+  .md-content > ol:last-child {
+    margin-top: 2rem;
+    padding: 1.25rem 1.5rem;
+    background: rgba(255, 255, 255, 0.025);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 0.75rem;
+    list-style: none;
+    padding-left: 1.5rem;
+  }
+
+  .md-content > ul:last-child li::marker,
+  .md-content > ol:last-child li::marker {
+    color: oklch(72% 0.19 50);
+  }
+
+  /* ===== Code block improved header bar ===== */
+  .md-content pre {
+    position: relative;
+    margin: 1.75rem 0;
+    border-radius: 0.875rem;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    overflow: hidden;
+    background: #080c12;
+    box-shadow:
+      0 4px 24px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  }
+
+  /* Language badge in top-right corner */
+  .md-content pre[data-lang]::after {
+    content: attr(data-lang);
+    position: absolute;
+    top: 0.625rem;
+    right: 0.75rem;
+    padding: 0.2rem 0.625rem;
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #fb923c;
+    background: oklch(249 0.113 22.87 / 0.12);
+    border: 1px solid oklch(249 0.113 22.87 / 0.18);
+    border-radius: 9999px;
+    z-index: 1;
+    pointer-events: none;
   }
 }
