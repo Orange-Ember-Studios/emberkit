@@ -1,5 +1,6 @@
 import type { RouteComponent } from '@emberkit/core';
 import { IconChevronRight } from '@emberkit/icons';
+import { Icon } from '@emberkit/ui';
 import { useNavigate } from '@emberkit/core';
 
 const docs = [
@@ -66,8 +67,10 @@ const Sidebar: RouteComponent = () => {
     >
       <div className="mb-8 flex items-center justify-between lg:hidden">
         <div className="flex items-center gap-2 text-xl font-bold text-white">
-          <span className="text-2xl drop-shadow-[0_0_8px_rgba(249,115,22,0.4)]">🔥</span>
-          <span className="bg-gradient-to-r from-orange-400 to-orange-500 bg-clip-text text-transparent">EmberKit</span>
+          <span className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500/35 via-fuchsia-500/25 to-cyan-500/20 ring-1 ring-orange-400/40 shadow-[0_0_18px_rgba(249,115,22,0.3)]">
+            <Icon name="emberkit" size={26} className="text-orange-200 drop-shadow-[0_0_10px_rgba(251,113,133,0.5)]" />
+          </span>
+          <span className="bg-gradient-to-r from-orange-400 via-orange-500 to-fuchsia-400 bg-clip-text text-transparent">EmberKit</span>
         </div>
         <button onClick={closeSidebar} className="text-gray-400 hover:text-white transition-colors">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

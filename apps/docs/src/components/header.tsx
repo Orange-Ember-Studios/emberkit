@@ -1,5 +1,6 @@
 import type { RouteComponent } from '@emberkit/core';
 import { IconGithub } from '@emberkit/icons';
+import { Icon } from '@emberkit/ui';
 import { useNavigate } from '@emberkit/core';
 
 const Header: RouteComponent = () => {
@@ -56,8 +57,10 @@ const Header: RouteComponent = () => {
           }}
           className="flex items-center gap-2 text-xl font-bold text-white no-underline transition-all duration-200 hover:opacity-80 cursor-pointer"
         >
-          <span className="text-2xl drop-shadow-[0_0_8px_rgba(249,115,22,0.4)]">🔥</span>
-          <span className="bg-gradient-to-r from-orange-400 to-orange-500 bg-clip-text text-transparent transition-all duration-300 hover:from-orange-300 hover:to-orange-400">EmberKit</span>
+          <span className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500/35 via-fuchsia-500/25 to-cyan-500/20 ring-1 ring-orange-400/40 shadow-[0_0_20px_rgba(249,115,22,0.35)]">
+            <Icon name="emberkit" size={26} className="text-orange-200 drop-shadow-[0_0_12px_rgba(251,113,133,0.55)]" />
+          </span>
+          <span className="bg-gradient-to-r from-orange-400 via-orange-500 to-fuchsia-400 bg-clip-text text-transparent transition-all duration-300 hover:from-orange-300 hover:via-orange-400 hover:to-fuchsia-300">EmberKit</span>
         </a>
       </div>
       <nav className="hidden sm:flex gap-6">

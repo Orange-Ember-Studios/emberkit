@@ -1,5 +1,6 @@
 import type { RouteComponent } from '@emberkit/core';
 import { IconZap, IconPackage, IconTarget, IconType, IconArrowRight } from '@emberkit/icons';
+import { Icon } from '@emberkit/ui';
 import { useNavigate } from '@emberkit/core';
 import { CodeBlock } from '@emberkit/ui/molecules';
 
@@ -12,20 +13,25 @@ const HomePage: RouteComponent = () => {
       {/* Ambient glow blobs */}
       <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[500px] w-[500px] rounded-full bg-orange-500/20 blur-[150px] animate-pulse" />
       <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[300px] w-[300px] rounded-full bg-amber-500/15 blur-[120px] animate-pulse [animation-delay:700ms]" />
+      <div className="pointer-events-none absolute top-1/3 right-[15%] h-[280px] w-[280px] rounded-full bg-fuchsia-500/12 blur-[100px] animate-pulse [animation-delay:400ms]" />
+      <div className="pointer-events-none absolute bottom-1/4 left-[10%] h-[220px] w-[220px] rounded-full bg-cyan-500/10 blur-[90px] animate-pulse [animation-delay:1100ms]" />
 
       {/* Hero Section */}
       <section className="relative z-10 flex min-h-[85vh] flex-col items-center justify-center px-6 text-center">
-        <div className="relative mb-10 h-24 w-24 animate-bounce" style={{ animationDuration: '3s' }}>
-          <div className="absolute inset-0 animate-pulse rounded-full bg-orange-500/30 blur-2xl" />
-          <span className="relative z-10 flex h-full w-full items-center justify-center text-6xl drop-shadow-[0_0_15px_rgba(249,115,22,0.6)]">🔥</span>
+        <div className="relative mb-10 h-28 w-28 animate-bounce md:h-32 md:w-32" style={{ animationDuration: '3s' }}>
+          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-orange-500/40 via-fuchsia-500/25 to-cyan-500/20 blur-2xl animate-pulse" />
+          <div className="absolute inset-2 rounded-full bg-gradient-to-tr from-fuchsia-500/20 to-transparent blur-xl" />
+          <span className="relative z-10 flex h-full w-full items-center justify-center rounded-2xl bg-gradient-to-br from-orange-500/30 via-fuchsia-500/20 to-cyan-500/15 ring-2 ring-orange-400/35 shadow-[0_0_40px_rgba(249,115,22,0.35)]">
+            <Icon name="emberkit" size={76} className="text-orange-100 drop-shadow-[0_0_24px_rgba(251,113,133,0.65)]" />
+          </span>
         </div>
 
-        <span className="mb-4 text-sm font-semibold uppercase tracking-[0.3em] text-orange-400 md:text-base animate-fade-in-down" style={{ animationDelay: '100ms', animation: 'fade-in-down 0.6s ease-out' }}>
+        <span className="mb-4 text-sm font-semibold uppercase tracking-[0.3em] text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-fuchsia-400 to-cyan-300 md:text-base animate-fade-in-down" style={{ animationDelay: '100ms', animation: 'fade-in-down 0.6s ease-out' }}>
           Minimalist &middot; TypeScript &middot; Zero JS by Default
         </span>
 
         <h1 className="mb-6 text-5xl font-bold tracking-tight md:text-7xl lg:text-8xl animate-fade-in-down" style={{ animationDelay: '200ms', animation: 'fade-in-down 0.6s ease-out 200ms forwards', opacity: 0 }}>
-          <span className="bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600 bg-clip-text text-transparent">EmberKit</span>
+          <span className="bg-gradient-to-br from-orange-300 via-orange-500 to-fuchsia-500 bg-clip-text text-transparent">EmberKit</span>
         </h1>
 
         <p className="mb-10 max-w-2xl text-lg leading-relaxed text-gray-300 md:text-2xl animate-fade-in-down" style={{ animationDelay: '300ms', animation: 'fade-in-down 0.6s ease-out 300ms forwards', opacity: 0 }}>
