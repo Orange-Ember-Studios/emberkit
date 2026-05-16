@@ -1,5 +1,11 @@
 # @emberkit/core
 
+## 0.3.3
+
+### Patch Changes
+
+- SSR dev middleware and branded CLI dev server
+
 ## 0.3.2
 
 ### Patch Changes
