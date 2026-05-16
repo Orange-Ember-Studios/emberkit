@@ -1,5 +1,11 @@
 # @emberkit/core
 
+## 0.3.1
+
+### Patch Changes
+
+- aaa517b: Fix pino module being bundled into browser code
+
 ## 0.3.0
 
 ### Minor Changes
