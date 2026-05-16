@@ -236,7 +236,6 @@ export function render(
 
     e.preventDefault();
     history.pushState(null, '', href);
-    renderCurrentRoute();
   });
 
   window.addEventListener('popstate', () => {
