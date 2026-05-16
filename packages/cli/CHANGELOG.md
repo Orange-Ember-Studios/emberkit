@@ -1,5 +1,11 @@
 # @emberkit/cli
 
+## 0.6.9
+
+### Patch Changes
+
+- Fix TS config loading in CI via esbuild; add esbuild devDep
+
 ## 0.6.8
 
 ### Patch Changes
