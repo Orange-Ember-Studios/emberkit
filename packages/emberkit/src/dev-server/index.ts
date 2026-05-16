@@ -1,5 +1,5 @@
 import type { Logger, LogLevel } from '../logger/types.js';
-import { createLogger, createHttpLogger } from '../logger/index.js';
+import { createLogger } from '../logger/helpers/create-logger.js';
 
 export interface DevServerOptions {
   port?: number;
@@ -89,8 +89,6 @@ export class DevServer {
   }
 
   private createRequestHandler() {
-    const httpLogger = createHttpLogger(this.logger);
-
     return async (req: import('http').IncomingMessage, res: import('http').ServerResponse) => {
       this.requestCount++;
 
