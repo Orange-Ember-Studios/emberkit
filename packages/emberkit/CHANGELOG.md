@@ -1,5 +1,11 @@
 # @emberkit/core
 
+## 0.3.7
+
+### Patch Changes
+
+- Restore syntax highlighting, copy buttons, and heading IDs in MDX pages
+
 ## 0.3.6
 
 ### Patch Changes
