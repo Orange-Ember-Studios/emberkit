@@ -336,12 +336,34 @@ async function transformMDX(code: string, _id: string): Promise<{ code: string }
 
   exportLines.push(`export const metadata = ${JSON.stringify(frontmatter)};`);
 
-  const body =
+  let body =
     typeof compiled === 'object' && compiled !== null && 'value' in compiled
       ? String((compiled as { value: string }).value)
       : String(compiled);
 
-  return { code: insertAfterLeadingImports(body, exportLines.join('\n')) };
+  // Rename the @mdx-js/mdx default export so we can wrap it with the
+  // md-doc / md-content styling containers that the docs CSS targets.
+  body = body.replace(
+    /export default function MDXContent/,
+    'function _MDXContent',
+  );
+
+  // Wrapper re-exports the component with the styling containers.
+  // We reuse _jsx/_jsxs already imported by the compiled output.
+  const wrapper = `
+export default function MDXComponent(props) {
+  var p = props ?? {};
+  return _jsx('article', {
+    className: 'md-doc',
+    children: _jsx('div', {
+      className: 'md-content',
+      children: _jsx(_MDXContent, p)
+    })
+  });
+}
+`;
+
+  return { code: insertAfterLeadingImports(body + wrapper, exportLines.join('\n')) };
 }
 
 function parseFrontmatter(content: string): Record<string, unknown> {
