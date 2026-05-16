@@ -3,6 +3,7 @@ import { getCliPackageVersion } from "./cli-package-version.js";
 import { dev } from "./commands/dev.js";
 import { build } from "./commands/build.js";
 import { preview } from "./commands/preview.js";
+import { serve } from "./commands/serve.js";
 import { create, TEMPLATES } from "./commands/create.js";
 import { generate } from "./utils/generator.js";
 import { toKebabCase } from "./templates/index.js";
@@ -29,6 +30,10 @@ export async function runCLI(args: string[]): Promise<void> {
       break;
     case "preview":
       await preview(restArgs);
+      break;
+    case "serve":
+    case "start":
+      await serve(restArgs);
       break;
     case "create":
       await handleCreate(restArgs);
@@ -60,8 +65,9 @@ Usage: emberkit <command> [options]
 Commands:
   create [name]        Create a new EmberKit project
   dev                  Start development server
-  build                Build for production
-  preview              Preview production build
+  build                Build for production (SSR/hybrid/static/SPA)
+  preview              Preview production build locally
+  serve                Start production server (SSR/hybrid)
   generate <type> <name>  Generate a file from a template
 
 Options:
