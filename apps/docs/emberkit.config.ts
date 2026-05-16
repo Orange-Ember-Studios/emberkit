@@ -1,4 +1,6 @@
+import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from '@emberkit/core';
+import { emberkitVitePlugin } from '@emberkit/core/vite-plugin';
 
 export default defineConfig({
   mode: 'ssr',
@@ -17,5 +19,11 @@ export default defineConfig({
   markdown: {
     gfm: true,
     tables: true,
+  },
+  vite: {
+    plugins: [emberkitVitePlugin(), tailwindcss()],
+    esbuild: {
+      jsxImportSource: '@emberkit/core',
+    },
   },
 });
