@@ -7,6 +7,7 @@ import { serve } from "./commands/serve.js";
 import { create, TEMPLATES } from "./commands/create.js";
 import { generate } from "./utils/generator.js";
 import { toKebabCase } from "./templates/index.js";
+import { cliBrand } from "./brand.js";
 
 export interface CLIConfig {
   version: string;
@@ -58,7 +59,7 @@ export async function runCLI(args: string[]): Promise<void> {
 
 function showHelp(): void {
   console.log(`
-🔥 EmberKit CLI v${getCliPackageVersion()}
+${cliBrand.logo()} EmberKit CLI v${getCliPackageVersion()}
 
 Usage: emberkit <command> [options]
 
@@ -149,7 +150,7 @@ async function handleCreate(args: string[]): Promise<void> {
 
 function showCreateHelp(): void {
   console.log(`
-🔥 EmberKit — Create a new project
+${cliBrand.logo()} EmberKit — Create a new project
 
 Usage: emberkit create [name] [options]
 
@@ -240,9 +241,9 @@ async function runGenerate(args: string[]): Promise<void> {
   const result = await generate({ name, path: filePath, template: type });
 
   if (result.success) {
-    console.log(`✓ Generated ${type}: ${result.path}`);
+    console.log(`${cliBrand.spark()} Generated ${type}: ${result.path}`);
   } else {
-    console.error(`✗ ${result.error}`);
+    console.error(`${cliBrand.fail()} ${result.error}`);
     process.exit(1);
   }
 }

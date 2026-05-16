@@ -133,9 +133,9 @@ const HomePage: RouteComponent = () => {
   const [activeTab, setActiveTab] = createSignal('features');
 
   const features = [
-    { icon: '⚡', title: 'Lightning Fast', desc: 'Sub-10KB runtime with tree-shakeable architecture' },
-    { icon: '📘', title: 'TypeScript First', desc: 'Full type safety with intelligent autocomplete' },
-    { icon: '📁', title: 'File-Based Routing', desc: 'Routes automatically created from your file structure' },
+    { icon: 'zap' as const, title: 'Lightning Fast', desc: 'Sub-10KB runtime with tree-shakeable architecture' },
+    { icon: 'book' as const, title: 'TypeScript First', desc: 'Full type safety with intelligent autocomplete' },
+    { icon: 'folder' as const, title: 'File-Based Routing', desc: 'Routes automatically created from your file structure' },
   ];
 
   const components = [
@@ -153,8 +153,9 @@ const HomePage: RouteComponent = () => {
       <section className="relative text-center py-20">
         <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[400px] w-[400px] rounded-full bg-ember-500/15 blur-[150px] animate-pulse-glow" />
         <div className="relative z-10 space-y-6 animate-fade-in-down">
-          <Badge variant="primary" className="inline-block">
-            ✨ Welcome to {{name}}
+          <Badge variant="primary" className="inline-flex items-center gap-2">
+            <Icon name="emberkit" size={14} className="text-amber-400 shrink-0 drop-shadow-[0_0_6px_rgba(251,191,36,0.45)]" />
+            Welcome to {{name}}
           </Badge>
           <Heading level="h1" size="4xl" weight="bold">
             Built with EmberKit <span className="bg-gradient-to-r from-ember-400 via-ember-500 to-amber-500 bg-clip-text text-transparent">UI System</span>
@@ -186,7 +187,9 @@ const HomePage: RouteComponent = () => {
             <Card key={feature.title} padding="lg" className="relative group hover:border-ember-500/50 transition-all hover:-translate-y-1 cursor-pointer">
               <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-ember-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
               <div className="relative space-y-3">
-                <div className="text-3xl">{feature.icon}</div>
+                <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-ember-400/20 via-fuchsia-500/10 to-cyan-500/10 text-ember-300 ring-1 ring-ember-400/25 shadow-[0_0_24px_rgba(236,72,153,0.12)]">
+                  <Icon name={feature.icon} size={28} className="drop-shadow-[0_0_10px_rgba(249,115,22,0.35)]" />
+                </div>
                 <Heading level="h3" size="md" weight="semibold">
                   {feature.title}
                 </Heading>
@@ -244,10 +247,16 @@ const HomePage: RouteComponent = () => {
                 </div>
               </div>
               <Alert variant="success">
-                ✓ This is a success alert message. Use it to confirm important actions.
+                <span className="inline-flex items-start gap-2">
+                  <Icon name="check" size={18} className="text-emerald-400 shrink-0 mt-0.5" />
+                  <span>This is a success alert message. Use it to confirm important actions.</span>
+                </span>
               </Alert>
               <Alert variant="info">
-                ℹ This is an info alert. Useful for displaying helpful information.
+                <span className="inline-flex items-start gap-2">
+                  <Icon name="info" size={18} className="text-sky-400 shrink-0 mt-0.5" />
+                  <span>This is an info alert. Useful for displaying helpful information.</span>
+                </span>
               </Alert>
             </div>
           </Card>
@@ -299,14 +308,14 @@ export default HomePage;`,
 
   "src/routes/about.tsx": `import type { RouteComponent } from '@emberkit/core';
 import { Head } from '@emberkit/core';
-import { Heading, Text, Button, Card, Badge, Alert } from '@emberkit/ui';
+import { Heading, Text, Button, Card, Badge, Alert, Icon } from '@emberkit/ui';
 
 const AboutPage: RouteComponent = () => {
   const features = [
-    { icon: '⚙️', title: 'TypeScript-first', desc: 'Full type safety with intelligent autocomplete' },
-    { icon: '🎨', title: 'UI Components', desc: 'Pre-built design system components' },
-    { icon: '🎯', title: 'Tailwind CSS', desc: 'Utility-first styling framework' },
-    { icon: '📁', title: 'File Routing', desc: 'Automatic routes from file structure' },
+    { icon: 'type' as const, title: 'TypeScript-first', desc: 'Full type safety with intelligent autocomplete' },
+    { icon: 'grid' as const, title: 'UI Components', desc: 'Pre-built design system components' },
+    { icon: 'zap' as const, title: 'Tailwind CSS', desc: 'Utility-first styling framework' },
+    { icon: 'folder' as const, title: 'File Routing', desc: 'Automatic routes from file structure' },
   ];
 
   const techStack = ['EmberKit', 'TypeScript', 'Tailwind CSS', 'Vite', 'JSX', 'Design System'];
@@ -346,7 +355,9 @@ const AboutPage: RouteComponent = () => {
           <div className="grid sm:grid-cols-2 gap-4">
             {features.map((f) => (
               <Card key={f.title} padding="lg" className="hover:border-ember-500/50 transition-all hover:-translate-y-0.5">
-                <div className="text-2xl mb-3">{f.icon}</div>
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-ember-400/20 via-fuchsia-500/10 to-cyan-500/10 text-ember-300 ring-1 ring-ember-400/25 mb-3">
+                  <Icon name={f.icon} size={24} className="drop-shadow-[0_0_8px_rgba(249,115,22,0.35)]" />
+                </div>
                 <Heading level="h3" size="md" weight="semibold" className="mb-1">
                   {f.title}
                 </Heading>
@@ -374,7 +385,10 @@ const AboutPage: RouteComponent = () => {
 
         {/* Benefits Alert */}
         <Alert variant="success">
-          ✨ <strong>Pro Tip:</strong> This template uses the EmberKit design system components. Check the component library documentation to learn about all available components and their capabilities.
+          <span className="inline-flex items-start gap-2">
+            <Icon name="emberkit" size={18} className="text-amber-400 shrink-0 mt-0.5 drop-shadow-[0_0_8px_rgba(251,191,36,0.4)]" />
+            <span><strong>Pro Tip:</strong> This template uses the EmberKit design system components. Check the component library documentation to learn about all available components and their capabilities.</span>
+          </span>
         </Alert>
 
         {/* Back Button */}

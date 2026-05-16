@@ -19,7 +19,7 @@ const COLORS = {
 const EMBERKIT_ASCII = `
     ╔═══════════════════════════════════════╗
     ║                                       ║
-    ║     🔥  E M B E R K I T  🔥           ║
+    ║     ${COLORS.orange}◆${COLORS.reset}  E M B E R K I T  ${COLORS.orange}◆${COLORS.reset}           ║
     ║                                       ║
     ║      ░▒▓█ PRODUCTION SERVER █▓▒░      ║
     ║                                       ║

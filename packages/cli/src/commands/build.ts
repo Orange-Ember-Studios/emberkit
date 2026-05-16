@@ -2,6 +2,8 @@ import { build as viteBuild, type UserConfig, type InlineConfig } from "vite";
 import { join } from "path";
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from "fs";
 import { pathToFileURL } from "url";
+import { cliBrand } from "../brand.js";
+import { mergeEmberkitViteConfig } from "../utils/merge-emberkit-vite.js";
 
 const COLORS = {
   reset: "\x1b[0m",
@@ -82,10 +84,11 @@ async function loadViteConfig(root: string): Promise<UserConfig | null> {
 export async function build(_args: string[]): Promise<void> {
   const root = process.cwd();
   
-  console.log(`\n${COLORS.orange}🔥 EmberKit Build${COLORS.reset}\n`);
+  console.log(`\n${cliBrand.logo()} ${COLORS.orange}EmberKit Build${COLORS.reset}\n`);
   
   const emberkitConfig = await loadEmberKitConfig(root);
-  const viteConfig = await loadViteConfig(root);
+  const viteFileConfig = await loadViteConfig(root);
+  const viteConfig = mergeEmberkitViteConfig(emberkitConfig, viteFileConfig);
   
   const mode = (emberkitConfig as any)?.mode || "hybrid";
   const outDir = (emberkitConfig as any)?.build?.outDir || "dist";
@@ -140,7 +143,9 @@ export async function build(_args: string[]): Promise<void> {
       log("success", "Static build complete!");
     }
     
-    console.log(`\n${COLORS.green}✨ Build finished successfully!${COLORS.reset}`);
+    console.log(
+      `\n${cliBrand.spark()} ${COLORS.green}Build finished successfully!${COLORS.reset}\n`,
+    );
     console.log(`${COLORS.gray}   Output: ${COLORS.cyan}./${outDir}${COLORS.reset}\n`);
     
   } catch (error) {
@@ -565,10 +570,10 @@ async function prerenderStaticRoutes(
       }
       
       writeFileSync(outputPath, html, "utf-8");
-      console.log(`  ${COLORS.green}✓${COLORS.reset} ${route.path}`);
-      
+      console.log(`  ${cliBrand.spark()} ${COLORS.green}${route.path}${COLORS.reset}`);
+
     } catch (e) {
-      console.log(`  ${COLORS.red}✗${COLORS.reset} ${route.path} - ${e}`);
+      console.log(`  ${COLORS.red}◆${COLORS.reset} ${COLORS.red}${route.path} - ${e}${COLORS.reset}`);
     }
   }
 }

@@ -10,6 +10,7 @@ import { blogTemplate } from "../templates/project-templates/blog/blog.js";
 import { saasTemplate } from "../templates/project-templates/saas/saas.js";
 import { dashboardTemplate } from "../templates/project-templates/dashboard/dashboard.js";
 import { apiTemplate } from "../templates/project-templates/api/api.js";
+import { cliBrand } from "../brand.js";
 
 export interface CreateOptions {
   name: string;
@@ -59,7 +60,7 @@ function printTemplateList() {
 function printHeader() {
   const header = `
 ${BRIGHT_BLACK}╭─────────────────────────────────────────────────────╮${RESET}
-${BRIGHT_BLACK}│${RESET}   ${ORANGE_BG}${BRIGHT_BLACK} EmberKit ${RESET}                                         ${BRIGHT_BLACK}│${RESET}
+${BRIGHT_BLACK}│${RESET}   ${cliBrand.logo()} ${ORANGE_BG}${BRIGHT_BLACK} EmberKit ${RESET}                                         ${BRIGHT_BLACK}│${RESET}
 ${BRIGHT_BLACK}│${RESET}   ${DIM}A minimalist TypeScript-first JSX framework${RESET}     ${BRIGHT_BLACK}│${RESET}
 ${BRIGHT_BLACK}╰─────────────────────────────────────────────────────╯${RESET}
 `;
@@ -74,12 +75,12 @@ function printStep(step: number, total: number, message: string) {
 }
 
 function printSuccess(message: string) {
-  const check = BRIGHT_GREEN + "✓" + RESET;
+  const check = cliBrand.spark();
   console.log(`\n  ${check} ${BRIGHT_GREEN + message + RESET}\n`);
 }
 
 function printError(message: string) {
-  const err = BRIGHT_RED + "✗" + RESET;
+  const err = `${BRIGHT_RED}◆${RESET}`;
   console.log(`\n  ${err} ${BRIGHT_RED + message + RESET}\n`);
 }
 

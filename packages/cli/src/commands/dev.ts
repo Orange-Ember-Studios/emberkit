@@ -2,16 +2,7 @@ import { createServer, type UserConfig, type LogLevel } from "vite";
 import { join } from "path";
 import { existsSync } from "fs";
 import { pathToFileURL } from "url";
-
-const EMBERKIT_ASCII = `
-    ╔═══════════════════════════════════════╗
-    ║                                       ║
-    ║     🔥  E M B E R K I T  🔥           ║
-    ║                                       ║
-    ║        ░▒▓█ DEV SERVER █▓▒░           ║
-    ║                                       ║
-    ╚═══════════════════════════════════════╝
-`;
+import { mergeEmberkitViteConfig } from "../utils/merge-emberkit-vite.js";
 
 const COLORS = {
   reset: "\x1b[0m",
@@ -25,6 +16,16 @@ const COLORS = {
   yellow: "\x1b[38;5;220m",
   red: "\x1b[38;5;196m",
 };
+
+const EMBERKIT_ASCII = `
+    ╔═══════════════════════════════════════╗
+    ║                                       ║
+    ║     ${COLORS.orange}◆${COLORS.reset}  E M B E R K I T  ${COLORS.orange}◆${COLORS.reset}           ║
+    ║                                       ║
+    ║        ░▒▓█ DEV SERVER █▓▒░           ║
+    ║                                       ║
+    ╚═══════════════════════════════════════╝
+`;
 
 function log(level: "info" | "warn" | "error" | "success" | "debug", message: string, meta?: Record<string, unknown>) {
   const timestamp = new Date().toLocaleTimeString("en-US", { hour12: false });
@@ -101,7 +102,8 @@ export async function dev(_args: string[]): Promise<void> {
   log("info", "Initializing development server...");
   
   const emberkitConfig = await loadEmberKitConfig(root);
-  const viteConfig = await loadViteConfig(root);
+  const viteFileConfig = await loadViteConfig(root);
+  const viteConfig = mergeEmberkitViteConfig(emberkitConfig, viteFileConfig);
   
   if (emberkitConfig) {
     log("debug", "Loaded emberkit.config", { mode: (emberkitConfig as any).mode || "hybrid" });
