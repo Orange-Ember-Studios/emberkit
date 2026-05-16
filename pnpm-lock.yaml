@@ -168,10 +168,10 @@ importers:
   packages/ui:
     dependencies:
       '@emberkit/core':
-        specifier: workspace:^0.3.2
+        specifier: workspace:^0.3.5
         version: link:../emberkit
       '@emberkit/icons':
-        specifier: workspace:^1.0.2
+        specifier: workspace:^1.0.5
         version: link:../icons
       tailwindcss:
         specifier: ^4.0.0
