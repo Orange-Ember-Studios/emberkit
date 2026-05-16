@@ -142,14 +142,16 @@ const Select: FC<SelectProps> = ({
           )}
           {options.map((opt) => {
             const isSelected = opt.value === selectedValue();
+            const inactiveCls = "text-surface-800 hover:bg-surface-200/60 hover:text-surface-900";
+            const activeCls = "bg-primary-500/30 text-primary-300 font-medium ring-1 ring-primary-500/40";
+            
             const optCls = [
               "flex items-center justify-between px-4 py-2.5 text-sm cursor-pointer transition-all duration-150",
               opt.disabled
                 ? "opacity-40 cursor-not-allowed text-surface-500"
-                : isSelected
-                  ? "bg-primary-500/30 text-primary-300 font-medium ring-1 ring-primary-500/40"
-                  : "text-surface-800 hover:bg-surface-200/60 hover:text-surface-900",
+                : isSelected ? activeCls : inactiveCls,
             ].join(" ");
+
             return (
               <li
                 key={opt.value}
@@ -158,9 +160,23 @@ const Select: FC<SelectProps> = ({
                 aria-disabled={opt.disabled}
                 class={optCls}
                 onClick={() => handleSelect(opt)}
+                data-ek-bind={opt.disabled ? undefined : selectedValue}
+                data-ek-active-when={opt.disabled ? undefined : opt.value}
+                data-ek-active-class={opt.disabled ? undefined : activeCls}
+                data-ek-inactive-class={opt.disabled ? undefined : inactiveCls}
               >
                 <span>{opt.label}</span>
-                {isSelected && (
+                {!opt.disabled && (
+                  <Icon
+                    name="check"
+                    size={14}
+                    className={`text-primary-400 shrink-0 ${isSelected ? "" : "hidden"}`}
+                    data-ek-bind={selectedValue}
+                    data-ek-show-when={opt.value}
+                    data-ek-hide-class="hidden"
+                  />
+                )}
+                {opt.disabled && isSelected && (
                   <Icon
                     name="check"
                     size={14}

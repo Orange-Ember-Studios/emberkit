@@ -260,7 +260,7 @@ export interface IconProps {
   color?: string;
 }
 
-const Icon: FC<IconProps> = ({ name, size = 24, className, color }) => {
+const Icon: FC<IconProps> = ({ name, size = 24, className, color, ...rest }) => {
   const Component = registry[name];
   if (!Component) return null;
   // Do not coerce missing color to "". @emberkit/icons uses (color ?? "currentColor")
@@ -268,8 +268,8 @@ const Icon: FC<IconProps> = ({ name, size = 24, className, color }) => {
   // Omit `color` when undefined so exactOptionalPropertyTypes accepts the props object.
   const iconProps =
     color === undefined
-      ? { size, className: className ?? "" }
-      : { size, className: className ?? "", color };
+      ? { size, className: className ?? "", ...rest }
+      : { size, className: className ?? "", color, ...rest };
   return <Component {...iconProps} />;
 };
 
