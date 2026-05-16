@@ -1,5 +1,11 @@
 # @emberkit/core
 
+## 0.2.10
+
+### Patch Changes
+
+- e4e910a: Fix parent routes stealing child URL matches via broken prefix matching
+
 ## 0.2.9
 
 ### Patch Changes
