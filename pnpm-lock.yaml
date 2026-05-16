@@ -66,6 +66,9 @@ importers:
       inquirer:
         specifier: ^9.2.0
         version: 9.3.8(@types/node@22.19.18)
+      vite:
+        specifier: ^6.0.0
+        version: 6.4.2(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)
     devDependencies:
       '@eslint/js':
         specifier: ^10.0.1
@@ -165,10 +168,10 @@ importers:
   packages/ui:
     dependencies:
       '@emberkit/core':
-        specifier: workspace:^0.2.10
+        specifier: workspace:^0.3.2
         version: link:../emberkit
       '@emberkit/icons':
-        specifier: workspace:^0.2.8
+        specifier: workspace:^1.0.2
         version: link:../icons
       tailwindcss:
         specifier: ^4.0.0
