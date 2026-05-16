@@ -1,7 +1,7 @@
-import type { Plugin } from 'vite';
+import type { Plugin, ViteDevServer } from 'vite';
 import type { EmberKitPluginOptions, EmberKitMode } from './types.js';
 import { DEFAULT_CONFIG } from './types.js';
-import { readdirSync, statSync, existsSync } from 'node:fs';
+import { readdirSync, statSync, existsSync, readFileSync } from 'node:fs';
 import { join, relative, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { compile } from '@mdx-js/mdx';
@@ -10,24 +10,54 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const VIRTUAL_EMBERKIT_CONFIG = 'virtual:emberkit-config';
 const VIRTUAL_EMBERKIT_ROUTES = 'virtual:emberkit-routes';
+const VIRTUAL_SSR_ENTRY = 'virtual:emberkit-ssr-entry';
 
-function resolveConfig(userOptions: EmberKitPluginOptions = {}) {
+async function loadEmberKitConfig(root: string): Promise<Partial<EmberKitPluginOptions>> {
+  const { pathToFileURL } = await import('node:url');
+  
+  const configPaths = [
+    join(root, 'emberkit.config.ts'),
+    join(root, 'emberkit.config.js'),
+    join(root, 'emberkit.config.mjs'),
+  ];
+  
+  for (const configPath of configPaths) {
+    if (existsSync(configPath)) {
+      try {
+        const configUrl = pathToFileURL(configPath).href;
+        const mod = await import(configUrl);
+        return mod.default || mod;
+      } catch {
+        continue;
+      }
+    }
+  }
+  
+  return {};
+}
+
+function resolveConfig(userOptions: EmberKitPluginOptions = {}, fileConfig: Partial<EmberKitPluginOptions> = {}) {
   return {
     ...DEFAULT_CONFIG,
+    ...fileConfig,
     ...userOptions,
-    markdown: { ...DEFAULT_CONFIG.markdown, ...userOptions.markdown },
+    markdown: { ...DEFAULT_CONFIG.markdown, ...fileConfig.markdown, ...userOptions.markdown },
   };
 }
 
 export function emberkitVitePlugin(userOptions: EmberKitPluginOptions = {}): Plugin {
-  const options = resolveConfig(userOptions);
+  let options = resolveConfig(userOptions);
   let routesCode = `export const routes = [];`;
+  let projectRoot = process.cwd();
 
   return {
     name: 'emberkit:vite-plugin',
     enforce: 'pre',
 
-    async config() {
+    async config(config) {
+      projectRoot = config.root || process.cwd();
+      const fileConfig = await loadEmberKitConfig(projectRoot);
+      options = resolveConfig(userOptions, fileConfig);
       const pkgRoot = resolve(__dirname, '..', '..');
       const srcDir = join(pkgRoot, 'src');
 
@@ -75,6 +105,9 @@ export function emberkitVitePlugin(userOptions: EmberKitPluginOptions = {}): Plu
       if (id === VIRTUAL_EMBERKIT_ROUTES) {
         return VIRTUAL_EMBERKIT_ROUTES;
       }
+      if (id === VIRTUAL_SSR_ENTRY) {
+        return VIRTUAL_SSR_ENTRY;
+      }
       return null;
     },
 
@@ -85,7 +118,48 @@ export function emberkitVitePlugin(userOptions: EmberKitPluginOptions = {}): Plu
       if (id === VIRTUAL_EMBERKIT_ROUTES) {
         return routesCode;
       }
+      if (id === VIRTUAL_SSR_ENTRY) {
+        return generateSSREntry();
+      }
       return null;
+    },
+
+    configureServer(server: ViteDevServer) {
+      if (options.mode === 'spa') {
+        return;
+      }
+
+      server.middlewares.use(async (req, res, next) => {
+        const url = req.url ?? '/';
+
+        if (
+          url.startsWith('/@') ||
+          url.startsWith('/__') ||
+          url.startsWith('/node_modules') ||
+          url.startsWith('/src/') ||
+          url.includes('.') ||
+          req.headers.accept?.includes('application/json')
+        ) {
+          return next();
+        }
+
+        if (!req.headers.accept?.includes('text/html')) {
+          return next();
+        }
+
+        try {
+          const ssrModule = await server.ssrLoadModule(VIRTUAL_SSR_ENTRY);
+          const html = await ssrModule.render(url, server);
+
+          res.statusCode = 200;
+          res.setHeader('Content-Type', 'text/html');
+          res.end(html);
+        } catch (error) {
+          server.ssrFixStacktrace(error as Error);
+          console.error('[EmberKit SSR Error]', error);
+          next(error);
+        }
+      });
     },
 
     transform(code: string, id: string) {
@@ -1216,6 +1290,191 @@ function processParagraphs(html: string, breaks?: boolean): string {
 }
 
 export type { EmberKitPluginOptions, EmberKitMode };
+
+function generateSSREntry(): string {
+  return `
+import { routes } from 'virtual:emberkit-routes';
+import { createElement } from '@emberkit/core';
+
+const matchRoute = (routes, pathname) => {
+  const normalizedPath = pathname.replace(/\\/+$/, '') || '/';
+  
+  for (const route of routes) {
+    const pattern = routeToRegex(route.path);
+    const match = normalizedPath.match(pattern.regex);
+    if (match) {
+      const params = {};
+      pattern.paramNames.forEach((name, i) => {
+        params[name] = match[i + 1];
+      });
+      return { route, params };
+    }
+  }
+  return null;
+};
+
+const routeToRegex = (routePath) => {
+  const paramNames = [];
+  const regexStr = routePath
+    .replace(/:([^/]+)\\*/g, (_, name) => {
+      paramNames.push(name);
+      return '(.*)';
+    })
+    .replace(/:([^/]+)/g, (_, name) => {
+      paramNames.push(name);
+      return '([^/]+)';
+    });
+  return { regex: new RegExp('^' + regexStr + '$'), paramNames };
+};
+
+const renderToString = (element) => {
+  if (!element && element !== 0) return '';
+  if (typeof element === 'string') return escapeHtml(element);
+  if (typeof element === 'number') return String(element);
+  if (Array.isArray(element)) return element.map(renderToString).join('');
+  
+  if (typeof element !== 'object' || !element.type) return '';
+  
+  let { type, props } = element;
+  props = props || {};
+  
+  // Resolve function components
+  let depth = 0;
+  while (typeof type === 'function' && depth < 50) {
+    depth++;
+    try {
+      const result = type(props);
+      if (result && typeof result === 'object' && result.type) {
+        type = result.type;
+        props = result.props || {};
+      } else if (typeof result === 'string' || typeof result === 'number') {
+        return typeof result === 'string' ? escapeHtml(result) : String(result);
+      } else if (Array.isArray(result)) {
+        return result.map(renderToString).join('');
+      } else {
+        return '';
+      }
+    } catch (e) {
+      console.error('[SSR render error]', e);
+      return '';
+    }
+  }
+  
+  if (type === 'Fragment' || type === 'React.Fragment') {
+    const children = Array.isArray(props.children) ? props.children : [props.children];
+    return children.filter(Boolean).map(renderToString).join('');
+  }
+  
+  const SELF_CLOSING = new Set(['area','base','br','col','embed','hr','img','input','link','meta','source','track','wbr']);
+  
+  const children = Array.isArray(props.children) ? props.children : (props.children ? [props.children] : []);
+  let childHtml = children.filter(c => c != null).map(renderToString).join('');
+  
+  // Handle dangerouslySetInnerHTML
+  if (props.dangerouslySetInnerHTML && props.dangerouslySetInnerHTML.__html) {
+    childHtml = props.dangerouslySetInnerHTML.__html;
+  }
+  
+  const attrs = Object.entries(props)
+    .filter(([k, v]) => k !== 'children' && k !== 'key' && k !== 'dangerouslySetInnerHTML' && v != null && typeof v !== 'function')
+    .map(([k, v]) => {
+      if (k === 'className') k = 'class';
+      if (v === true) return ' ' + k;
+      if (v === false) return '';
+      if (k === 'style' && typeof v === 'object') {
+        const styleStr = Object.entries(v)
+          .filter(([, sv]) => sv != null)
+          .map(([sp, sv]) => sp.replace(/([A-Z])/g, '-$1').toLowerCase() + ': ' + sv)
+          .join('; ');
+        return ' ' + k + '="' + escapeHtml(styleStr) + '"';
+      }
+      return ' ' + k + '="' + escapeHtml(String(v)) + '"';
+    })
+    .join('');
+  
+  if (SELF_CLOSING.has(type)) {
+    return '<' + type + attrs + '/>';
+  }
+  
+  return '<' + type + attrs + '>' + childHtml + '</' + type + '>';
+};
+
+const escapeHtml = (str) => {
+  if (typeof str !== 'string') return str;
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+};
+
+export async function render(url, server) {
+  const pathname = url.split('?')[0];
+  
+  // Sort routes: static first, then dynamic
+  const sortedRoutes = [...routes].sort((a, b) => {
+    const aScore = a.path.includes(':') ? 0 : 1;
+    const bScore = b.path.includes(':') ? 0 : 1;
+    return bScore - aScore;
+  });
+  
+  const match = matchRoute(sortedRoutes, pathname);
+  
+  let appHtml = '';
+  let headContent = '';
+  
+  if (match) {
+    try {
+      const mod = await match.route.component();
+      const Component = mod.default || mod;
+      
+      // Get metadata if available
+      if (mod.metadata) {
+        if (mod.metadata.title) {
+          headContent += '<title>' + escapeHtml(mod.metadata.title) + '</title>\\n';
+        }
+        if (mod.metadata.description) {
+          headContent += '<meta name="description" content="' + escapeHtml(mod.metadata.description) + '">\\n';
+        }
+      }
+      
+      const element = createElement(Component, { params: match.params });
+      appHtml = renderToString(element);
+    } catch (e) {
+      console.error('[SSR] Failed to render route:', pathname, e);
+      appHtml = '<div style="color: red; padding: 20px;">SSR Error: ' + escapeHtml(String(e)) + '</div>';
+    }
+  } else {
+    appHtml = '<div style="padding: 20px;">404 - Page not found</div>';
+  }
+  
+  // Load and transform index.html
+  const fs = await import('node:fs');
+  const path = await import('node:path');
+  const indexPath = path.join(server.config.root, 'index.html');
+  let template = fs.readFileSync(indexPath, 'utf-8');
+  template = await server.transformIndexHtml(url, template);
+  
+  // Inject SSR content
+  // Look for body with id="app" or div with id="app"
+  if (template.includes('<body id="app">')) {
+    template = template.replace('<body id="app">', '<body id="app">' + appHtml);
+  } else if (template.includes('<div id="app">')) {
+    template = template.replace('<div id="app"></div>', '<div id="app">' + appHtml + '</div>');
+  } else if (template.includes('<div id="app"/>')) {
+    template = template.replace('<div id="app"/>', '<div id="app">' + appHtml + '</div>');
+  }
+  
+  // Inject head content if any
+  if (headContent && template.includes('</head>')) {
+    template = template.replace('</head>', headContent + '</head>');
+  }
+  
+  return template;
+}
+`;
+}
 
 function scanRouteFiles(dir: string): string[] {
   const files: string[] = [];
