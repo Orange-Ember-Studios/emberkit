@@ -1,5 +1,11 @@
 # @emberkit/core
 
+## 0.4.1
+
+### Patch Changes
+
+- 8df9f10: Export RouteParams from the public API
+
 ## 0.4.0
 
 ### Minor Changes
