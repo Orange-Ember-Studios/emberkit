@@ -90,6 +90,25 @@ export async function build(_args: string[]): Promise<void> {
   const viteFileConfig = await loadViteConfig(root);
   const viteConfig = mergeEmberkitViteConfig(emberkitConfig, viteFileConfig);
   
+  // Ensure emberkitVitePlugin is always included
+  const { emberkitVitePlugin } = await import('@emberkit/core/vite-plugin');
+  const existingPlugins = viteConfig?.plugins 
+    ? (Array.isArray(viteConfig.plugins) ? viteConfig.plugins : [viteConfig.plugins])
+    : [];
+  
+  // Check if emberkitVitePlugin is already in the plugins
+  const hasEmberkitPlugin = existingPlugins.some((p: any) => {
+    return p?.name === 'emberkit:vite-plugin' || (typeof p === 'function' && p.name === 'emberkitVitePlugin');
+  });
+  
+  if (!hasEmberkitPlugin) {
+    existingPlugins.unshift(emberkitVitePlugin());
+  }
+  
+  if (viteConfig) {
+    viteConfig.plugins = existingPlugins;
+  }
+  
   const mode = (emberkitConfig as any)?.mode || "hybrid";
   const outDir = (emberkitConfig as any)?.build?.outDir || "dist";
   
