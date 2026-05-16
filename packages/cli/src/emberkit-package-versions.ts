@@ -2,7 +2,7 @@
 // When releasing libraries, bump these to match packages/*/package.json "version".
 export const EMBERKIT_PACKAGE_VERSIONS = {
   core: "^0.3.7",
-  ui: "^1.0.0",
+  ui: "^1.0.1",
   icons: "^1.0.7",
   cli: "^0.6.7",
   edge: "^0.2.4",

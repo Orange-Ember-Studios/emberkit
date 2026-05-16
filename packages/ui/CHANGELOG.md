@@ -1,5 +1,11 @@
 # @emberkit/ui
 
+## 1.0.1
+
+### Patch Changes
+
+- Fix Select option visual active state and update Icon to accept DOM bindings
+
 ## 1.0.0
 
 ### Patch Changes
