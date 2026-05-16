@@ -27,21 +27,29 @@ export function scoreRoute(routePath: string): number {
 function routeMatchesPath(routePath: string, normalized: string): boolean {
   if (routePath === normalized) return true;
 
-  if (routePath !== '/' && normalized.startsWith(routePath + '/')) return true;
+  const routeParts = routePath.split('/').filter(Boolean);
+  const pathParts = normalized.split('/').filter(Boolean);
 
-  if (routePath !== '/' && routePath.includes(':')) {
-    const routeParts = routePath.split('/');
-    const pathParts = normalized.split('/');
-    if (routeParts.length === pathParts.length) {
-      for (let i = 0; i < routeParts.length; i++) {
-        if (routeParts[i].startsWith(':')) continue;
-        if (routeParts[i] !== pathParts[i]) return false;
-      }
-      return true;
+  // Catch-all routes (e.g. /:slug*) can match longer paths
+  const hasCatchAll = routeParts.some((p) => p.endsWith('*'));
+  if (hasCatchAll) {
+    if (pathParts.length < routeParts.length) return false;
+    for (let i = 0; i < routeParts.length; i++) {
+      const part = routeParts[i];
+      if (part.startsWith(':')) continue;
+      if (part !== pathParts[i]) return false;
     }
+    return true;
   }
 
-  return false;
+  // Standard routes: segment counts must match exactly
+  if (routeParts.length !== pathParts.length) return false;
+
+  for (let i = 0; i < routeParts.length; i++) {
+    if (routeParts[i].startsWith(':')) continue;
+    if (routeParts[i] !== pathParts[i]) return false;
+  }
+  return true;
 }
 
 /**
