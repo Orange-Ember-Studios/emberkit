@@ -1316,7 +1316,7 @@ const routeToRegex = (routePath) => {
       paramNames.push(name);
       return '([^/]+)';
     });
-  return { regex: new RegExp('^' + regexStr + '$'), paramNames };
+  return { regex: new RegExp('^' + regexStr.replace(/\\/$/, '/?') + '$'), paramNames };
 };
 
 const renderToString = (element) => {

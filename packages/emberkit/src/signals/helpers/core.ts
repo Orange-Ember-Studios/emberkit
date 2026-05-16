@@ -110,6 +110,8 @@ export function createMemo<T>(computation: () => T, _options?: SignalOptions<T>)
 }
 
 export function createEffect(callback: () => void | (() => void)): () => void {
+  if (typeof window === 'undefined') return () => {};
+
   let cleanup: (() => void) | void;
 
   function run(): void {
