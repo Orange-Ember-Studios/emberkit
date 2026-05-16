@@ -40,6 +40,9 @@ export type { MetaData, OpenGraphData, TwitterCardData } from './meta/index.js';
 
 export type { FC, RouteComponent, RouteChildren } from './runtime/types.js';
 
+export { createLogger, createHttpLogger } from './logger/index.js';
+export type { Logger, LoggerOptions, LogLevel, RequestLog, ResponseLog } from './logger/index.js';
+
 export function defineConfig(config: Record<string, unknown>): Record<string, unknown> {
   return config;
 }

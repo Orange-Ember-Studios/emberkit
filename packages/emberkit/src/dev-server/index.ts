@@ -1,8 +1,13 @@
+import type { Logger, LogLevel } from '../logger/types.js';
+import { createLogger, createHttpLogger } from '../logger/index.js';
+
 export interface DevServerOptions {
   port?: number;
   host?: string;
   cors?: boolean;
   hmr?: boolean;
+  logLevel?: LogLevel;
+  logger?: Logger;
 }
 
 export interface ServerStats {
@@ -14,12 +19,14 @@ export interface ServerStats {
 
 export class DevServer {
   private errorCount = 0;
-  private readonly options: Required<DevServerOptions>;
+  private readonly logger: Logger;
+  private readonly options: Required<Omit<DevServerOptions, 'logger' | 'logLevel'>>;
   private requestCount = 0;
   private server: import('http').Server | null = null;
   private startTime = 0;
 
   constructor(options: DevServerOptions = {}) {
+    this.logger = options.logger ?? createLogger({ name: '@emberkit/dev-server', level: options.logLevel ?? 'info' });
     this.options = {
       port: options.port ?? 3000,
       host: options.host ?? 'localhost',
@@ -47,12 +54,15 @@ export class DevServer {
 
     await new Promise<void>((resolve, reject) => {
       this.server!.listen(this.options.port, this.options.host, () => {
-        console.log(`Dev server running at http://${this.options.host}:${this.options.port}`);
+        this.logger.info(`Dev server running at http://${this.options.host}:${this.options.port}`, {
+          port: this.options.port,
+          host: this.options.host,
+        });
         resolve();
       });
 
       this.server!.on('error', (err) => {
-        console.error('Server error:', err);
+        this.logger.error('Server error', err);
         reject(err);
       });
     });
@@ -67,8 +77,10 @@ export class DevServer {
 
       this.server.close((err) => {
         if (err) {
+          this.logger.error('Error closing server', err);
           reject(err);
         } else {
+          this.logger.info('Dev server stopped');
           this.server = null;
           resolve();
         }
@@ -77,14 +89,41 @@ export class DevServer {
   }
 
   private createRequestHandler() {
+    const httpLogger = createHttpLogger(this.logger);
+
     return async (req: import('http').IncomingMessage, res: import('http').ServerResponse) => {
       this.requestCount++;
 
+      const startTime = Date.now();
+      const method = req.method ?? 'GET';
+      const path = req.url ?? '/';
+
+      const logContext = {
+        method,
+        path,
+        remoteAddress: req.socket.remoteAddress,
+        userAgent: req.headers['user-agent'],
+      };
+
       try {
         await this.handleRequest(req, res);
+
+        const responseTime = Date.now() - startTime;
+        this.logger.debug(`${method} ${path}`, {
+          ...logContext,
+          statusCode: res.statusCode,
+          responseTime,
+        });
       } catch (error) {
         this.errorCount++;
-        console.error('Request error:', error);
+        const responseTime = Date.now() - startTime;
+
+        this.logger.error(`${method} ${path} - Error`, {
+          ...logContext,
+          responseTime,
+          error: error instanceof Error ? error.message : String(error),
+        });
+
         this.sendError(res, 500, 'Internal Server Error');
       }
     };
@@ -112,6 +151,7 @@ export class DevServer {
     const url = new URL(req.url ?? '/', `http://${req.headers.host}`);
 
     if (url.pathname === '/__emberkit_hmr') {
+      this.logger.trace('HMR request', { pathname: url.pathname });
       this.handleWebSocket(req, res);
       return;
     }
