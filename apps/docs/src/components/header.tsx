@@ -2,6 +2,7 @@ import type { RouteComponent } from '@emberkit/core';
 import { IconGithub } from '@emberkit/icons';
 import { Icon } from '@emberkit/ui';
 import { useNavigate } from '@emberkit/core';
+import { CORE_VERSION, formatVersion } from '../lib/version.js';
 
 const navLinks = [
   { label: 'Docs', path: '/docs/introduction' },
@@ -70,7 +71,7 @@ const Header: RouteComponent = () => {
           <span className="text-[1.0625rem] font-bold bg-gradient-to-r from-orange-400 via-orange-500 to-fuchsia-400 bg-clip-text text-transparent">EmberKit</span>
         </a>
         <span className="hidden sm:inline-flex items-center rounded-full bg-orange-500/10 px-2 py-0.5 text-[0.625rem] font-semibold uppercase tracking-wider text-orange-500/80 ring-1 ring-orange-500/20">
-          v0.1.0
+          {formatVersion(CORE_VERSION)}
         </span>
       </div>
 

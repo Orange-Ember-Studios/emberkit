@@ -1,5 +1,12 @@
 # @emberkit/docs
 
+## 1.0.0
+
+### Minor Changes
+
+- First stable docs site release (version badge synced to package.json)
+- Remove alpha labels from site chrome and UI docs page
+
 ## 0.1.1
 
 ### Patch Changes

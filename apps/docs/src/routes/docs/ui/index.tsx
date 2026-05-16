@@ -21,6 +21,7 @@ import {
   Select,
 } from "@emberkit/ui/molecules";
 import { DataTable, Pagination } from "@emberkit/ui/organisms";
+import { UI_VERSION } from "../../../lib/version.js";
 
 type PropRow = {
   name: string;
@@ -98,7 +99,7 @@ const UIContent: RouteComponent = () => {
         />
         <div class="relative mx-auto max-w-5xl px-8 py-16 md:py-20">
           <Badge variant="accent" size="sm" className="mb-4">
-            @emberkit/ui (npm alpha)
+            @emberkit/ui v{UI_VERSION}
           </Badge>
           <Heading level={1} className="mb-4">
             <span class="text-primary-400">@emberkit/ui</span> — Component

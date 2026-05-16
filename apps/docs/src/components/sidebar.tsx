@@ -2,6 +2,7 @@ import type { RouteComponent } from '@emberkit/core';
 import { IconChevronRight } from '@emberkit/icons';
 import { Icon } from '@emberkit/ui';
 import { useNavigate } from '@emberkit/core';
+import { CORE_VERSION, DOCS_VERSION, formatVersion } from '../lib/version.js';
 
 const docs = [
   {
@@ -131,7 +132,9 @@ const Sidebar: RouteComponent = () => {
       ))}
 
       <div className="mt-6 border-t border-white/5 pt-6 px-3">
-        <span className="text-[0.6875rem] font-semibold text-gray-600 uppercase tracking-[0.1em]">v0.1.0 — Alpha</span>
+        <span className="text-[0.6875rem] font-semibold text-gray-600 uppercase tracking-[0.1em]">
+          {formatVersion(CORE_VERSION)} · docs {formatVersion(DOCS_VERSION)}
+        </span>
       </div>
     </aside>
   );
