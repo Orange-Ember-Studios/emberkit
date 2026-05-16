@@ -1,5 +1,13 @@
 # @emberkit/core
 
+## 0.4.0
+
+### Minor Changes
+
+- feat: add custom 404 and 500 error page support
+
+  Users can now create `404.tsx` and `500.tsx` files in their routes directory to customize error pages, similar to Next.js and Astro. The framework automatically renders these custom pages when no route matches (404) or when errors occur during rendering (500).
+
 ## 0.3.8
 
 ### Patch Changes
