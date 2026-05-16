@@ -149,11 +149,11 @@ export function emberkitVitePlugin(userOptions: EmberKitPluginOptions = {}): Plu
 
         try {
           const ssrModule = await server.ssrLoadModule(VIRTUAL_SSR_ENTRY);
-          const html = await ssrModule.render(url, server);
+          const result = await ssrModule.render(url, server);
 
-          res.statusCode = 200;
+          res.statusCode = result.status || 200;
           res.setHeader('Content-Type', 'text/html');
-          res.end(html);
+          res.end(result.html || result);
         } catch (error) {
           server.ssrFixStacktrace(error as Error);
           console.error('[EmberKit SSR Error]', error);
@@ -1285,7 +1285,7 @@ export type { EmberKitPluginOptions, EmberKitMode };
 
 function generateSSREntry(): string {
   return `
-import { routes } from 'virtual:emberkit-routes';
+import { routes, notFoundRoute, errorRoute } from 'virtual:emberkit-routes';
 import { createElement } from '@emberkit/core';
 
 const matchRoute = (routes, pathname) => {
@@ -1324,12 +1324,12 @@ const renderToString = (element) => {
   if (typeof element === 'string') return escapeHtml(element);
   if (typeof element === 'number') return String(element);
   if (Array.isArray(element)) return element.map(renderToString).join('');
-  
+
   if (typeof element !== 'object' || !element.type) return '';
-  
+
   let { type, props } = element;
   props = props || {};
-  
+
   // Resolve function components
   let depth = 0;
   while (typeof type === 'function' && depth < 50) {
@@ -1351,22 +1351,22 @@ const renderToString = (element) => {
       return '';
     }
   }
-  
+
   if (type === 'Fragment' || type === 'React.Fragment') {
     const children = Array.isArray(props.children) ? props.children : [props.children];
     return children.filter(Boolean).map(renderToString).join('');
   }
-  
+
   const SELF_CLOSING = new Set(['area','base','br','col','embed','hr','img','input','link','meta','source','track','wbr']);
-  
+
   const children = Array.isArray(props.children) ? props.children : (props.children ? [props.children] : []);
   let childHtml = children.filter(c => c != null).map(renderToString).join('');
-  
+
   // Handle dangerouslySetInnerHTML
   if (props.dangerouslySetInnerHTML && props.dangerouslySetInnerHTML.__html) {
     childHtml = props.dangerouslySetInnerHTML.__html;
   }
-  
+
   const attrs = Object.entries(props)
     .filter(([k, v]) => k !== 'children' && k !== 'key' && k !== 'dangerouslySetInnerHTML' && v != null && typeof v !== 'function')
     .map(([k, v]) => {
@@ -1383,11 +1383,11 @@ const renderToString = (element) => {
       return ' ' + k + '="' + escapeHtml(String(v)) + '"';
     })
     .join('');
-  
+
   if (SELF_CLOSING.has(type)) {
     return '<' + type + attrs + '/>';
   }
-  
+
   return '<' + type + attrs + '>' + childHtml + '</' + type + '>';
 };
 
@@ -1403,24 +1403,25 @@ const escapeHtml = (str) => {
 
 export async function render(url, server) {
   const pathname = url.split('?')[0];
-  
+
   // Sort routes: static first, then dynamic
   const sortedRoutes = [...routes].sort((a, b) => {
     const aScore = a.path.includes(':') ? 0 : 1;
     const bScore = b.path.includes(':') ? 0 : 1;
     return bScore - aScore;
   });
-  
+
   const match = matchRoute(sortedRoutes, pathname);
-  
+
   let appHtml = '';
   let headContent = '';
-  
+  let status = 200;
+
   if (match) {
     try {
       const mod = await match.route.component();
       const Component = mod.default || mod;
-      
+
       // Get metadata if available
       if (mod.metadata) {
         if (mod.metadata.title) {
@@ -1430,24 +1431,56 @@ export async function render(url, server) {
           headContent += '<meta name="description" content="' + escapeHtml(mod.metadata.description) + '">\\n';
         }
       }
-      
+
       const element = createElement(Component, { params: match.params });
       appHtml = renderToString(element);
     } catch (e) {
       console.error('[SSR] Failed to render route:', pathname, e);
-      appHtml = '<div style="color: red; padding: 20px;">SSR Error: ' + escapeHtml(String(e)) + '</div>';
+      if (errorRoute) {
+        try {
+          status = 500;
+          const mod = await errorRoute();
+          const Component = mod.default || mod;
+          const errorInfo = {
+            status: 500,
+            message: e instanceof Error ? e.message : 'Internal Server Error',
+            error: e,
+          };
+          const element = createElement(Component, { error: errorInfo });
+          appHtml = renderToString(element);
+        } catch (fallbackError) {
+          console.error('[SSR] Failed to render 500 page:', fallbackError);
+          appHtml = '<div style="color: red; padding: 20px;">Internal Server Error</div>';
+        }
+      } else {
+        appHtml = '<div style="color: red; padding: 20px;">SSR Error: ' + escapeHtml(String(e)) + '</div>';
+        status = 500;
+      }
     }
   } else {
-    appHtml = '<div style="padding: 20px;">404 - Page not found</div>';
+    status = 404;
+    if (notFoundRoute) {
+      try {
+        const mod = await notFoundRoute();
+        const Component = mod.default || mod;
+        const element = createElement(Component, { });
+        appHtml = renderToString(element);
+      } catch (e) {
+        console.error('[SSR] Failed to render 404 page:', e);
+        appHtml = '<div style="padding: 20px;">404 - Page not found</div>';
+      }
+    } else {
+      appHtml = '<div style="padding: 20px;">404 - Page not found</div>';
+    }
   }
-  
+
   // Load and transform index.html
   const fs = await import('node:fs');
   const path = await import('node:path');
   const indexPath = path.join(server.config.root, 'index.html');
   let template = fs.readFileSync(indexPath, 'utf-8');
   template = await server.transformIndexHtml(url, template);
-  
+
   // Inject SSR content
   // Look for body with id="app" or div with id="app"
   if (template.includes('<body id="app">')) {
@@ -1457,13 +1490,13 @@ export async function render(url, server) {
   } else if (template.includes('<div id="app"/>')) {
     template = template.replace('<div id="app"/>', '<div id="app">' + appHtml + '</div>');
   }
-  
+
   // Inject head content if any
   if (headContent && template.includes('</head>')) {
     template = template.replace('</head>', headContent + '</head>');
   }
-  
-  return template;
+
+  return { html: template, status };
 }
 `;
 }
@@ -1522,11 +1555,25 @@ function scoreRoutePath(routePath: string): number {
 
 function generateRoutesCode(files: string[], routeDir: string): string {
   const routeEntries: Array<{ path: string; entry: string }> = [];
+  let notFoundRoute = 'null';
+  let errorRoute = 'null';
 
   for (const file of files) {
     const relativePath = relative(routeDir, file).replace(/\\/g, '/');
     const ext = file.split('.').pop() ?? '';
     const isMarkdown = ext === 'md' || ext === 'mdx';
+
+    // Check for special error pages
+    if (relativePath === '404.tsx' || relativePath === '404.ts' || relativePath === '404.jsx' || relativePath === '404.js') {
+      const importPath = file.replace(/\\/g, '/');
+      notFoundRoute = `() => import(${JSON.stringify(importPath)})`;
+      continue;
+    }
+    if (relativePath === '500.tsx' || relativePath === '500.ts' || relativePath === '500.jsx' || relativePath === '500.js') {
+      const importPath = file.replace(/\\/g, '/');
+      errorRoute = `() => import(${JSON.stringify(importPath)})`;
+      continue;
+    }
 
     // Skip special files
     if (
@@ -1565,5 +1612,7 @@ function generateRoutesCode(files: string[], routeDir: string): string {
   // the correct priority order (defense-in-depth alongside runtime scoring).
   routeEntries.sort((a, b) => scoreRoutePath(b.path) - scoreRoutePath(a.path));
 
-  return `export const routes = [\n${routeEntries.map((r) => r.entry).join(',\n')}\n];`;
+  return `export const routes = [\n${routeEntries.map((r) => r.entry).join(',\n')}\n];
+export const notFoundRoute = ${notFoundRoute};
+export const errorRoute = ${errorRoute};`;
 }

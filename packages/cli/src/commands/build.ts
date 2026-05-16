@@ -182,7 +182,7 @@ async function buildClient(
 }
 
 function getServerEntryShim(): string {
-  return `import { routes } from 'virtual:emberkit-routes';
+  return `import { routes, notFoundRoute, errorRoute } from 'virtual:emberkit-routes';
 import { createElement } from '@emberkit/core';
 import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
@@ -310,6 +310,7 @@ export async function render(url) {
 
   let appHtml = '';
   let headContent = '';
+  let status = 200;
 
   if (match) {
     try {
@@ -329,10 +330,42 @@ export async function render(url) {
       appHtml = renderToString(element);
     } catch (e) {
       console.error('[SSR] Failed to render route:', pathname, e);
-      appHtml = '<div style="color: red; padding: 20px;">SSR Error: ' + escapeHtml(String(e)) + '</div>';
+      if (errorRoute) {
+        try {
+          status = 500;
+          const mod = await errorRoute();
+          const Component = mod.default || mod;
+          const errorInfo = {
+            status: 500,
+            message: e instanceof Error ? e.message : 'Internal Server Error',
+            error: e,
+          };
+          const element = createElement(Component, { error: errorInfo });
+          appHtml = renderToString(element);
+        } catch (fallbackError) {
+          console.error('[SSR] Failed to render 500 page:', fallbackError);
+          appHtml = '<div style="color: red; padding: 20px;">Internal Server Error</div>';
+        }
+      } else {
+        appHtml = '<div style="color: red; padding: 20px;">SSR Error: ' + escapeHtml(String(e)) + '</div>';
+        status = 500;
+      }
     }
   } else {
-    appHtml = '<div style="padding: 20px;">404 - Page not found</div>';
+    status = 404;
+    if (notFoundRoute) {
+      try {
+        const mod = await notFoundRoute();
+        const Component = mod.default || mod;
+        const element = createElement(Component, {});
+        appHtml = renderToString(element);
+      } catch (e) {
+        console.error('[SSR] Failed to render 404 page:', e);
+        appHtml = '<div style="padding: 20px;">404 - Page not found</div>';
+      }
+    } else {
+      appHtml = '<div style="padding: 20px;">404 - Page not found</div>';
+    }
   }
 
   const templatePath = join(__dirname, '..', 'index.html');
@@ -350,7 +383,7 @@ export async function render(url) {
     template = template.replace('</head>', headContent + '</head>');
   }
 
-  return template;
+  return { html: template, status };
 }
 `;
 }
