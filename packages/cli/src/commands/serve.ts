@@ -2,6 +2,7 @@ import { createServer as createHttpServer } from "http";
 import { join, extname } from "path";
 import { existsSync, readFileSync, statSync } from "fs";
 import { pathToFileURL } from "url";
+import { normalizeSSRRenderResult } from "../utils/ssr-render-result.js";
 
 const COLORS = {
   reset: "\x1b[0m",
@@ -216,10 +217,13 @@ export async function serve(args: string[]): Promise<void> {
         if (routeMatch && (manifest.mode === "ssr" || !routeMatch.route.isStatic)) {
           try {
             if (serverModule.render) {
-              const html = await serverModule.render(url, routeMatch.params);
+              const result = normalizeSSRRenderResult(
+                await serverModule.render(url, routeMatch.params),
+              );
+              res.statusCode = result.status;
               res.setHeader("Content-Type", "text/html; charset=utf-8");
               res.setHeader("Cache-Control", "no-cache");
-              res.end(typeof html === "string" ? html : html?.html ?? "");
+              res.end(result.html);
               
               const ms = Date.now() - reqStart;
               log("request", `${COLORS.green}200${COLORS.reset} ${pathname} ${COLORS.dim}(ssr, ${ms}ms)${COLORS.reset}`);

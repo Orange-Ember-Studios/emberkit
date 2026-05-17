@@ -2,6 +2,7 @@ import { createServer as createHttpServer } from "http";
 import { join, extname } from "path";
 import { existsSync, readFileSync, statSync } from "fs";
 import { pathToFileURL } from "url";
+import { normalizeSSRRenderResult } from "../utils/ssr-render-result.js";
 
 const COLORS = {
   reset: "\x1b[0m",
@@ -103,7 +104,7 @@ export async function preview(_args: string[]): Promise<void> {
   console.log(`${COLORS.orange}${EMBERKIT_ASCII}${COLORS.reset}`);
   
   const emberkitConfig = await loadEmberKitConfig(root);
-  const mode = (emberkitConfig as any)?.mode || "hybrid";
+  const configMode = (emberkitConfig as any)?.mode || "hybrid";
   const outDir = (emberkitConfig as any)?.build?.outDir || "dist";
   const distPath = join(root, outDir);
   
@@ -118,8 +119,10 @@ export async function preview(_args: string[]): Promise<void> {
   
   if (existsSync(manifestPath)) {
     manifest = JSON.parse(readFileSync(manifestPath, "utf-8"));
-    log("info", `Loaded SSR manifest (mode: ${manifest?.mode || mode})`);
+    log("info", `Loaded SSR manifest (mode: ${manifest?.mode || configMode})`);
   }
+
+  const mode = manifest?.mode || configMode;
   
   const serverEntryPath = join(distPath, "server", "entry-server.js");
   let serverModule: any = null;
@@ -161,21 +164,30 @@ export async function preview(_args: string[]): Promise<void> {
       return;
     }
     
-    if (pathname !== "/" && !pathname.includes(".")) {
+    const wantsHtml =
+      req.headers.accept?.includes("text/html") ||
+      (req.headers.accept?.includes("*/*") && !pathname.includes("."));
+
+    if (
+      pathname !== "/" &&
+      !pathname.includes(".") &&
+      (mode === "static" || mode === "hybrid")
+    ) {
       const htmlPath = join(distPath, pathname, "index.html");
       if (serveStaticFile(htmlPath)) {
         log("request", `${COLORS.green}200${COLORS.reset} ${pathname} ${COLORS.dim}(prerendered)${COLORS.reset}`);
         return;
       }
     }
-    
+
     if ((mode === "ssr" || mode === "hybrid") && serverModule) {
-      if (req.headers.accept?.includes("text/html")) {
+      if (wantsHtml) {
         try {
-          const html = await serverModule.render(url);
+          const result = normalizeSSRRenderResult(await serverModule.render(url));
+          res.statusCode = result.status;
           res.setHeader("Content-Type", "text/html; charset=utf-8");
-          res.end(html);
-          log("request", `${COLORS.green}200${COLORS.reset} ${pathname} ${COLORS.dim}(ssr)${COLORS.reset}`);
+          res.end(result.html);
+          log("request", `${COLORS.green}${result.status}${COLORS.reset} ${pathname} ${COLORS.dim}(ssr)${COLORS.reset}`);
           return;
         } catch (e) {
           log("error", `SSR render failed: ${e}`);

@@ -5,6 +5,7 @@ import { pathToFileURL } from "url";
 import { cliBrand } from "../brand.js";
 import { mergeEmberkitViteConfig } from "../utils/merge-emberkit-vite.js";
 import { loadEmberKitConfig, loadViteConfig } from "../utils/load-config.js";
+import { normalizeSSRRenderResult } from "../utils/ssr-render-result.js";
 
 const COLORS = {
   reset: "\x1b[0m",
@@ -79,9 +80,14 @@ export async function build(_args: string[]): Promise<void> {
       
       if (mode === "hybrid") {
         log("info", "Pre-rendering static routes...");
-        await prerenderStaticRoutes(root, outDir);
+        await prerenderStaticRoutes(root, outDir, false, emberkitConfig);
       }
-      
+
+      if (mode === "ssr") {
+        log("info", "Pre-rendering routes for static HTML shells...");
+        await prerenderStaticRoutes(root, outDir, true, emberkitConfig);
+      }
+
       log("success", `${mode.toUpperCase()} build complete!`);
     } else if (mode === "static") {
       log("info", "Building static site...");
@@ -94,7 +100,7 @@ export async function build(_args: string[]): Promise<void> {
       await generateManifest(root, outDir, mode);
       
       log("info", "Pre-rendering all routes...");
-      await prerenderStaticRoutes(root, outDir, true);
+      await prerenderStaticRoutes(root, outDir, true, emberkitConfig);
       
       log("success", "Static build complete!");
     }
@@ -176,6 +182,10 @@ import {
   buildRouteHeadFromMetadata,
   drainHeadContent,
   clearHeadContent,
+  renderMatchedRouteModule,
+  injectSSRIntoTemplate,
+  createWrapWithRootLayout,
+  renderToHTMLString,
 } from '@emberkit/core';
 import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
@@ -183,18 +193,7 @@ import { fileURLToPath } from 'node:url';
 
 const siteHeadOptions = ${siteHeadOptions};
 
-const wrapWithRootLayout = async (RouteComponent) => {
-  if (!rootLayout) {
-    return RouteComponent;
-  }
-  const layoutMod = await rootLayout();
-  const Layout = layoutMod.default || layoutMod;
-  return (routeProps) =>
-    createElement(Layout, {
-      pathname: routeProps?.pathname,
-      children: createElement(RouteComponent, routeProps),
-    });
-};
+const wrapWithRootLayout = createWrapWithRootLayout(rootLayout, createElement);
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -319,15 +318,22 @@ export async function render(url) {
   let appHtml = '';
   let headContent = '';
   let status = 200;
+  let loaderState = null;
 
   if (match) {
     try {
       const mod = await match.route.component();
-      const Route = mod.default || mod;
       clearHeadContent();
-      const Page = await wrapWithRootLayout(Route);
-      const element = createElement(Page, { params: match.params, pathname });
-      appHtml = renderToString(element);
+      const rendered = await renderMatchedRouteModule({
+        url,
+        pathname,
+        params: match.params,
+        routeModule: mod,
+        wrapWithRootLayout,
+      });
+      appHtml = rendered.appHtml;
+      status = rendered.status;
+      loaderState = rendered.loaderState;
       const drained = drainHeadContent();
       if (mod.metadata) {
         headContent =
@@ -387,17 +393,7 @@ export async function render(url) {
   const templatePath = join(__dirname, '..', 'index.html');
   let template = readFileSync(templatePath, 'utf-8');
 
-  if (template.includes('<body id="app">')) {
-    template = template.replace('<body id="app">', '<body id="app">' + appHtml);
-  } else if (template.includes('<div id="app">')) {
-    template = template.replace('<div id="app"></div>', '<div id="app">' + appHtml + '</div>');
-  } else if (template.includes('<div id="app"/>')) {
-    template = template.replace('<div id="app"/>', '<div id="app">' + appHtml + '</div>');
-  }
-
-  if (headContent && template.includes('</head>')) {
-    template = template.replace('</head>', headContent + '</head>');
-  }
+  template = injectSSRIntoTemplate(template, { appHtml, headContent, loaderState });
 
   return { html: template, status };
 }
@@ -568,6 +564,7 @@ async function prerenderStaticRoutes(
   root: string,
   outDir: string,
   prerenderAll = false,
+  emberkitConfig: Record<string, unknown> | null = null,
 ): Promise<void> {
   const manifestPath = join(root, outDir, "ssr-manifest.json");
   
@@ -594,40 +591,42 @@ async function prerenderStaticRoutes(
     return;
   }
   
-  const routesToPrerender = manifest.routes.filter((route: RouteEntry) => 
-    prerenderAll || route.isStatic
-  );
-  
-  for (const route of routesToPrerender) {
-    if (route.path.includes(":")) {
-      continue;
-    }
-    
+  const { resolvePrerenderPaths } = await import("@emberkit/core");
+
+  const staticPaths = manifest.routes
+    .filter((route: RouteEntry) => (prerenderAll || route.isStatic) && !route.path.includes(":"))
+    .map((route: RouteEntry) => route.path);
+
+  const prerenderConfig = (emberkitConfig as { prerender?: { paths?: string[]; exclude?: string[]; discover?: () => Promise<string[]> } })
+    ?.prerender;
+
+  const pathsToPrerender = await resolvePrerenderPaths(staticPaths, prerenderConfig);
+
+  for (const routePath of pathsToPrerender) {
     try {
       let html: string;
 
       if (serverModule.render) {
-        html = await serverModule.render(route.path);
+        html = normalizeSSRRenderResult(await serverModule.render(routePath)).html;
       } else if (serverModule.default && typeof serverModule.default === "function") {
         html = "<!DOCTYPE html><html><head></head><body></body></html>";
       } else {
         continue;
       }
 
-      const outputPath = route.path === "/"
+      const outputPath = routePath === "/"
         ? join(root, outDir, "index.html")
-        : join(root, outDir, route.path, "index.html");
-      
+        : join(root, outDir, routePath, "index.html");
+
       const outputDir = outputPath.replace(/\/index\.html$/, "");
       if (!existsSync(outputDir)) {
         mkdirSync(outputDir, { recursive: true });
       }
-      
-      writeFileSync(outputPath, html, "utf-8");
-      console.log(`  ${cliBrand.spark()} ${COLORS.green}${route.path}${COLORS.reset}`);
 
+      writeFileSync(outputPath, html, "utf-8");
+      console.log(`  ${cliBrand.spark()} ${COLORS.green}${routePath}${COLORS.reset}`);
     } catch (e) {
-      console.log(`  ${COLORS.red}◆${COLORS.reset} ${COLORS.red}${route.path} - ${e}${COLORS.reset}`);
+      console.log(`  ${COLORS.red}◆${COLORS.reset} ${COLORS.red}${routePath} - ${e}${COLORS.reset}`);
     }
   }
 }
