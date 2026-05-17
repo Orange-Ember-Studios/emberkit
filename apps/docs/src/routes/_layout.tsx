@@ -16,9 +16,9 @@ const Layout: RouteComponent = ({ children, pathname }) => {
 
       <div className="relative" data-app-shell>
         <Header />
-        <div className="pt-16">
+        <div className="pt-16 lg:grid lg:grid-cols-[260px_minmax(0,1fr)]">
           <Sidebar pathname={pathname as string | undefined} />
-          <main className="md-content relative w-full min-w-0 px-4 py-8 sm:px-6 sm:py-10 lg:ml-[260px] lg:px-16 lg:py-14">
+          <main className="md-content relative min-w-0 px-4 py-8 sm:px-6 sm:py-10 lg:px-16 lg:py-14">
             {children}
           </main>
         </div>

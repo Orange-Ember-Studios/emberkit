@@ -74,7 +74,7 @@ const Sidebar: RouteComponent<{ pathname?: string }> = ({ pathname: pathnameProp
   return (
     <aside
       data-sidebar
-      className="fixed top-16 left-0 z-[110] h-[calc(100dvh-4rem)] w-[260px] max-lg:pointer-events-none overflow-y-auto border-r border-white/5 bg-[#0b0f19]/95 px-4 py-4 shadow-[4px_0_40px_rgba(0,0,0,0.2)] backdrop-blur-xl transition-transform duration-300 -translate-x-full lg:pointer-events-auto lg:translate-x-0 lg:py-6"
+      className="fixed top-16 left-0 z-[110] h-[calc(100dvh-4rem)] w-[260px] max-lg:pointer-events-none overflow-y-auto border-r border-white/5 bg-[#0b0f19]/95 px-4 py-4 shadow-[4px_0_40px_rgba(0,0,0,0.2)] backdrop-blur-xl transition-transform duration-300 -translate-x-full lg:static lg:sticky lg:top-16 lg:z-40 lg:translate-x-0 lg:pointer-events-auto lg:self-start lg:py-6"
     >
       {docs.map((section) => (
         <div key={section.title} className="mb-7">
