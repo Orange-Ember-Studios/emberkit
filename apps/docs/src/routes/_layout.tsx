@@ -1,10 +1,12 @@
 import type { RouteComponent } from '@emberkit/core';
+import DocsPageHead from '../components/docs-page-head';
 import Sidebar from '../components/sidebar';
 import Header from '../components/header';
 
 const Layout: RouteComponent = ({ children }) => {
   return (
     <div className="relative flex min-h-screen flex-col overflow-hidden bg-[#0b0f19] text-gray-100">
+      <DocsPageHead />
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute top-[20%] left-1/2 h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-orange-500/18 blur-[130px] animate-pulse" />
         <div className="absolute top-[25%] left-1/2 h-[260px] w-[260px] -translate-x-1/2 rounded-full bg-amber-500/12 blur-[100px] animate-pulse [animation-delay:700ms]" />

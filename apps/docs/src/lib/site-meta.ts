@@ -1,4 +1,4 @@
-import type { MetaData } from '@emberkit/core';
+import type { HeadProps, MetaData } from '@emberkit/core';
 
 export const SITE_URL = 'https://emberkit.orangeember.com';
 export const SITE_NAME = 'EmberKit';
@@ -103,21 +103,42 @@ const PAGE_COPY: Record<string, { title: string; description: string }> = {
   },
 };
 
+export function normalizeDocsPath(pathname: string): string {
+  return pathname.replace(/\/+$/, '') || '/';
+}
+
 function pageCopyForPath(pathname: string): { title: string; description: string } | undefined {
-  const normalized = pathname.replace(/\/+$/, '') || '/';
-  return PAGE_COPY[normalized];
+  return PAGE_COPY[normalizeDocsPath(pathname)];
+}
+
+export function formatDocsTitle(title?: string): string {
+  if (!title) {
+    return DOCS_TITLE_SUFFIX;
+  }
+  if (title.includes(DOCS_TITLE_SUFFIX)) {
+    return title;
+  }
+  return `${title} | ${DOCS_TITLE_SUFFIX}`;
+}
+
+export function docsPageUrl(pathname: string): string {
+  const path = normalizeDocsPath(pathname);
+  return path === '/' ? SITE_URL : `${SITE_URL}${path}`;
 }
 
 export function enrichDocsMetadata(
   pathname: string,
   frontmatter: Record<string, unknown> = {},
 ): MetaData {
-  const page = pageCopyForPath(pathname);
+  const path = normalizeDocsPath(pathname);
+  const page = pageCopyForPath(path);
   const title = typeof frontmatter.title === 'string' ? frontmatter.title : page?.title;
   const description =
     typeof frontmatter.description === 'string'
       ? frontmatter.description
       : (page?.description ?? DEFAULT_DESCRIPTION);
+  const pageUrl = docsPageUrl(path);
+  const fullTitle = formatDocsTitle(title);
 
   return {
     title,
@@ -125,6 +146,61 @@ export function enrichDocsMetadata(
     keywords: Array.isArray(frontmatter.keywords)
       ? frontmatter.keywords.filter((k): k is string => typeof k === 'string')
       : ['emberkit', 'jsx', 'typescript', 'ssr', 'framework'],
-    robots: pathname.includes('404') ? 'noindex, follow' : 'index, follow',
+    robots: path.includes('404') ? 'noindex, follow' : 'index, follow',
+    canonical: pageUrl,
+    openGraph: {
+      type: 'website',
+      locale: 'en_US',
+      siteName: SITE_NAME,
+      url: pageUrl,
+      title: fullTitle,
+      description,
+      images: [
+        {
+          url: OG_IMAGE_URL,
+          width: 1200,
+          height: 630,
+          alt: fullTitle,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: fullTitle,
+      description,
+      image: OG_IMAGE_URL,
+      imageAlt: fullTitle,
+    },
+  };
+}
+
+export function getDocsHeadProps(pathname: string, metadata?: MetaData): HeadProps {
+  const meta = metadata ?? enrichDocsMetadata(pathname);
+  const pageUrl = meta.canonical ?? docsPageUrl(pathname);
+  const title = formatDocsTitle(meta.title);
+  const description = meta.description ?? DEFAULT_DESCRIPTION;
+  const ogImage = meta.openGraph?.images?.[0]?.url ?? OG_IMAGE_URL;
+
+  return {
+    title,
+    description,
+    canonical: pageUrl,
+    robots: meta.robots,
+    keywords: meta.keywords,
+    og: {
+      type: meta.openGraph?.type ?? 'website',
+      title: meta.openGraph?.title ?? title,
+      description: meta.openGraph?.description ?? description,
+      url: meta.openGraph?.url ?? pageUrl,
+      image: ogImage,
+      locale: meta.openGraph?.locale ?? 'en_US',
+      siteName: meta.openGraph?.siteName ?? SITE_NAME,
+    },
+    twitter: {
+      card: meta.twitter?.card ?? 'summary_large_image',
+      title: meta.twitter?.title ?? title,
+      description: meta.twitter?.description ?? description,
+      image: meta.twitter?.image ?? ogImage,
+    },
   };
 }
