@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0b0f19" />
+      <stop offset="0.55" stop-color="#12182a" />
+      <stop offset="1" stop-color="#0b0f19" />
+    </linearGradient>
+    <linearGradient id="glow" x1="360" y1="120" x2="840" y2="520" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#f97316" stop-opacity="0.45" />
+      <stop offset="0.5" stop-color="#d946ef" stop-opacity="0.28" />
+      <stop offset="1" stop-color="#06b6d4" stop-opacity="0.22" />
+    </linearGradient>
+    <linearGradient id="title" x1="120" y1="300" x2="1080" y2="420" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fdba74" />
+      <stop offset="0.45" stop-color="#fb923c" />
+      <stop offset="1" stop-color="#e879f9" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)" />
+  <circle cx="600" cy="250" r="220" fill="url(#glow)" />
+  <circle cx="920" cy="160" r="120" fill="#d946ef" fill-opacity="0.12" />
+  <circle cx="260" cy="480" r="140" fill="#06b6d4" fill-opacity="0.1" />
+  <rect x="72" y="72" width="1056" height="486" rx="28" stroke="#ffffff" stroke-opacity="0.08" />
+  <g transform="translate(120, 168)">
+    <rect width="88" height="88" rx="22" fill="#0b0f19" stroke="#fb923c" stroke-opacity="0.45" />
+    <path
+      fill="#fed7aa"
+      fill-rule="evenodd"
+      transform="translate(20, 14) scale(2)"
+      d="M12 2C15.5 6 20 10.5 20 15C20 19.5 16.5 22 12 22C7.5 22 4 19.5 4 15C4 10.5 8.5 6 12 2ZM12 9C10 11.5 8 13.5 8 15.5C8 17.5 9.8 19 12 19C14.2 19 16 17.5 16 15.5C16 13.5 14 11.5 12 9Z"
+    />
+  </g>
+  <text
+    x="120"
+    y="360"
+    fill="url(#title)"
+    font-family="Inter, ui-sans-serif, system-ui, sans-serif"
+    font-size="88"
+    font-weight="800"
+    letter-spacing="-2"
+  >
+    EmberKit
+  </text>
+  <text
+    x="120"
+    y="430"
+    fill="#cbd5e1"
+    font-family="Inter, ui-sans-serif, system-ui, sans-serif"
+    font-size="34"
+    font-weight="500"
+  >
+    TypeScript-first JSX framework  speed first
+  </text>
+  <text
+    x="120"
+    y="500"
+    fill="#94a3b8"
+    font-family="Inter, ui-sans-serif, system-ui, sans-serif"
+    font-size="24"
+    font-weight="500"
+  >
+    Documentation
+  </text>
+</svg>
