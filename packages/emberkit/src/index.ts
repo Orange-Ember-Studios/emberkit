@@ -32,7 +32,7 @@ export { DataCache, createCache, getCached, setCache, prefetch } from './cache/i
 export { LazyInView, hydrateLazyInView, clearLazyRegistry } from './viewport/index.js';
 
 export { renderToHTMLString } from './ssr/helpers/render-html.js';
-export { drainHeadContent } from './meta/head-registry.js';
+export { drainHeadContent, clearHeadContent } from './meta/head-registry.js';
 export { Head } from './meta/index.js';
 export type { HeadProps } from './meta/index.js';
 export {

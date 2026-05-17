@@ -1300,10 +1300,28 @@ function siteConfigToHeadOptions(site?: import('./types.js').SiteConfig): string
 function generateSSREntry(site?: import('./types.js').SiteConfig): string {
   const siteHeadOptions = siteConfigToHeadOptions(site);
   return `
-import { routes, notFoundRoute, errorRoute } from 'virtual:emberkit-routes';
-import { createElement, buildRouteHeadFromMetadata } from '@emberkit/core';
+import { routes, rootLayout, notFoundRoute, errorRoute } from 'virtual:emberkit-routes';
+import {
+  createElement,
+  buildRouteHeadFromMetadata,
+  drainHeadContent,
+  clearHeadContent,
+} from '@emberkit/core';
 
 const siteHeadOptions = ${siteHeadOptions};
+
+const wrapWithRootLayout = async (RouteComponent) => {
+  if (!rootLayout) {
+    return RouteComponent;
+  }
+  const layoutMod = await rootLayout();
+  const Layout = layoutMod.default || layoutMod;
+  return (routeProps) =>
+    createElement(Layout, {
+      pathname: routeProps?.pathname,
+      children: createElement(RouteComponent, routeProps),
+    });
+};
 
 const matchRoute = (routes, pathname) => {
   const normalizedPath = pathname.replace(/\\/+$/, '') || '/';
@@ -1437,14 +1455,18 @@ export async function render(url, server) {
   if (match) {
     try {
       const mod = await match.route.component();
-      const Component = mod.default || mod;
-
-      if (mod.metadata) {
-        headContent += buildRouteHeadFromMetadata(mod.metadata, pathname, siteHeadOptions ?? undefined) + '\\n';
-      }
-
-      const element = createElement(Component, { params: match.params });
+      const Route = mod.default || mod;
+      clearHeadContent();
+      const Page = await wrapWithRootLayout(Route);
+      const element = createElement(Page, { params: match.params, pathname });
       appHtml = renderToString(element);
+      const drained = drainHeadContent();
+      if (mod.metadata) {
+        headContent =
+          buildRouteHeadFromMetadata(mod.metadata, pathname, siteHeadOptions ?? undefined) + '\\n';
+      } else if (drained) {
+        headContent = drained + '\\n';
+      }
     } catch (e) {
       console.error('[SSR] Failed to render route:', pathname, e);
       if (errorRoute) {
@@ -1473,9 +1495,18 @@ export async function render(url, server) {
     if (notFoundRoute) {
       try {
         const mod = await notFoundRoute();
-        const Component = mod.default || mod;
-        const element = createElement(Component, { });
+        const Route = mod.default || mod;
+        clearHeadContent();
+        const Page = await wrapWithRootLayout(Route);
+        const element = createElement(Page, { });
         appHtml = renderToString(element);
+        const drained = drainHeadContent();
+        if (drained) {
+          headContent = drained + '\\n';
+        } else if (mod.metadata) {
+          headContent =
+            buildRouteHeadFromMetadata(mod.metadata, pathname, siteHeadOptions ?? undefined) + '\\n';
+        }
       } catch (e) {
         console.error('[SSR] Failed to render 404 page:', e);
         appHtml = '<div style="padding: 20px;">404 - Page not found</div>';
@@ -1568,11 +1599,23 @@ function generateRoutesCode(files: string[], routeDir: string): string {
   const routeEntries: Array<{ path: string; entry: string }> = [];
   let notFoundRoute = 'null';
   let errorRoute = 'null';
+  let rootLayout = 'null';
 
   for (const file of files) {
     const relativePath = relative(routeDir, file).replace(/\\/g, '/');
     const ext = file.split('.').pop() ?? '';
     const isMarkdown = ext === 'md' || ext === 'mdx';
+    const importPath = file.replace(/\\/g, '/');
+
+    if (
+      relativePath === '_layout.tsx' ||
+      relativePath === '_layout.ts' ||
+      relativePath === '_layout.jsx' ||
+      relativePath === '_layout.js'
+    ) {
+      rootLayout = `() => import(${JSON.stringify(importPath)})`;
+      continue;
+    }
 
     // Check for special error pages
     if (relativePath === '404.tsx' || relativePath === '404.ts' || relativePath === '404.jsx' || relativePath === '404.js') {
@@ -1611,7 +1654,6 @@ function generateRoutesCode(files: string[], routeDir: string): string {
       routePath = '/' + routePath;
     }
 
-    const importPath = file.replace(/\\/g, '/');
     const entry = isMarkdown
       ? `  { path: ${JSON.stringify(routePath)}, component: () => import(${JSON.stringify(importPath)}), isMarkdown: true }`
       : `  { path: ${JSON.stringify(routePath)}, component: () => import(${JSON.stringify(importPath)}) }`;
@@ -1624,6 +1666,7 @@ function generateRoutesCode(files: string[], routeDir: string): string {
   routeEntries.sort((a, b) => scoreRoutePath(b.path) - scoreRoutePath(a.path));
 
   return `export const routes = [\n${routeEntries.map((r) => r.entry).join(',\n')}\n];
+export const rootLayout = ${rootLayout};
 export const notFoundRoute = ${notFoundRoute};
 export const errorRoute = ${errorRoute};`;
 }
