@@ -3,6 +3,15 @@ import type { MarkdownOptions } from '../markdown/index.js';
 
 export type EmberKitMode = 'static' | 'ssr' | 'spa' | 'hybrid';
 
+export interface SiteConfig {
+  url: string;
+  name?: string;
+  titleSuffix?: string;
+  description?: string;
+  ogImage?: string;
+  twitterSite?: string;
+}
+
 export interface EmberKitPluginOptions {
   mode?: EmberKitMode;
   routeDir?: string;
@@ -10,6 +19,7 @@ export interface EmberKitPluginOptions {
   jsx?: 'automatic' | 'classic';
   markdown?: Partial<MarkdownConfig>;
   mdx?: MDXConfig;
+  site?: SiteConfig;
   compression?: {
     gzip?: boolean;
     brotli?: boolean;

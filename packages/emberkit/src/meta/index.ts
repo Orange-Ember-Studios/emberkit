@@ -313,3 +313,90 @@ export function mergeMeta(base: MetaData, override: Partial<MetaData>): MetaData
     },
   };
 }
+
+export interface SiteHeadOptions {
+  siteUrl?: string;
+  siteName?: string;
+  titleSuffix?: string;
+  defaultDescription?: string;
+  defaultOgImage?: string;
+  twitterSite?: string;
+}
+
+function normalizeSiteUrl(siteUrl: string): string {
+  return siteUrl.replace(/\/$/, '');
+}
+
+function resolvePageUrl(pathname: string, siteUrl?: string): string {
+  const path = pathname.startsWith('/') ? pathname : `/${pathname}`;
+  if (!siteUrl) {
+    return path;
+  }
+  return `${normalizeSiteUrl(siteUrl)}${path}`;
+}
+
+function formatRouteTitle(title: string | undefined, titleSuffix?: string): string | undefined {
+  if (!title) {
+    return undefined;
+  }
+  if (!titleSuffix || title.includes(titleSuffix)) {
+    return title;
+  }
+  return `${title} | ${titleSuffix}`;
+}
+
+export function buildRouteHeadFromMetadata(
+  metadata: MetaData,
+  pathname: string,
+  options: SiteHeadOptions = {},
+): string {
+  const pageUrl = resolvePageUrl(pathname, options.siteUrl);
+  const title = formatRouteTitle(metadata.title, options.titleSuffix);
+  const description = metadata.description ?? options.defaultDescription;
+  const ogImageUrl =
+    metadata.openGraph?.images?.[0]?.url ?? metadata.twitter?.image ?? options.defaultOgImage;
+
+  const openGraphImages =
+    metadata.openGraph?.images ??
+    (ogImageUrl
+      ? [
+          {
+            url: ogImageUrl,
+            width: 1200,
+            height: 630,
+            alt: metadata.openGraph?.images?.[0]?.alt ?? title ?? options.siteName,
+          },
+        ]
+      : undefined);
+
+  const merged: MetaData = {
+    ...metadata,
+    title,
+    description,
+    canonical: metadata.canonical ?? pageUrl,
+    openGraph: {
+      type: 'website',
+      locale: 'en_US',
+      siteName: options.siteName,
+      url: pageUrl,
+      title: metadata.openGraph?.title ?? title,
+      description: metadata.openGraph?.description ?? description,
+      images: openGraphImages,
+      ...metadata.openGraph,
+    },
+    twitter:
+      metadata.twitter ??
+      (ogImageUrl
+        ? {
+            card: 'summary_large_image',
+            site: options.twitterSite,
+            title: metadata.twitter?.title ?? title,
+            description: metadata.twitter?.description ?? description,
+            image: ogImageUrl,
+            imageAlt: metadata.twitter?.imageAlt ?? title,
+          }
+        : undefined),
+  };
+
+  return generateMeta(merged, pageUrl);
+}

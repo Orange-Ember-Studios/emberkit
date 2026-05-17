@@ -119,7 +119,7 @@ export function emberkitVitePlugin(userOptions: EmberKitPluginOptions = {}): Plu
         return routesCode;
       }
       if (id === VIRTUAL_SSR_ENTRY) {
-        return generateSSREntry();
+        return generateSSREntry(options.site);
       }
       return null;
     },
@@ -1283,10 +1283,27 @@ function processParagraphs(html: string, breaks?: boolean): string {
 
 export type { EmberKitPluginOptions, EmberKitMode };
 
-function generateSSREntry(): string {
+function siteConfigToHeadOptions(site?: import('./types.js').SiteConfig): string {
+  if (!site?.url) {
+    return 'null';
+  }
+  return JSON.stringify({
+    siteUrl: site.url,
+    siteName: site.name,
+    titleSuffix: site.titleSuffix,
+    defaultDescription: site.description,
+    defaultOgImage: site.ogImage,
+    twitterSite: site.twitterSite,
+  });
+}
+
+function generateSSREntry(site?: import('./types.js').SiteConfig): string {
+  const siteHeadOptions = siteConfigToHeadOptions(site);
   return `
 import { routes, notFoundRoute, errorRoute } from 'virtual:emberkit-routes';
-import { createElement } from '@emberkit/core';
+import { createElement, buildRouteHeadFromMetadata } from '@emberkit/core';
+
+const siteHeadOptions = ${siteHeadOptions};
 
 const matchRoute = (routes, pathname) => {
   const normalizedPath = pathname.replace(/\\/+$/, '') || '/';
@@ -1422,14 +1439,8 @@ export async function render(url, server) {
       const mod = await match.route.component();
       const Component = mod.default || mod;
 
-      // Get metadata if available
       if (mod.metadata) {
-        if (mod.metadata.title) {
-          headContent += '<title>' + escapeHtml(mod.metadata.title) + '</title>\\n';
-        }
-        if (mod.metadata.description) {
-          headContent += '<meta name="description" content="' + escapeHtml(mod.metadata.description) + '">\\n';
-        }
+        headContent += buildRouteHeadFromMetadata(mod.metadata, pathname, siteHeadOptions ?? undefined) + '\\n';
       }
 
       const element = createElement(Component, { params: match.params });

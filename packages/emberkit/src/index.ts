@@ -37,11 +37,12 @@ export { Head } from './meta/index.js';
 export type { HeadProps } from './meta/index.js';
 export {
   generateMeta,
+  buildRouteHeadFromMetadata,
   generateBreadcrumbs,
   generateArticleSchema,
   generateProductSchema,
 } from './meta/index.js';
-export type { MetaData, OpenGraphData, TwitterCardData } from './meta/index.js';
+export type { MetaData, OpenGraphData, TwitterCardData, SiteHeadOptions } from './meta/index.js';
 
 export type { FC, RouteComponent, RouteChildren, RouteParams } from './runtime/types.js';
 export type { LazyInViewProps } from './viewport/index.js';
