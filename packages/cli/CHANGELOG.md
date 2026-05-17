@@ -1,5 +1,11 @@
 # @emberkit/cli
 
+## 0.7.0
+
+### Minor Changes
+
+- Add SSR route head builder and site config for Open Graph tags
+
 ## 0.6.9
 
 ### Patch Changes
