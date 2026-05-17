@@ -1,5 +1,5 @@
 import type { RouteComponent } from "@emberkit/core";
-import { createSignal } from "@emberkit/core";
+import { createSignal, LazyInView } from "@emberkit/core";
 import {
   CodeBlock,
 } from "@emberkit/ui/molecules";
@@ -63,6 +63,13 @@ function PropsTable({ rows }: { rows: PropRow[] }) {
     </div>
   );
 }
+
+const uiSectionFallback = (minHeight: string) => (
+  <div
+    class={`rounded-2xl border border-white/5 bg-white/[0.02] animate-pulse ${minHeight}`}
+    aria-hidden="true"
+  />
+);
 
 function DocSubheading({ children }: { children: string }) {
   return (
@@ -297,6 +304,7 @@ import type { ButtonProps } from "@emberkit/ui/atoms";`}
           </div>
         </section>
 
+        <LazyInView class="block" minHeight="32rem" fallback={uiSectionFallback('min-h-[32rem]')}>
         {/* ═══ ATOMS ═══ */}
         <section id="atoms" class="scroll-mt-28">
           <div class="mb-10">
@@ -787,7 +795,9 @@ import type { ButtonProps } from "@emberkit/ui/atoms";`}
             />
           </div>
         </section>
+        </LazyInView>
 
+        <LazyInView class="block" minHeight="36rem" fallback={uiSectionFallback('min-h-[36rem]')}>
         {/* ═══ MOLECULES ═══ */}
         <section id="molecules" class="scroll-mt-28">
           <div class="mb-10">
@@ -1366,7 +1376,9 @@ const [open, setOpen] = createSignal(false);
             />
           </div>
         </section>
+        </LazyInView>
 
+        <LazyInView class="block" minHeight="28rem" fallback={uiSectionFallback('min-h-[28rem]')}>
         {/* ═══ ORGANISMS ═══ */}
         <section id="organisms" class="scroll-mt-28">
           <div class="mb-10">
@@ -1529,6 +1541,7 @@ const [page, setPage] = createSignal(1);
             />
           </div>
         </section>
+        </LazyInView>
 
         {/* ═══ DESIGN TOKENS ═══ */}
         <section id="tokens" class="scroll-mt-28">

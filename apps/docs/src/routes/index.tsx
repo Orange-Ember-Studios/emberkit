@@ -1,8 +1,15 @@
 import type { RouteComponent } from '@emberkit/core';
+import { LazyInView, useNavigate } from '@emberkit/core';
 import { IconZap, IconPackage, IconTarget, IconType, IconArrowRight } from '@emberkit/icons';
 import { Icon } from '@emberkit/ui';
-import { useNavigate } from '@emberkit/core';
 import { CodeBlock } from '@emberkit/ui/molecules';
+
+const sectionFallback = (minHeight: string) => (
+  <div
+    className={`rounded-2xl border border-white/5 bg-white/[0.02] animate-pulse ${minHeight}`}
+    aria-hidden="true"
+  />
+);
 
 const HomePage: RouteComponent = () => {
   const navigate = useNavigate();
@@ -55,6 +62,11 @@ const HomePage: RouteComponent = () => {
         </div>
       </section>
 
+      <LazyInView
+        className="relative z-10"
+        minHeight="24rem"
+        fallback={sectionFallback('min-h-96')}
+      >
       {/* Features Section */}
       <section className="relative z-10 py-24">
         <div className="mx-auto max-w-6xl px-6">
@@ -93,7 +105,13 @@ const HomePage: RouteComponent = () => {
           </div>
         </div>
       </section>
+      </LazyInView>
 
+      <LazyInView
+        className="relative z-10"
+        minHeight="30rem"
+        fallback={sectionFallback('min-h-[30rem]')}
+      >
       {/* Code Preview Section */}
       <section className="relative z-10 py-24">
         <div className="mx-auto max-w-4xl px-6 animate-fade-in-up" style={{ animation: 'fade-in-up 0.6s ease-out' }}>
@@ -139,7 +157,13 @@ function Counter() {
           </div>
         </div>
       </section>
+      </LazyInView>
 
+      <LazyInView
+        className="relative z-10"
+        minHeight="18rem"
+        fallback={sectionFallback('min-h-72')}
+      >
       {/* CTA Section */}
       <section className="relative z-10 py-24 text-center">
         <div className="mx-auto max-w-2xl px-6 animate-fade-in-up" style={{ animation: 'fade-in-up 0.6s ease-out' }}>
@@ -157,6 +181,7 @@ function Counter() {
           </button>
         </div>
       </section>
+      </LazyInView>
     </div>
   );
 };

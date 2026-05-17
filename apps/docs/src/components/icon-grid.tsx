@@ -1,4 +1,4 @@
-import { createSignal } from '@emberkit/core';
+import { createSignal, LazyInView } from '@emberkit/core';
 import {
   IconMenu, IconX, IconSearch, IconGithub,
   IconChevronDown, IconChevronRight, IconChevronLeft,
@@ -293,4 +293,18 @@ function IconShowcase() {
   );
 }
 
-export default IconShowcase;
+const IconShowcasePage = () => (
+  <LazyInView
+    minHeight="600px"
+    fallback={
+      <div
+        className="min-h-[600px] rounded-2xl border border-white/5 bg-white/[0.02] animate-pulse"
+        aria-hidden="true"
+      />
+    }
+  >
+    <IconShowcase />
+  </LazyInView>
+);
+
+export default IconShowcasePage;
