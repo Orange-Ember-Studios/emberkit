@@ -1,6 +1,6 @@
 {
   "name": "@emberkit/ui",
-  "version": "4.0.0",
+  "version": "5.0.0",
   "type": "module",
   "private": false,
   "description": "Atomic design system for EmberKit – tokens, atoms, molecules, organisms, templates",
@@ -68,16 +68,16 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@emberkit/core": "workspace:^0.6.1",
-    "@emberkit/icons": "workspace:^4.0.1"
+    "@emberkit/core": "workspace:^0.7.0",
+    "@emberkit/icons": "workspace:^5.0.0"
   },
   "devDependencies": {
-    "@emberkit/core": "workspace:^0.6.1",
-    "@emberkit/icons": "workspace:^4.0.1"
+    "@emberkit/core": "workspace:^0.7.0",
+    "@emberkit/icons": "workspace:^5.0.0"
   },
   "peerDependencies": {
-    "@emberkit/core": "workspace:^0.6.1",
-    "@emberkit/icons": "workspace:^4.0.1",
+    "@emberkit/core": "workspace:^0.7.0",
+    "@emberkit/icons": "workspace:^5.0.0",
     "tailwindcss": "^4.0.0"
   }
 }
