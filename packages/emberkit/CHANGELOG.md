@@ -1,5 +1,11 @@
 # @emberkit/core
 
+## 0.5.0
+
+### Minor Changes
+
+- Add LazyInView viewport lazy loading API
+
 ## 0.4.2
 
 ### Patch Changes
