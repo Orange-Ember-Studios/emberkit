@@ -2,6 +2,7 @@ import type { JSXElementProps, JSXNode, DOMElement, JSXElement } from './types.j
 import { renderToString, getHandler, clearHandlers } from './helpers/render.js';
 import { getSignalByIndex } from '../signals/helpers/core.js';
 import { matchRoute } from './helpers/match.js';
+import { hydrateLazyInView } from '../viewport/index.js';
 
 export function createElement(
   type: string | ((props: JSXElementProps) => JSXNode),
@@ -21,7 +22,7 @@ export function createElement(
   };
 }
 
-function attachEventHandlers(container: Element): void {
+export function attachEventHandlers(container: Element): void {
   const elements = container.querySelectorAll('[data-ekclick]');
   elements.forEach((el) => {
     const id = el.getAttribute('data-ekclick');
@@ -98,11 +99,11 @@ function renderToTarget(
   const html = renderToString(jsxElement);
 
   target.innerHTML = html;
-  attachEventHandlers(target);
-  hydrateSignalBindings(target);
+  hydrateSubtree(target);
+  hydrateLazyInView(target);
 }
 
-function hydrateSignalBindings(container: Element): void {
+export function hydrateSignalBindings(container: Element): void {
   const els = container.querySelectorAll('[data-ek-bind]');
   els.forEach((el) => {
     const idx = parseInt(el.getAttribute('data-ek-bind') ?? '', 10);
@@ -158,6 +159,11 @@ function hydrateSignalBindings(container: Element): void {
       el.textContent = String(val);
     });
   });
+}
+
+export function hydrateSubtree(container: Element): void {
+  attachEventHandlers(container);
+  hydrateSignalBindings(container);
 }
 
 export function render(

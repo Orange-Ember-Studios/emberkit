@@ -1,11 +1,14 @@
-import { describe, it, expect } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createElement } from '../../runtime/index.js';
+import { renderToString } from '../../runtime/helpers/render.js';
 import {
   analyzeTree,
   analyzeElement,
   extractEventHandlers,
   buildSelector,
   determineHydrationStrategy,
+  createLazyHydration,
+  clearHydrationCache,
   getHydrationCandidates,
 } from '../index.js';
 
@@ -155,3 +158,50 @@ interface DOMElement {
   type: string;
   props: Record<string, unknown>;
 }
+
+describe('createLazyHydration', () => {
+  afterEach(() => {
+    clearHydrationCache();
+    document.body.innerHTML = '';
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
+
+  it('observes the matching lazy element by data-lazy-id', () => {
+    const frameCallbacks: FrameRequestCallback[] = [];
+    const observedIds: string[] = [];
+
+    class MockIntersectionObserver {
+      constructor(private readonly callback: IntersectionObserverCallback) {
+        void this.callback;
+      }
+
+      observe(element: Element): void {
+        observedIds.push(element.getAttribute('data-lazy-id') ?? '');
+      }
+
+      disconnect(): void {}
+    }
+
+    vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
+      frameCallbacks.push(callback);
+      return frameCallbacks.length;
+    });
+    vi.stubGlobal(
+      'IntersectionObserver',
+      MockIntersectionObserver as unknown as typeof IntersectionObserver,
+    );
+
+    const first = createLazyHydration(async () => 'first');
+    const second = createLazyHydration(async () => 'second');
+
+    document.body.innerHTML = renderToString(createElement('div', null, first, second));
+
+    frameCallbacks.forEach((callback) => callback(0));
+
+    expect(observedIds).toEqual([
+      String(first.props['data-lazy-id']),
+      String(second.props['data-lazy-id']),
+    ]);
+  });
+});

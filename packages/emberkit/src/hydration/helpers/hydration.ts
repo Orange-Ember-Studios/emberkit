@@ -2,8 +2,10 @@ import type { DOMElement } from '../../runtime/types.js';
 import { createElement } from '../../runtime/index.js';
 import { analyzeTree, getHydrationCandidates } from './analyzer.js';
 import type { InteractiveElement } from '../types.js';
+import { observeOnce } from '../../viewport/observe-once.js';
 
 const hydrationCache = new Map<string, Promise<void>>();
+let lazyHydrationIdCounter = 0;
 
 export interface HydrationOptions {
   hydrateInteractive?: boolean;
@@ -139,11 +141,13 @@ export function createLazyHydration<T>(
     onLoaded,
     onError,
   } = options;
+  const lazyId = `ek-hydrate-${++lazyHydrationIdCounter}`;
 
   const container = createElement(
     'div',
     {
       'data-lazy': '',
+      'data-lazy-id': lazyId,
       'data-loader': loader.toString(),
     },
     fallback,
@@ -151,7 +155,7 @@ export function createLazyHydration<T>(
 
   if (typeof IntersectionObserver !== 'undefined') {
     requestAnimationFrame(() => {
-      observeAndHydrate(container, loader, timeout, onLoaded, onError);
+      observeAndHydrate(lazyId, loader, timeout, onLoaded, onError);
     });
   } else {
     loadImmediately(loader, onLoaded, onError);
@@ -161,26 +165,26 @@ export function createLazyHydration<T>(
 }
 
 function observeAndHydrate<T>(
-  container: DOMElement,
+  lazyId: string,
   loader: () => Promise<T>,
   timeout: number | undefined,
   onLoaded: ((value: T) => void) | undefined,
   onError: ((error: Error) => void) | undefined,
 ): void {
-  const observer = new IntersectionObserver(
-    (entries) => {
-      if (entries[0]?.isIntersecting) {
-        observer.disconnect();
-        loadImmediately(loader, onLoaded, onError);
-      }
+  const root = document.querySelector(`[data-lazy-id="${lazyId}"]`);
+
+  if (!root) {
+    return;
+  }
+
+  observeOnce(
+    root,
+    () => {
+      void timeout;
+      void loadImmediately(loader, onLoaded, onError);
     },
     { rootMargin: '100px' },
   );
-
-  const root = document.querySelector(`[data-lazy]`);
-  if (root) {
-    observer.observe(root);
-  }
 }
 
 async function loadImmediately<T>(

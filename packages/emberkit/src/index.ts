@@ -29,6 +29,7 @@ export {
 export { compileMDX, compileSync, useMDX } from './mdx/index.js';
 
 export { DataCache, createCache, getCached, setCache, prefetch } from './cache/index.js';
+export { LazyInView, hydrateLazyInView, clearLazyRegistry } from './viewport/index.js';
 
 export { renderToHTMLString } from './ssr/helpers/render-html.js';
 export { drainHeadContent } from './meta/head-registry.js';
@@ -43,6 +44,7 @@ export {
 export type { MetaData, OpenGraphData, TwitterCardData } from './meta/index.js';
 
 export type { FC, RouteComponent, RouteChildren, RouteParams } from './runtime/types.js';
+export type { LazyInViewProps } from './viewport/index.js';
 
 export type { Logger, LoggerOptions, LogLevel, RequestLog, ResponseLog } from './logger/types.js';
 
