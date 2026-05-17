@@ -1,5 +1,11 @@
 # @emberkit/cli
 
+## 0.7.3
+
+### Patch Changes
+
+- Declare @emberkit/core dependency so CLI compiles in clean CI installs
+
 ## 0.7.2
 
 ### Patch Changes
