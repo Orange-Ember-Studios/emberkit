@@ -70,6 +70,9 @@ importers:
         specifier: ^6.0.0
         version: 6.4.2(@types/node@22.19.18)(jiti@2.7.0)(lightningcss@1.32.0)
     devDependencies:
+      '@emberkit/core':
+        specifier: workspace:*
+        version: link:../emberkit
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.3.0(jiti@2.7.0))

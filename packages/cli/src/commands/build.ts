@@ -5,6 +5,7 @@ import { pathToFileURL } from "url";
 import { cliBrand } from "../brand.js";
 import { mergeEmberkitViteConfig } from "../utils/merge-emberkit-vite.js";
 import { loadEmberKitConfig, loadViteConfig } from "../utils/load-config.js";
+import { resolvePrerenderPaths } from "@emberkit/core";
 import { normalizeSSRRenderResult } from "../utils/ssr-render-result.js";
 
 const COLORS = {
@@ -591,8 +592,6 @@ async function prerenderStaticRoutes(
     return;
   }
   
-  const { resolvePrerenderPaths } = await import("@emberkit/core");
-
   const staticPaths = manifest.routes
     .filter((route: RouteEntry) => (prerenderAll || route.isStatic) && !route.path.includes(":"))
     .map((route: RouteEntry) => route.path);
