@@ -72,7 +72,7 @@ export async function build(_args: string[]): Promise<void> {
       await buildClient(root, outDir, viteConfig, customLogger);
       
       log("info", "Building SSR bundle...");
-      await buildSSR(root, outDir, viteConfig, customLogger);
+      await buildSSR(root, outDir, viteConfig, customLogger, emberkitConfig);
       
       log("info", "Generating SSR manifest...");
       await generateManifest(root, outDir, mode);
@@ -88,7 +88,7 @@ export async function build(_args: string[]): Promise<void> {
       await buildClient(root, outDir, viteConfig, customLogger);
       
       log("info", "Building SSR bundle for pre-rendering...");
-      await buildSSR(root, outDir, viteConfig, customLogger);
+      await buildSSR(root, outDir, viteConfig, customLogger, emberkitConfig);
       
       log("info", "Generating manifest...");
       await generateManifest(root, outDir, mode);
@@ -144,9 +144,36 @@ async function buildClient(
   await viteBuild(clientConfig);
 }
 
-function getServerEntryShim(): string {
+function siteConfigToHeadOptions(site: Record<string, unknown> | undefined): string {
+  const config = site as
+    | {
+        url?: string;
+        name?: string;
+        titleSuffix?: string;
+        description?: string;
+        ogImage?: string;
+        twitterSite?: string;
+      }
+    | undefined;
+  if (!config?.url) {
+    return "null";
+  }
+  return JSON.stringify({
+    siteUrl: config.url,
+    siteName: config.name,
+    titleSuffix: config.titleSuffix,
+    defaultDescription: config.description,
+    defaultOgImage: config.ogImage,
+    twitterSite: config.twitterSite,
+  });
+}
+
+function getServerEntryShim(site: Record<string, unknown> | undefined): string {
+  const siteHeadOptions = siteConfigToHeadOptions(site);
   return `import { routes, notFoundRoute, errorRoute } from 'virtual:emberkit-routes';
-import { createElement } from '@emberkit/core';
+import { createElement, buildRouteHeadFromMetadata } from '@emberkit/core';
+
+const siteHeadOptions = ${siteHeadOptions};
 import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -281,12 +308,7 @@ export async function render(url) {
       const Component = mod.default || mod;
 
       if (mod.metadata) {
-        if (mod.metadata.title) {
-          headContent += '<title>' + escapeHtml(mod.metadata.title) + '</title>\\n';
-        }
-        if (mod.metadata.description) {
-          headContent += '<meta name="description" content="' + escapeHtml(mod.metadata.description) + '">\\n';
-        }
+        headContent += buildRouteHeadFromMetadata(mod.metadata, pathname, siteHeadOptions ?? undefined) + '\\n';
       }
 
       const element = createElement(Component, { params: match.params });
@@ -351,7 +373,10 @@ export async function render(url) {
 `;
 }
 
-async function resolveSSREntry(root: string): Promise<string> {
+async function resolveSSREntry(
+  root: string,
+  emberkitConfig: Record<string, unknown> | null,
+): Promise<string> {
   const userEntryTs = join(root, "src", "entry-server.ts");
   const userEntryTsx = join(root, "src", "entry-server.tsx");
   if (existsSync(userEntryTs)) {
@@ -363,7 +388,8 @@ async function resolveSSREntry(root: string): Promise<string> {
   const cacheDir = join(root, "node_modules", ".cache", "emberkit");
   mkdirSync(cacheDir, { recursive: true });
   const shimPath = join(cacheDir, "server-entry.js");
-  writeFileSync(shimPath, getServerEntryShim(), "utf-8");
+  const site = emberkitConfig?.site as Record<string, unknown> | undefined;
+  writeFileSync(shimPath, getServerEntryShim(site), "utf-8");
   return shimPath;
 }
 
@@ -372,8 +398,9 @@ async function buildSSR(
   outDir: string,
   viteConfig: UserConfig | null,
   customLogger: any,
+  emberkitConfig: Record<string, unknown> | null,
 ): Promise<void> {
-  const ssrEntry = await resolveSSREntry(root);
+  const ssrEntry = await resolveSSREntry(root, emberkitConfig);
   const ssrConfig: InlineConfig = {
     ...viteConfig,
     root,
