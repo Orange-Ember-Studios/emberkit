@@ -137,6 +137,56 @@ useContext<T>(context: Context<T>): T
 
 Reads the nearest context value above the current component.
 
+## Viewport (lazy in view)
+
+Defer rendering and hydrating heavy sections until they are near the viewport. See [Hydration — Viewport lazy loading](/docs/hydration#viewport-lazy-loading-lazyinview) for concepts and testing.
+
+### LazyInView
+
+```typescript
+function LazyInView(props: LazyInViewProps): JSXNode
+```
+
+```typescript
+interface LazyInViewProps {
+  children: JSXNode | (() => JSXNode);
+  fallback?: JSXNode;
+  rootMargin?: string;      // default '200px'
+  minHeight?: string | number;
+  once?: boolean;             // default true
+  ssr?: 'lazy' | 'eager';     // default 'lazy'
+  as?: string;                // default 'div'
+  className?: string;
+  style?: Record<string, unknown>;
+}
+```
+
+```tsx
+import { LazyInView } from '@emberkit/core';
+
+<LazyInView minHeight="20rem" fallback={<div className="min-h-80 animate-pulse" />}>
+  <ExpensiveSection />
+</LazyInView>
+```
+
+Called automatically after client `render()` — you rarely call the helpers below unless you implement a custom mount flow.
+
+### hydrateLazyInView
+
+```typescript
+hydrateLazyInView(container: Element): void
+```
+
+Finds `[data-ek-lazy-in-view]:not([data-ek-lazy-loaded])` under `container`, observes each host, mounts registered children when visible, then runs subtree hydration (handlers + signals).
+
+### clearLazyRegistry
+
+```typescript
+clearLazyRegistry(): void
+```
+
+Clears in-memory content loaders. Useful in tests or full app teardown.
+
 ## Navigation
 
 ### navigate

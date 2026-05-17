@@ -49,6 +49,8 @@ Each file maps to `/docs/<name>` without a manual route table.
 
 Most MDX pages are static HTML after SSR. Interactive pieces (homepage CTAs, sidebar navigation, UI component demos) use client handlers or signal bindings. That matches the model in [Components](/docs/components): only regions with `onClick` or `data-ek-bind` pay for client JS.
 
+Below-the-fold sections use framework [`LazyInView`](/docs/hydration#viewport-lazy-loading-lazyinview) on the homepage (features, code preview, CTA), the [icons](/docs/icons) grid, and large blocks on the [UI](/docs/ui) reference page so initial paint stays light.
+
 ## Local development
 
 From the repo root:

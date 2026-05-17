@@ -127,6 +127,117 @@ function App() {
 }
 ```
 
+## Viewport lazy loading (`LazyInView`)
+
+Defer rendering heavy UI until it is near the viewport. The docs site uses this for the homepage sections below the hero, the icon grid, and large UI demos.
+
+<Alert variant="info" title="Different from image lazy loading">
+  <code>LazyInView</code> delays <strong>component HTML and client work</strong> for a section. Image <code>loading="lazy"</code> only defers image requests — see [Image Optimization](/docs/images).
+</Alert>
+
+### How it works
+
+1. **SSR (default `ssr="lazy"`)** — The server sends a lightweight host element with your <code>fallback</code> (placeholder), not the full children.
+2. **Client navigation / hydration** — After each <code>render()</code>, EmberKit runs <code>hydrateLazyInView()</code> on the app root.
+3. **IntersectionObserver** — When the host enters the viewport (plus <code>rootMargin</code>), children are rendered into the host and <code>hydrateSubtree()</code> wires click handlers and <code>data-ek-bind</code> inside that section.
+
+**Flow:** page load → fallback visible → user scrolls near section → `LazyInView` mounts children → `hydrateSubtree` wires that host.
+
+### Basic usage
+
+```tsx
+import { LazyInView } from '@emberkit/core';
+
+function HomePage() {
+  return (
+    <div>
+      <Hero />
+      <LazyInView
+        minHeight="24rem"
+        rootMargin="200px"
+        fallback={
+          <div aria-hidden="true" className="min-h-96 animate-pulse rounded-2xl border border-white/5 bg-white/[0.02]" />
+        }
+      >
+        <FeaturesSection />
+      </LazyInView>
+    </div>
+  );
+}
+```
+
+Use a <code>minHeight</code> (or fallback with fixed height) so the layout does not jump when content appears.
+
+### Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `children` | `JSXNode` or `() => JSXNode` | — | Content to render when visible |
+| `fallback` | `JSXNode` | `null` | Placeholder shown before load |
+| `rootMargin` | `string` | `'200px'` | Passed to `IntersectionObserver` (preload before visible) |
+| `minHeight` | `string` \| `number` | — | Reserved space on the host element |
+| `once` | `boolean` | `true` | Unregister loader after first mount |
+| `ssr` | `'lazy'` \| `'eager'` | `'lazy'` | `eager` = render children on the server too |
+| `as` | `string` | `'div'` | Host tag name |
+| `className` | `string` | — | Classes on the host |
+
+### SSR modes
+
+| Mode | First HTML | Best for |
+|------|------------|----------|
+| `lazy` (default) | Fallback only | Long pages, demos, marketing sections below the fold |
+| `eager` | Full children | SEO-critical body copy that must be in view source |
+
+### Lazy render prop
+
+Pass a function when children pull in large modules:
+
+```tsx
+<LazyInView fallback={<SectionSkeleton />}>
+  {() => {
+    // Evaluated only when the section enters the viewport
+    return <HeavyChart data={data} />;
+  }}
+</LazyInView>
+```
+
+### Host attributes (debugging)
+
+Inspect the DOM while testing:
+
+| Attribute | Meaning |
+|-----------|---------|
+| `data-ek-lazy-in-view` | Registry id for this host |
+| `data-ek-lazy-root-margin` | Observer margin |
+| `data-ek-lazy-loaded="true"` | Children have been mounted |
+| `aria-busy="true"` | Still waiting (removed after load) |
+
+### Testing locally
+
+1. Start the docs app: <code>pnpm dev</code> from the repo root (or <code>pnpm dev</code> in <code>apps/docs</code>).
+2. Open <code>/</code>, <code>/docs/icons</code>, or <code>/docs/ui</code>.
+3. Confirm pulse placeholders above the fold where sections are lazy.
+4. Scroll down — content should replace placeholders; hosts gain <code>data-ek-lazy-loaded</code>.
+5. Optional: DevTools → Network → throttle **Fast 3G**, hard refresh, and compare first paint vs after scroll.
+
+Framework tests:
+
+```bash
+pnpm --filter @emberkit/core test -- src/viewport src/hydration
+```
+
+### `data-hydrate="lazy"` (interactive islands)
+
+For elements that need hydration but not immediately, mark them lazy so the hydration analyzer treats them as low priority:
+
+```tsx
+<div data-hydrate="lazy" onClick={handleClick}>
+  Below-the-fold control
+</div>
+```
+
+This complements <code>LazyInView</code>: lazy in view defers <strong>rendering</strong>; <code>data-hydrate="lazy"</code> defers <strong>wiring event handlers</strong> for already-rendered HTML.
+
 ## Performance Impact
 
 | Approach | Bundle Size | FCP | TTI |
@@ -134,9 +245,11 @@ function App() {
 | Traditional SPA | ~100KB+ | Slow | Slow |
 | EmberKit hydration | ~1-2KB | Fast | Fast |
 | Static only | 0KB | Instant | Instant |
+| + LazyInView below fold | Same route chunk; less initial render/hydration work | Faster perceived load on long pages | Sections hydrate as user scrolls |
 
 ## Next Steps
 
 - [Signals](/docs/signals) — Signal API and subscribe
 - [SSR](/docs/ssr) — Server-side rendering
 - [Components](/docs/components) — Static vs interactive components
+- [API Reference](/docs/api) — `LazyInView`, `hydrateLazyInView`, `clearLazyRegistry`
