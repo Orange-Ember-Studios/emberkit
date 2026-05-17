@@ -1,5 +1,4 @@
 import type { RouteComponent } from '@emberkit/core';
-import { Icon } from '@emberkit/ui';
 import { useNavigate } from '@emberkit/core';
 import { CORE_VERSION, DOCS_VERSION, formatVersion } from '../lib/version.js';
 
@@ -51,16 +50,19 @@ const docs = [
   },
 ];
 
-const Sidebar: RouteComponent = () => {
+const Sidebar: RouteComponent<{ pathname?: string }> = ({ pathname: pathnameProp }) => {
   const navigate = useNavigate();
-  const pathname =
-    typeof window !== 'undefined' ? normalizePath(window.location.pathname) : '/';
+  const pathname = normalizePath(
+    pathnameProp ??
+      (typeof window !== 'undefined' ? window.location.pathname : '/'),
+  );
 
   const closeSidebar = () => {
     const sidebar = document.querySelector('[data-sidebar]');
     const backdrop = document.querySelector('[data-sidebar-backdrop]');
     sidebar?.classList.remove('translate-x-0');
     sidebar?.classList.add('-translate-x-full');
+    sidebar?.classList.add('max-lg:pointer-events-none');
     backdrop?.remove();
 
     const icon = document.querySelector('[data-menu-icon]');
@@ -72,22 +74,8 @@ const Sidebar: RouteComponent = () => {
   return (
     <aside
       data-sidebar
-      className="fixed top-0 lg:top-16 left-0 z-[100] lg:z-40 h-screen lg:h-[calc(100vh-4rem)] w-[260px] overflow-y-auto border-r border-white/5 bg-[#0b0f19]/70 px-4 py-6 shadow-[4px_0_40px_rgba(0,0,0,0.2)] backdrop-blur-xl transition-transform duration-300 -translate-x-full lg:translate-x-0"
+      className="fixed top-16 left-0 z-[110] h-[calc(100dvh-4rem)] w-[260px] max-lg:pointer-events-none overflow-y-auto border-r border-white/5 bg-[#0b0f19]/95 px-4 py-4 shadow-[4px_0_40px_rgba(0,0,0,0.2)] backdrop-blur-xl transition-transform duration-300 -translate-x-full lg:pointer-events-auto lg:translate-x-0 lg:py-6"
     >
-      <div className="mb-8 flex items-center justify-between lg:hidden">
-        <div className="flex items-center gap-2 text-xl font-bold text-white">
-          <span className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500/35 via-fuchsia-500/25 to-cyan-500/20 ring-1 ring-orange-400/40 shadow-[0_0_18px_rgba(249,115,22,0.3)]">
-            <Icon name="emberkit" size={26} className="text-orange-200 drop-shadow-[0_0_10px_rgba(251,113,133,0.5)]" />
-          </span>
-          <span className="bg-gradient-to-r from-orange-400 via-orange-500 to-fuchsia-400 bg-clip-text text-transparent">EmberKit</span>
-        </div>
-        <button onClick={closeSidebar} className="text-gray-400 hover:text-white transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M18 6L6 18"/><path d="M6 6l12 12"/>
-          </svg>
-        </button>
-      </div>
-
       {docs.map((section) => (
         <div key={section.title} className="mb-7">
           <h3 className="mb-2 px-3 text-[0.6875rem] font-semibold uppercase tracking-[0.12em] text-transparent bg-clip-text bg-gradient-to-r from-orange-400/85 via-fuchsia-400/75 to-cyan-400/70">

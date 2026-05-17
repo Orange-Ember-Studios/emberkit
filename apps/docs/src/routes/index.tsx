@@ -15,7 +15,7 @@ const HomePage: RouteComponent = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="relative -mx-6 -mt-8 lg:-mx-16 lg:-mt-12 min-h-screen bg-[#0b0f19] text-gray-100 overflow-hidden">
+    <div className="relative -mx-4 max-lg:-mt-6 sm:-mx-6 lg:-mx-16 lg:-mt-12 min-h-0 overflow-x-hidden text-gray-100">
 
       {/* Ambient glow blobs */}
       <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[500px] w-[500px] rounded-full bg-orange-500/20 blur-[150px] animate-pulse" />
@@ -65,6 +65,7 @@ const HomePage: RouteComponent = () => {
       <LazyInView
         className="relative z-10"
         minHeight="24rem"
+        ssr="eager"
         fallback={sectionFallback('min-h-96')}
       >
       {/* Features Section */}

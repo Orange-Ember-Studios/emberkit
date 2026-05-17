@@ -15,17 +15,21 @@ const Header: RouteComponent = () => {
     if (isOpen) {
       sidebar?.classList.remove('translate-x-0');
       sidebar?.classList.add('-translate-x-full');
+      sidebar?.classList.add('max-lg:pointer-events-none');
       backdrop?.remove();
     } else {
       sidebar?.classList.remove('-translate-x-full');
+      sidebar?.classList.remove('max-lg:pointer-events-none');
       sidebar?.classList.add('translate-x-0');
 
       if (!backdrop) {
         const overlay = document.createElement('div');
         overlay.setAttribute('data-sidebar-backdrop', '');
-        overlay.className = 'fixed inset-0 z-[90] bg-black/50 backdrop-blur-sm lg:hidden';
+        overlay.className =
+          'fixed top-16 left-0 right-0 bottom-0 z-[90] bg-black/50 backdrop-blur-sm lg:hidden';
         overlay.onclick = () => toggleSidebar();
-        document.body.appendChild(overlay);
+        const shell = document.querySelector('[data-app-shell]');
+        (shell ?? document.body).insertBefore(overlay, shell?.firstChild ?? null);
       }
     }
 

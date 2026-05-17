@@ -30,7 +30,9 @@
   body {
     background: #0b0f19;
     color: #f3f4f6;
+    overflow-x: hidden;
   }
+
 
   ::selection {
     background: oklch(249 0.113 22.87 / 0.3);
@@ -156,6 +158,13 @@
   }
 
   /* ===== MD Content Container ===== */
+  .md-content p.text-surface-700,
+  .md-content .text-surface-700,
+  .md-content p.text-surface-900,
+  .md-content .text-surface-900 {
+    color: #d1d5db;
+  }
+
   .md-content {
     font-size: 1rem;
     line-height: 1.75;
