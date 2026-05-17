@@ -6,7 +6,6 @@ import { DEFAULT_DESCRIPTION, DOCS_TITLE_SUFFIX, OG_IMAGE_URL, SITE_NAME, SITE_U
 
 export default defineConfig({
   mode: 'ssr',
-  root: './apps/docs',
   site: {
     url: SITE_URL,
     name: SITE_NAME,
