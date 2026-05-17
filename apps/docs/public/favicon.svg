@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 34 34" fill="none">
+  <defs>
+    <linearGradient id="logoBg" x1="3" y1="3" x2="31" y2="31" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#f97316" stop-opacity="0.35" />
+      <stop offset="0.5" stop-color="#d946ef" stop-opacity="0.25" />
+      <stop offset="1" stop-color="#06b6d4" stop-opacity="0.2" />
+    </linearGradient>
+  </defs>
+  <rect width="34" height="34" rx="12.75" fill="#0b0f19" />
+  <rect width="34" height="34" rx="12.75" fill="url(#logoBg)" />
+  <rect
+    width="33"
+    height="33"
+    x="0.5"
+    y="0.5"
+    rx="12.25"
+    fill="none"
+    stroke="#fb923c"
+    stroke-opacity="0.4"
+    stroke-width="1"
+  />
+  <!-- Larger flame, centered in 34×34 with extra inset from frame -->
+  <g transform="translate(17, 17) scale(1.14) translate(-12, -12)">
+    <path
+      fill="#fed7aa"
+      fill-rule="evenodd"
+      d="M12 2C15.5 6 20 10.5 20 15C20 19.5 16.5 22 12 22C7.5 22 4 19.5 4 15C4 10.5 8.5 6 12 2ZM12 9C10 11.5 8 13.5 8 15.5C8 17.5 9.8 19 12 19C14.2 19 16 17.5 16 15.5C16 13.5 14 11.5 12 9Z"
+    />
+  </g>
+</svg>
