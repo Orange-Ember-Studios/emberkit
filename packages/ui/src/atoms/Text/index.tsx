@@ -35,8 +35,8 @@ function weightClass(weight: TextWeight): string {
 
 function colorClass(color: TextColor): string {
   const map: Record<TextColor, string> = {
-    default: "text-surface-900",
-    muted: "text-surface-700",
+    default: "text-gray-100",
+    muted: "text-gray-400",
     primary: "text-primary-400",
     error: "text-error-500",
   };
