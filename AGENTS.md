@@ -44,6 +44,7 @@ src/
 - Route handlers get `RouteParams<T>` typed with param interface
 - Components are plain functions returning `JSX.Element`
 - State via `signal<T>()`, context via `createContext<T>()`
+- **Do not use `<motion>`** — EmberKit has no `motion` element; use standard HTML/CSS or framework-supported patterns for animation instead
 
 ## Dev Commands (planned)
 
