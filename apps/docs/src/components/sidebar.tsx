@@ -1,8 +1,12 @@
 import type { RouteComponent } from '@emberkit/core';
-import { IconChevronRight } from '@emberkit/icons';
 import { Icon } from '@emberkit/ui';
 import { useNavigate } from '@emberkit/core';
 import { CORE_VERSION, DOCS_VERSION, formatVersion } from '../lib/version.js';
+
+function normalizePath(path: string): string {
+  const p = path.replace(/\/+$/, '') || '/';
+  return p;
+}
 
 const docs = [
   {
@@ -12,6 +16,8 @@ const docs = [
       { title: 'Installation', path: '/docs/installation' },
       { title: 'Quick Start', path: '/docs/quick-start' },
       { title: 'Built with EmberKit', path: '/docs/built-with-emberkit' },
+      { title: 'API Reference', path: '/docs/api' },
+      { title: 'Examples', path: '/docs/examples' },
     ],
   },
   {
@@ -45,19 +51,10 @@ const docs = [
   },
 ];
 
-const activePath = typeof window !== 'undefined' ? window.location.pathname : '';
-
-const setActiveLink = (path: string) => {
-  if (typeof document === 'undefined') return;
-  document.querySelectorAll('[data-sidebar-link]').forEach((el) => {
-    el.removeAttribute('data-active');
-  });
-  const link = document.querySelector(`[data-sidebar-link="${path}"]`);
-  if (link) link.setAttribute('data-active', 'true');
-};
-
 const Sidebar: RouteComponent = () => {
   const navigate = useNavigate();
+  const pathname =
+    typeof window !== 'undefined' ? normalizePath(window.location.pathname) : '/';
 
   const closeSidebar = () => {
     const sidebar = document.querySelector('[data-sidebar]');
@@ -75,7 +72,7 @@ const Sidebar: RouteComponent = () => {
   return (
     <aside
       data-sidebar
-      className="fixed top-0 lg:top-16 left-0 z-[100] lg:z-40 h-screen lg:h-[calc(100vh-4rem)] w-[260px] overflow-y-auto border-r border-white/5 bg-[#0b0f19] px-4 py-6 transition-transform duration-300 -translate-x-full lg:translate-x-0"
+      className="fixed top-0 lg:top-16 left-0 z-[100] lg:z-40 h-screen lg:h-[calc(100vh-4rem)] w-[260px] overflow-y-auto border-r border-white/5 bg-[#0b0f19]/70 px-4 py-6 shadow-[4px_0_40px_rgba(0,0,0,0.2)] backdrop-blur-xl transition-transform duration-300 -translate-x-full lg:translate-x-0"
     >
       <div className="mb-8 flex items-center justify-between lg:hidden">
         <div className="flex items-center gap-2 text-xl font-bold text-white">
@@ -93,34 +90,35 @@ const Sidebar: RouteComponent = () => {
 
       {docs.map((section) => (
         <div key={section.title} className="mb-7">
-          <h3 className="mb-2 px-3 text-[0.6875rem] font-semibold uppercase tracking-[0.1em] text-gray-500">{section.title}</h3>
+          <h3 className="mb-2 px-3 text-[0.6875rem] font-semibold uppercase tracking-[0.12em] text-transparent bg-clip-text bg-gradient-to-r from-orange-400/85 via-fuchsia-400/75 to-cyan-400/70">
+            {section.title}
+          </h3>
           <ul className="list-none space-y-0.5">
             {section.items.map((item) => {
-              const isActive = activePath === item.path;
+              const isActive = pathname === normalizePath(item.path);
               return (
                 <li key={item.path}>
                   <a
                     href={item.path}
                     data-sidebar-link={item.path}
-                    data-active={isActive ? 'true' : undefined}
+                    aria-current={isActive ? 'page' : undefined}
                     onClick={(e) => {
                       e.preventDefault();
-                      setActiveLink(item.path);
                       closeSidebar();
                       navigate(item.path);
                     }}
                     className={[
-                      'group flex items-center gap-2 rounded-lg px-3 py-2 text-sm no-underline transition-all duration-200 cursor-pointer',
+                      'group flex items-center gap-2 rounded-xl border border-transparent px-3 py-2 text-sm no-underline transition-all duration-200 cursor-pointer',
                       isActive
-                        ? 'bg-orange-500/10 font-semibold text-orange-400 ring-1 ring-orange-500/20'
-                        : 'font-medium text-gray-400 hover:bg-white/[0.04] hover:text-gray-100',
+                        ? 'bg-orange-500/10 font-semibold text-orange-300 ring-1 ring-orange-500/30 shadow-[0_0_24px_rgba(249,115,22,0.08)]'
+                        : 'font-medium text-gray-400 hover:border-orange-500/25 hover:bg-white/[0.04] hover:text-gray-100 hover:shadow-[0_0_20px_rgba(249,115,22,0.06)]',
                     ].join(' ')}
                   >
                     <span className={[
                       'flex h-1.5 w-1.5 shrink-0 rounded-full transition-all duration-200',
                       isActive
-                        ? 'bg-orange-400 shadow-[0_0_6px_rgba(251,146,60,0.6)]'
-                        : 'bg-gray-600 group-hover:bg-gray-400',
+                        ? 'bg-orange-300 shadow-[0_0_8px_rgba(251,146,60,0.7)]'
+                        : 'bg-gray-600 group-hover:bg-orange-400/60',
                     ].join(' ')} />
                     {item.title}
                   </a>
@@ -132,7 +130,7 @@ const Sidebar: RouteComponent = () => {
       ))}
 
       <div className="mt-6 border-t border-white/5 pt-6 px-3">
-        <span className="text-[0.6875rem] font-semibold text-gray-600 uppercase tracking-[0.1em]">
+        <span className="text-[0.6875rem] font-semibold uppercase tracking-[0.1em] text-transparent bg-clip-text bg-gradient-to-r from-orange-400/70 via-fuchsia-400/55 to-cyan-400/50">
           {formatVersion(CORE_VERSION)} · docs {formatVersion(DOCS_VERSION)}
         </span>
       </div>

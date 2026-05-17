@@ -4,15 +4,8 @@ import { Icon } from '@emberkit/ui';
 import { useNavigate } from '@emberkit/core';
 import { CORE_VERSION, formatVersion } from '../lib/version.js';
 
-const navLinks = [
-  { label: 'Docs', path: '/docs/introduction' },
-  { label: 'API', path: '/docs/api' },
-  { label: 'Examples', path: '/docs/examples' },
-];
-
 const Header: RouteComponent = () => {
   const navigate = useNavigate();
-  const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
 
   const toggleSidebar = () => {
     const sidebar = document.querySelector('[data-sidebar]');
@@ -45,7 +38,7 @@ const Header: RouteComponent = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 flex h-16 items-center justify-between border-b border-white/[0.06] bg-[#0b0f19]/90 px-6 backdrop-blur-xl">
+    <header className="fixed top-0 left-0 right-0 z-50 flex h-16 items-center justify-between border-b border-white/5 bg-[#0b0f19]/80 px-6 shadow-[0_8px_32px_rgba(249,115,22,0.04)] backdrop-blur-xl">
       <div className="flex items-center gap-3">
         <button
           onClick={() => toggleSidebar()}
@@ -75,37 +68,12 @@ const Header: RouteComponent = () => {
         </span>
       </div>
 
-      <nav className="hidden sm:flex items-center gap-1">
-        {navLinks.map((link) => {
-          const docsBase = link.path.split('/').slice(0, 2).join('/');
-          const isActive = link.path !== '/' && currentPath.startsWith(docsBase);
-          return (
-            <a
-              key={link.path}
-              href={link.path}
-              onClick={(e) => {
-                e.preventDefault();
-                navigate(link.path);
-              }}
-              className={[
-                'px-3 py-1.5 rounded-md text-sm font-medium no-underline transition-all duration-200 cursor-pointer',
-                isActive
-                  ? 'text-orange-400 bg-orange-500/10'
-                  : 'text-gray-400 hover:text-gray-100 hover:bg-white/[0.04]',
-              ].join(' ')}
-            >
-              {link.label}
-            </a>
-          );
-        })}
-      </nav>
-
       <div className="flex items-center gap-2">
         <a
-          href="https://github.com"
-          className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition-all duration-200 hover:bg-white/5 hover:text-white active:scale-95"
+          href="https://github.com/Orange-Ember-Studios/emberkit"
+          className="flex h-9 w-9 items-center justify-center rounded-lg border border-transparent text-gray-500 transition-all duration-200 hover:border-orange-500/30 hover:bg-white/5 hover:text-white hover:shadow-[0_0_18px_rgba(249,115,22,0.12)] active:scale-95"
           target="_blank"
-          rel="noopener"
+          rel="noopener noreferrer"
         >
           <IconGithub size={18} />
         </a>

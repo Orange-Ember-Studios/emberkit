@@ -4,15 +4,22 @@ import Header from '../components/header';
 
 const Layout: RouteComponent = ({ children }) => {
   return (
-    <div className="flex min-h-screen flex-col bg-[#0b0f19]">
-      <Header />
-      <div className="flex flex-1 pt-16">
-        <Sidebar />
-        <main className="md-content flex-1 min-w-0 px-6 py-10 lg:ml-[260px] lg:px-16 lg:py-14">
-          <div className="max-w-[800px]">
+    <div className="relative flex min-h-screen flex-col overflow-hidden bg-[#0b0f19] text-gray-100">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute top-[20%] left-1/2 h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-orange-500/18 blur-[130px] animate-pulse" />
+        <div className="absolute top-[25%] left-1/2 h-[260px] w-[260px] -translate-x-1/2 rounded-full bg-amber-500/12 blur-[100px] animate-pulse [animation-delay:700ms]" />
+        <div className="absolute top-[15%] right-[8%] h-[240px] w-[240px] rounded-full bg-fuchsia-500/10 blur-[90px] animate-pulse [animation-delay:400ms]" />
+        <div className="absolute bottom-[10%] left-[6%] h-[200px] w-[200px] rounded-full bg-cyan-500/10 blur-[80px] animate-pulse [animation-delay:1100ms]" />
+      </div>
+
+      <div className="relative z-10 flex min-h-screen flex-col">
+        <Header />
+        <div className="flex flex-1 pt-16">
+          <Sidebar />
+          <main className="md-content relative w-full flex-1 min-w-0 px-6 py-10 lg:ml-[260px] lg:px-16 lg:py-14">
             {children}
-          </div>
-        </main>
+          </main>
+        </div>
       </div>
     </div>
   );
