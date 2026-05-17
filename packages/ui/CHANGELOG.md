@@ -1,5 +1,14 @@
 # @emberkit/ui
 
+## 5.0.0
+
+### Patch Changes
+
+- SSR loaders with hydration sync, CLI render normalization, and Text contrast on dark UI
+- Updated dependencies
+  - @emberkit/core@0.7.0
+  - @emberkit/icons@5.0.0
+
 ## 4.0.0
 
 ### Patch Changes

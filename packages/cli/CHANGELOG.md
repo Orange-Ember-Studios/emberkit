@@ -1,5 +1,11 @@
 # @emberkit/cli
 
+## 0.7.2
+
+### Patch Changes
+
+- SSR loaders with hydration sync, CLI render normalization, and Text contrast on dark UI
+
 ## 0.7.1
 
 ### Patch Changes
