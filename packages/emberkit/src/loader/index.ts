@@ -1,2 +1,7 @@
 export * from './types.js';
-export * from './helpers/loader.js';
+export {
+  runLoader,
+  extractLoaderData,
+  extractLoaderError,
+  mergeLoaderResults,
+} from './helpers/loader.js';

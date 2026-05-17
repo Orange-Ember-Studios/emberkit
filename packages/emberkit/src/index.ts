@@ -16,7 +16,25 @@ export {
 export { createContext, useContext } from './context/index.js';
 export { navigate, preload, useNavigate } from './navigation/index.js';
 export { createRouter, matchRoute } from './router/index.js';
-export { createLoaderData, type LoaderResult, type LoaderFunction } from './loader/index.js';
+export {
+  createLoaderData,
+  runLoader,
+  type LoaderResult,
+  type LoaderFunction,
+} from './loader/index.js';
+export {
+  renderMatchedRouteModule,
+  createWrapWithRootLayout,
+  parseUrlForLoader,
+  buildRoutePropsFromLoader,
+  resolvePrerenderPaths,
+  injectSSRIntoTemplate,
+  buildLoaderStateScript,
+  readLoaderStateFromDocument,
+  clearLoaderStateScript,
+  type PrerenderConfig,
+  type LoaderStatePayload,
+} from './ssr/index.js';
 export { createErrorBoundary, createLoadingBoundary } from './boundaries/index.js';
 export type { JSXElement, JSXNode, DOMElement } from './runtime/types.js';
 export type { Signal, WritableSignal, ReadonlySignal } from './signals/index.js';

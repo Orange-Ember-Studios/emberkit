@@ -3,6 +3,11 @@ import { renderToString, getHandler, clearHandlers } from './helpers/render.js';
 import { getSignalByIndex } from '../signals/helpers/core.js';
 import { matchRoute } from './helpers/match.js';
 import { hydrateLazyInView } from '../viewport/index.js';
+import { runLoader } from '../loader/helpers/loader.js';
+import type { LoaderFunction } from '../loader/types.js';
+import { readLoaderStateFromDocument, clearLoaderStateScript } from '../ssr/helpers/loader-state.js';
+import { buildRoutePropsFromLoader } from '../ssr/helpers/matched-route.js';
+import { resyncInteractiveAttributesFromRender } from '../hydration/helpers/sync-ssr-attributes.js';
 
 export function createElement(
   type: string | ((props: JSXElementProps) => JSXNode),
@@ -81,11 +86,31 @@ function extractParamsFromPath(routePath: string, pathname: string): Record<stri
   return params;
 }
 
+function hasServerRenderedContent(target: Element): boolean {
+  for (const child of target.childNodes) {
+    if (child.nodeType === Node.ELEMENT_NODE) {
+      const el = child as Element;
+      if (el.tagName === 'SCRIPT') {
+        const scriptType = el.getAttribute('type');
+        if (scriptType === 'module' || scriptType === 'application/json') {
+          continue;
+        }
+      }
+      return true;
+    }
+    if (child.nodeType === Node.TEXT_NODE && child.textContent?.trim()) {
+      return true;
+    }
+  }
+  return false;
+}
+
 function renderToTarget(
   layout: (props: Record<string, unknown>) => JSXNode,
   target: Element,
   routeComponent?: (props: Record<string, unknown>) => JSXNode,
   routeProps?: RouteProps,
+  options?: { hydrate?: boolean },
 ): void {
   clearHandlers();
 
@@ -96,9 +121,17 @@ function renderToTarget(
     props: routeComponent ? { children: [createElement(routeComponent, componentProps)] } : {},
   } as JSXElement;
 
-  const html = renderToString(jsxElement);
+  const shouldHydrate =
+    options?.hydrate === true ||
+    (options?.hydrate !== false && hasServerRenderedContent(target));
 
-  target.innerHTML = html;
+  if (!shouldHydrate) {
+    const html = renderToString(jsxElement);
+    target.innerHTML = html;
+  } else {
+    resyncInteractiveAttributesFromRender(target, jsxElement);
+  }
+
   hydrateSubtree(target);
   hydrateLazyInView(target);
 }
@@ -201,19 +234,57 @@ export function render(
     return;
   }
 
+  let isInitialNavigation = true;
+  let initialLoaderState = readLoaderStateFromDocument();
+
+  async function resolveRouteProps(
+    mod: Record<string, unknown>,
+    matchedPath: string,
+    hydrate: boolean,
+  ): Promise<RouteProps & Record<string, unknown>> {
+    const params = extractParamsFromPath(matchedPath, window.location.pathname);
+    const query = parseQueryString(window.location.search);
+    const request = new Request(window.location.href);
+    const base: RouteProps & Record<string, unknown> = { params, query, request };
+    const pathname = window.location.pathname;
+
+    if (hydrate && initialLoaderState && initialLoaderState.pathname === pathname) {
+      const props = buildRoutePropsFromLoader(
+        initialLoaderState.loaderResult ?? { data: undefined },
+        { ...base, pathname },
+      );
+      initialLoaderState = null;
+      clearLoaderStateScript();
+      return props as RouteProps & Record<string, unknown>;
+    }
+
+    const loader = mod.loader as LoaderFunction | undefined;
+    if (loader) {
+      const loaderResult = await runLoader(loader, { params, query, request });
+      return buildRoutePropsFromLoader(loaderResult, { ...base, pathname }) as RouteProps &
+        Record<string, unknown>;
+    }
+
+    return { ...base, pathname };
+  }
+
   async function renderCurrentRoute() {
     const matched = matchRoute(routes, window.location.pathname);
+    const hydrate = isInitialNavigation;
+    isInitialNavigation = false;
+
     if (matched) {
       const mod = await matched.component();
-
-      const params = extractParamsFromPath(matched.path, window.location.pathname);
-      const query = parseQueryString(window.location.search);
-      const request = new Request(window.location.href);
-
-      const routeProps: RouteProps = { params, query, request };
-      renderToTarget(layout, target, mod.default, routeProps);
+      const routeProps = await resolveRouteProps(mod, matched.path, hydrate);
+      renderToTarget(
+        layout,
+        target,
+        mod.default as (props: Record<string, unknown>) => JSXNode,
+        routeProps,
+        { hydrate },
+      );
     } else {
-      renderToTarget(layout, target);
+      renderToTarget(layout, target, undefined, undefined, { hydrate });
     }
   }
 

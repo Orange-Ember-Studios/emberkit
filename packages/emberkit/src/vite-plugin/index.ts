@@ -1306,22 +1306,14 @@ import {
   buildRouteHeadFromMetadata,
   drainHeadContent,
   clearHeadContent,
+  renderMatchedRouteModule,
+  injectSSRIntoTemplate,
+  createWrapWithRootLayout,
+  renderToHTMLString,
 } from '@emberkit/core';
 
 const siteHeadOptions = ${siteHeadOptions};
-
-const wrapWithRootLayout = async (RouteComponent) => {
-  if (!rootLayout) {
-    return RouteComponent;
-  }
-  const layoutMod = await rootLayout();
-  const Layout = layoutMod.default || layoutMod;
-  return (routeProps) =>
-    createElement(Layout, {
-      pathname: routeProps?.pathname,
-      children: createElement(RouteComponent, routeProps),
-    });
-};
+const wrapWithRootLayout = createWrapWithRootLayout(rootLayout, createElement);
 
 const matchRoute = (routes, pathname) => {
   const normalizedPath = pathname.replace(/\\/+$/, '') || '/';
@@ -1451,15 +1443,22 @@ export async function render(url, server) {
   let appHtml = '';
   let headContent = '';
   let status = 200;
+  let loaderState = null;
 
   if (match) {
     try {
       const mod = await match.route.component();
-      const Route = mod.default || mod;
       clearHeadContent();
-      const Page = await wrapWithRootLayout(Route);
-      const element = createElement(Page, { params: match.params, pathname });
-      appHtml = renderToString(element);
+      const rendered = await renderMatchedRouteModule({
+        url,
+        pathname,
+        params: match.params,
+        routeModule: mod,
+        wrapWithRootLayout,
+      });
+      appHtml = rendered.appHtml;
+      status = rendered.status;
+      loaderState = rendered.loaderState;
       const drained = drainHeadContent();
       if (mod.metadata) {
         headContent =
@@ -1480,7 +1479,7 @@ export async function render(url, server) {
             error: e,
           };
           const element = createElement(Component, { error: errorInfo });
-          appHtml = renderToString(element);
+          appHtml = renderToHTMLString(element);
         } catch (fallbackError) {
           console.error('[SSR] Failed to render 500 page:', fallbackError);
           appHtml = '<div style="color: red; padding: 20px;">Internal Server Error</div>';
@@ -1498,8 +1497,8 @@ export async function render(url, server) {
         const Route = mod.default || mod;
         clearHeadContent();
         const Page = await wrapWithRootLayout(Route);
-        const element = createElement(Page, { });
-        appHtml = renderToString(element);
+        const element = createElement(Page, { pathname });
+        appHtml = renderToHTMLString(element);
         const drained = drainHeadContent();
         if (drained) {
           headContent = drained + '\\n';
@@ -1523,20 +1522,7 @@ export async function render(url, server) {
   let template = fs.readFileSync(indexPath, 'utf-8');
   template = await server.transformIndexHtml(url, template);
 
-  // Inject SSR content
-  // Look for body with id="app" or div with id="app"
-  if (template.includes('<body id="app">')) {
-    template = template.replace('<body id="app">', '<body id="app">' + appHtml);
-  } else if (template.includes('<div id="app">')) {
-    template = template.replace('<div id="app"></div>', '<div id="app">' + appHtml + '</div>');
-  } else if (template.includes('<div id="app"/>')) {
-    template = template.replace('<div id="app"/>', '<div id="app">' + appHtml + '</div>');
-  }
-
-  // Inject head content if any
-  if (headContent && template.includes('</head>')) {
-    template = template.replace('</head>', headContent + '</head>');
-  }
+  template = injectSSRIntoTemplate(template, { appHtml, headContent, loaderState });
 
   return { html: template, status };
 }

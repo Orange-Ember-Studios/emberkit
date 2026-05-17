@@ -12,10 +12,20 @@ export interface SiteConfig {
   twitterSite?: string;
 }
 
+export interface PrerenderOptions {
+  /** Extra URL paths to pre-render at build time (e.g. `/blog/hello`). */
+  paths?: string[];
+  /** Paths to skip when pre-rendering. */
+  exclude?: string[];
+  /** Resolve dynamic or CMS-driven paths at build time. */
+  discover?: () => Promise<string[]>;
+}
+
 export interface EmberKitPluginOptions {
   mode?: EmberKitMode;
   routeDir?: string;
   outputDir?: string;
+  prerender?: PrerenderOptions;
   jsx?: 'automatic' | 'classic';
   markdown?: Partial<MarkdownConfig>;
   mdx?: MDXConfig;
