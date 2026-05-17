@@ -1,5 +1,11 @@
 # @emberkit/core
 
+## 0.6.1
+
+### Patch Changes
+
+- Fix SSR layout wrapping and per-page Open Graph head injection
+
 ## 0.6.0
 
 ### Minor Changes
