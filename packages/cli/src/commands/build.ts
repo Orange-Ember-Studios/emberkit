@@ -170,13 +170,31 @@ function siteConfigToHeadOptions(site: Record<string, unknown> | undefined): str
 
 function getServerEntryShim(site: Record<string, unknown> | undefined): string {
   const siteHeadOptions = siteConfigToHeadOptions(site);
-  return `import { routes, notFoundRoute, errorRoute } from 'virtual:emberkit-routes';
-import { createElement, buildRouteHeadFromMetadata } from '@emberkit/core';
-
-const siteHeadOptions = ${siteHeadOptions};
+  return `import { routes, rootLayout, notFoundRoute, errorRoute } from 'virtual:emberkit-routes';
+import {
+  createElement,
+  buildRouteHeadFromMetadata,
+  drainHeadContent,
+  clearHeadContent,
+} from '@emberkit/core';
 import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+const siteHeadOptions = ${siteHeadOptions};
+
+const wrapWithRootLayout = async (RouteComponent) => {
+  if (!rootLayout) {
+    return RouteComponent;
+  }
+  const layoutMod = await rootLayout();
+  const Layout = layoutMod.default || layoutMod;
+  return (routeProps) =>
+    createElement(Layout, {
+      pathname: routeProps?.pathname,
+      children: createElement(RouteComponent, routeProps),
+    });
+};
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -305,14 +323,18 @@ export async function render(url) {
   if (match) {
     try {
       const mod = await match.route.component();
-      const Component = mod.default || mod;
-
-      if (mod.metadata) {
-        headContent += buildRouteHeadFromMetadata(mod.metadata, pathname, siteHeadOptions ?? undefined) + '\\n';
-      }
-
-      const element = createElement(Component, { params: match.params });
+      const Route = mod.default || mod;
+      clearHeadContent();
+      const Page = await wrapWithRootLayout(Route);
+      const element = createElement(Page, { params: match.params, pathname });
       appHtml = renderToString(element);
+      const drained = drainHeadContent();
+      if (mod.metadata) {
+        headContent =
+          buildRouteHeadFromMetadata(mod.metadata, pathname, siteHeadOptions ?? undefined) + '\\n';
+      } else if (drained) {
+        headContent = drained + '\\n';
+      }
     } catch (e) {
       console.error('[SSR] Failed to render route:', pathname, e);
       if (errorRoute) {
@@ -341,9 +363,18 @@ export async function render(url) {
     if (notFoundRoute) {
       try {
         const mod = await notFoundRoute();
-        const Component = mod.default || mod;
-        const element = createElement(Component, {});
+        const Route = mod.default || mod;
+        clearHeadContent();
+        const Page = await wrapWithRootLayout(Route);
+        const element = createElement(Page, {});
         appHtml = renderToString(element);
+        const drained = drainHeadContent();
+        if (drained) {
+          headContent = drained + '\\n';
+        } else if (mod.metadata) {
+          headContent =
+            buildRouteHeadFromMetadata(mod.metadata, pathname, siteHeadOptions ?? undefined) + '\\n';
+        }
       } catch (e) {
         console.error('[SSR] Failed to render 404 page:', e);
         appHtml = '<div style="padding: 20px;">404 - Page not found</div>';
