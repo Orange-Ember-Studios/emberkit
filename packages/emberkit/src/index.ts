@@ -14,7 +14,16 @@ export {
   effect,
 } from './signals/index.js';
 export { createContext, useContext } from './context/index.js';
-export { navigate, preload, useNavigate } from './navigation/index.js';
+export {
+  navigate,
+  preload,
+  useNavigate,
+  supportsViewTransitions,
+  withViewTransition,
+  waitForAppUpdate,
+  initViewTransitions,
+  navigateWithViewTransition,
+} from './navigation/index.js';
 export { createRouter, matchRoute } from './router/index.js';
 export {
   createLoaderData,

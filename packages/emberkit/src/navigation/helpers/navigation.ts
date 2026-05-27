@@ -1,21 +1,28 @@
 import type { NavigationOptions, ViewTransitionOptions } from '../types.js';
+import { navigateWithViewTransition, withViewTransition } from './view-transitions.js';
 
 export async function navigate(to: string, options: NavigationOptions = {}): Promise<void> {
   const { replace = false, state, viewTransition } = options;
 
-  if (replace) {
-    history.replaceState(state ? { ...history.state, ...state } : history.state, '', to);
-  } else {
-    history.pushState(state ?? null, '', to);
-  }
+  const applyHistory = (): void => {
+    if (replace) {
+      history.replaceState(state ? { ...history.state, ...state } : history.state, '', to);
+    } else {
+      history.pushState(state ?? null, '', to);
+    }
+  };
 
   if (viewTransition) {
     const viewTransitionOptions = typeof viewTransition === 'boolean' ? {} : viewTransition;
-
-    await startViewTransition(viewTransitionOptions);
+    if (viewTransitionOptions.skipTransition) {
+      applyHistory();
+      return;
+    }
+    await navigateWithViewTransition(to, { replace });
+    return;
   }
 
-  window.dispatchEvent(new PopStateEvent('popstate', { state: history.state }));
+  applyHistory();
 }
 
 export function redirect(to: string, status: number = 302): never {
@@ -39,25 +46,11 @@ export function preload(path: string): void {
 export async function startViewTransition(options: ViewTransitionOptions = {}): Promise<void> {
   const { skipTransition = false, documentViewTransition = true } = options;
 
-  if (skipTransition) {
+  if (skipTransition || !documentViewTransition) {
     return;
   }
 
-  if (
-    documentViewTransition &&
-    typeof document !== 'undefined' &&
-    'startViewTransition' in document
-  ) {
-    const transition = (
-      document as unknown as {
-        startViewTransition: (callback: () => void | Promise<void>) => ViewTransition;
-      }
-    ).startViewTransition(async () => {
-      await Promise.resolve();
-    });
-
-    await transition.finished;
-  }
+  await withViewTransition(() => undefined);
 }
 
 export interface ViewTransition {
