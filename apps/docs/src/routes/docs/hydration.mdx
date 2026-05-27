@@ -238,6 +238,65 @@ For elements that need hydration but not immediately, mark them lazy so the hydr
 
 This complements <code>LazyInView</code>: lazy in view defers <strong>rendering</strong>; <code>data-hydrate="lazy"</code> defers <strong>wiring event handlers</strong> for already-rendered HTML.
 
+## Dynamic lists after SSR
+
+<Alert variant="warning" title="Hydration vs .map() lists">
+  After SSR, EmberKit <strong>hydrates</strong> existing HTML. It does <strong>not</strong> re-run JSX <code>.map()</code> when a signal updates — only nodes with <code>data-ek-bind</code> stay in sync.
+</Alert>
+
+### What goes wrong
+
+Typical flow on an SSR home page:
+
+1. **Server** renders with an empty list (no API on the server).
+2. **Client** preloads <code>/api/...</code> into <code>setCache()</code> before or after <code>render()</code>.
+3. **Hydration** keeps the server’s empty grid in the DOM.
+4. A signal is updated with fetched data, but the **list markup does not change**.
+
+The API can return 200 and the cache can be full while the UI still shows an empty section.
+
+### Recommended patterns
+
+**1. Force a client re-render of the route** when async data arrives and the list DOM is still empty:
+
+```tsx
+function refreshCurrentRoute() {
+  const url =
+    window.location.pathname + window.location.search + window.location.hash;
+  history.replaceState(null, '', url);
+}
+
+createEffect(() => {
+  void (async () => {
+    const list = await fetchProjects();
+    setProjects(list);
+    const grid = document.getElementById('portfolio-grid');
+    if (list.length > 0 && (grid?.children.length ?? 0) === 0) {
+      refreshCurrentRoute();
+    }
+  })();
+});
+```
+
+Patched <code>history.replaceState</code> in <code>render()</code> calls <code>renderCurrentRoute()</code> again with <code>hydrate: false</code>, so the route HTML is rebuilt from JSX.
+
+**2. Imperative DOM updates** (like the docs blog index pattern): render cards with <code>innerHTML</code> or <code>createElement</code> inside <code>createEffect</code> instead of relying on <code>.map()</code> in JSX.
+
+**3. SSR loaders** — fetch list data in a route <code>loader</code> so the server HTML includes items. See [SSR & SSG](/docs/ssr).
+
+**4. LazyInView with `ssr="eager"`** — when SEO needs full HTML at first paint.
+
+### Input bindings (0.8.0)
+
+<code>data-ek-bind</code> now syncs form controls during hydration:
+
+| Element | Bound property |
+|---------|----------------|
+| <code>&lt;input&gt;</code>, <code>&lt;textarea&gt;</code> | <code>.value</code> |
+| <code>&lt;select&gt;</code> | <code>.value</code> |
+| <code>&lt;button&gt;</code> (boolean signal) | <code>disabled</code> |
+| Other elements | <code>textContent</code> (default) |
+
 ## Performance Impact
 
 | Approach | Bundle Size | FCP | TTI |
@@ -251,5 +310,6 @@ This complements <code>LazyInView</code>: lazy in view defers <strong>rendering<
 
 - [Signals](/docs/signals) — Signal API and subscribe
 - [SSR](/docs/ssr) — Server-side rendering
+- [Release 0.8.0](/docs/release-0-8) — Dev API, view transitions, hydration notes
 - [Components](/docs/components) — Static vs interactive components
 - [API Reference](/docs/api) — `LazyInView`, `hydrateLazyInView`, `clearLazyRegistry`

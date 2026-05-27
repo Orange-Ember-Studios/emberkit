@@ -52,9 +52,19 @@ function Counter() {
 | State | Signals + targeted DOM updates |
 | Tooling | `emberkit dev`, `build`, `preview`, `serve` |
 
+## What's new in 0.8.0
+
+- **Reactive effects** — <code>createEffect</code> / <code>createMemo</code> re-run when dependencies change
+- **View Transitions** — <code>render(..., &#123; viewTransitions: true &#125;)</code> for SPA navigation
+- **Dev API** — <code>devApiPlugin</code> and <code>src/routes/_api/*</code> in development
+- **sqlRawPlugin** — import <code>*.sql?raw</code> for edge deployments
+
+See the full [Release 0.8.0](/docs/release-0-8) notes.
+
 ## Next Steps
 
 - [Installation](/docs/installation) — Create a project
 - [Quick Start](/docs/quick-start) — First routes and signals
+- [Release 0.8.0](/docs/release-0-8) — Latest release
 - [SSR & SSG](/docs/ssr) — How speed is delivered in each mode
 - [Hydration](/docs/hydration) — Selective client interactivity

@@ -1,0 +1,137 @@
+---
+title: Dev API
+---
+
+import { Badge, Alert, Card, Text } from '@emberkit/ui';
+
+# Dev API
+
+<Text color="muted" className="mb-6">
+  During <code>emberkit dev</code>, EmberKit can intercept <code>/api</code> and <code>/api/*</code> and run your backend logic in Node — without a separate proxy server.
+</Text>
+
+<Alert variant="info" title="Production">
+  Dev API middleware is <strong>development only</strong>. In production, wire APIs through your host (Cloudflare Workers, Node server, etc.). The Orange Ember website uses <code>worker.ts</code> for production and <code>devApiPlugin</code> locally.
+</Alert>
+
+## When to use it
+
+| Approach | Best for |
+|----------|----------|
+| <strong>File-based</strong> <code>src/routes/_api/*</code> | REST handlers colocated with routes, similar to Next.js Route Handlers |
+| <strong>Custom handler module</strong> | Existing Express-style routers, Turso migrations on first request, shared <code>handleApiRequest</code> for dev and Workers |
+
+## Option A — emberkit.config.ts
+
+```ts
+import { defineConfig } from '@emberkit/core';
+
+export default defineConfig({
+  mode: 'ssr',
+  devApi: {
+    handler: './src/server/api-router.node.ts',
+    export: 'handleApiRequestNode',
+    prefix: '/api', // optional, default '/api'
+  },
+});
+```
+
+<code>emberkitVitePlugin()</code> registers the middleware when <code>devApi</code> is set.
+
+## Option B — explicit Vite plugin
+
+Use this when you compose plugins in <code>vite.plugins.ts</code> (Vitest, CI shims):
+
+```ts
+import {
+  devApiPlugin,
+  emberkitVitePlugin,
+  sqlRawPlugin,
+} from '@emberkit/core/vite-plugin';
+
+export const appVitePlugins = [
+  sqlRawPlugin(),
+  devApiPlugin({
+    handler: './src/server/api-router.node.ts',
+    export: 'handleApiRequestNode',
+  }),
+  emberkitVitePlugin(),
+];
+```
+
+Register <code>devApiPlugin</code> <strong>before</strong> <code>emberkitVitePlugin</code> so API requests are handled before SSR HTML middleware.
+
+## Custom Node handler
+
+Export a function with Node’s <code>IncomingMessage</code> / <code>ServerResponse</code> signature:
+
+```ts
+// src/server/api-router.node.ts
+import type { IncomingMessage, ServerResponse } from 'node:http';
+import { handleApiRequest } from './api-router.ts';
+
+export async function handleApiRequestNode(
+  req: IncomingMessage,
+  res: ServerResponse,
+): Promise<void> {
+  const host = req.headers.host ?? 'localhost';
+  const url = `http://${host}${req.url ?? '/'}`;
+  const request = new Request(url, { method: req.method, headers: req.headers });
+  const response = await handleApiRequest(request, env);
+  // copy status, headers, body to res ...
+}
+```
+
+Share <code>handleApiRequest(request, env)</code> between dev (Node) and production (Workers) so behavior stays consistent.
+
+## File-based API routes
+
+Add handlers under <code>src/routes/_api/</code>:
+
+```
+src/routes/_api/
+  health.ts      →  GET /api/health
+  blog/
+    list.ts      →  GET /api/blog/list
+```
+
+When <code>devApi</code> is <strong>not</strong> set in config and at least one <code>_api</code> route exists, EmberKit auto-enables file-based dev API routing.
+
+<Alert variant="warning" title="Custom devApi overrides auto routing">
+  If you set <code>devApi.handler</code>, file-based <code>_api</code> routes are <strong>not</strong> used unless you call them from your handler.
+</Alert>
+
+## How requests are routed
+
+1. Request URL pathname is <code>/api</code> or starts with <code>/api/</code>.
+2. Dev middleware runs <strong>before</strong> SSR page rendering (SSR skips API URLs).
+3. Handler module is loaded once via <code>server.ssrLoadModule()</code> and cached.
+
+## Testing locally
+
+```bash
+pnpm dev
+curl -s "http://localhost:4321/api/health"
+curl -s "http://localhost:4321/api/blog/list?lang=en"
+```
+
+If the port is busy, EmberKit picks the next free port — check the dev server banner.
+
+## Vite exports
+
+From <code>@emberkit/core/vite-plugin</code>:
+
+| Export | Description |
+|--------|-------------|
+| <code>devApiPlugin(options)</code> | Vite plugin for custom handler |
+| <code>registerDevApiMiddleware(server, options)</code> | Register middleware on an existing dev server |
+| <code>registerFileBasedDevApiMiddleware(server)</code> | Register <code>_api</code> file routing |
+| <code>isApiRequest(url)</code> | Returns true for <code>/api</code> and <code>/api/*</code> |
+| <code>incomingMessageToRequest(req)</code> | Convert Node request to Fetch <code>Request</code> |
+| <code>writeFetchResponseToNode(res, response)</code> | Write Fetch <code>Response</code> to Node |
+
+## Related
+
+- [Release 0.8.0](/docs/release-0-8)
+- [SSR & SSG](/docs/ssr)
+- [Edge Deployment](/docs/edge)

@@ -1,5 +1,7 @@
 # View Transitions Implementation Guide
 
+> **Published docs:** [View Transitions](/docs/view-transitions) and [Release 0.8.0](/docs/release-0-8) on the docs site. This file is maintainer notes for the docs app itself.
+
 ## Overview
 
 The view transitions have been implemented using the **View Transitions API** (native browser API) combined with a custom `useNavigate` hook that automatically enables view transitions for all navigation.

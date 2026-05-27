@@ -10,19 +10,33 @@ import { Badge, Alert, Card, Text } from '@emberkit/ui';
 
 ```typescript
 render(
-  element: JSXElement | string | null,
+  element: JSXElement | string | null | ((props: Record<string, unknown>) => JSXNode),
   container: Element | string,
-  options?: { hydrate?: boolean }
+  options?: {
+    hydrate?: boolean;
+    viewTransitions?: boolean | { rootId?: string };
+    routes?: Array<{
+      path: string;
+      component: () => Promise<{ default: (props: Record<string, unknown>) => JSXNode }>;
+    }>;
+  }
 ): void
 ```
 
-Renders a JSX element into a DOM container.
+Renders a JSX element into a DOM container. Pass <code>routes</code> from <code>virtual:emberkit-routes</code> for file-based client routing.
 
 ```tsx
 import { render } from '@emberkit/core';
+import { routes } from 'virtual:emberkit-routes';
+import App from './routes/_layout.tsx';
 
-render(<App />, document.getElementById('app')!);
+render(App, document.getElementById('app')!, {
+  routes,
+  viewTransitions: true,
+});
 ```
+
+See [View Transitions](/docs/view-transitions).
 
 ### hydrate
 
@@ -197,7 +211,7 @@ navigate(
   options?: {
     replace?: boolean;
     state?: Record<string, unknown>;
-    viewTransition?: boolean | ViewTransitionOptions;
+    viewTransition?: boolean;
   }
 ): Promise<void>
 ```
@@ -207,7 +221,29 @@ Programmatic navigation.
 ```tsx
 navigate('/about');
 navigate('/new', { replace: true });
+await navigate('/docs', { viewTransition: true });
 ```
+
+### View transition helpers
+
+```typescript
+supportsViewTransitions(): boolean
+withViewTransition(callback: () => void | Promise<void>): Promise<void>
+waitForAppUpdate(href: string, options?: { replace?: boolean; rootId?: string }): Promise<void>
+initViewTransitions(options?: { rootId?: string }): void
+navigateWithViewTransition(href: string, options?: { replace?: boolean; rootId?: string }): Promise<void>
+```
+
+See [View Transitions](/docs/view-transitions).
+
+### getCached / setCache
+
+```typescript
+getCached<T>(key: string): T | null
+setCache<T>(key: string, data: T, ttl?: number): void
+```
+
+In-memory cache for client-side data sharing (e.g. preload before <code>render()</code>). Pair with [hydration guidance for dynamic lists](/docs/hydration#dynamic-lists-after-ssr) when using SSR + <code>.map()</code>.
 
 ### preload
 
@@ -367,10 +403,34 @@ type LoaderFunction<T = unknown> = (
 defineConfig(config: Record<string, unknown>): Record<string, unknown>
 ```
 
-Used in `emberkit.config.ts` for `mode`, `server`, `build`, and nested `vite` options. See [SSR & SSG](/docs/ssr).
+Used in `emberkit.config.ts` for `mode`, `server`, `build`, nested `vite` options, and optional `devApi`. See [SSR & SSG](/docs/ssr) and [Dev API](/docs/dev-api).
+
+```ts
+export default defineConfig({
+  mode: 'ssr',
+  devApi: {
+    handler: './src/server/api.node.ts',
+    export: 'handleRequest',
+  },
+});
+```
+
+## Vite plugin (`@emberkit/core/vite-plugin`)
+
+| Export | Description |
+|--------|-------------|
+| `emberkitVitePlugin(options?)` | Routes, SSR middleware, MDX, manifest |
+| `devApiPlugin(options)` | Dev-only `/api` → Node handler |
+| `sqlRawPlugin()` | Bundle `*.sql?raw` as string literals |
+| `registerDevApiMiddleware(server, options)` | Attach custom API middleware |
+| `registerFileBasedDevApiMiddleware(server)` | Attach `src/routes/_api/*` routing |
+| `isApiRequest(url)` | True for `/api` and `/api/*` |
 
 ## Next Steps
 
+- [Release 0.8.0](/docs/release-0-8) - Latest features
+- [Dev API](/docs/dev-api) - Local API middleware
+- [View Transitions](/docs/view-transitions) - SPA transitions
 - [Components](/docs/components) - Component patterns
 - [Signals](/docs/signals) - Reactive state
 - [Routing](/docs/routing) - File-based routing

@@ -1,5 +1,13 @@
 # @emberkit/docs
 
+## 1.1.0
+
+### Minor Changes
+
+- Document EmberKit 0.8.0: release notes, dev API, view transitions, and SSR dynamic-list hydration
+- Expand API reference for `render` options, cache, and Vite plugin exports
+- Expand `@emberkit/core` CHANGELOG entry for 0.8.0
+
 ## 1.0.0
 
 ### Minor Changes

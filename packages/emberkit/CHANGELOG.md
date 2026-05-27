@@ -4,7 +4,11 @@
 
 ### Minor Changes
 
-- Reactive effects, view transitions, dev API routing, and sqlRaw plugin
+- **Signals:** `createEffect` and `createMemo` track dependencies and re-run when signals change; `batch` and `untrack` coalesce notifications; effects skip during SSR
+- **View Transitions:** `render(..., { viewTransitions: true })`, `initViewTransitions`, `navigateWithViewTransition`, and `navigate(..., { viewTransition: true })` wait for `#app` DOM updates before transition snapshots
+- **Dev API:** `devApiPlugin`, `devApi` config option, auto file-based routing from `src/routes/_api/*`, SSR middleware skips `/api` requests
+- **Vite:** `sqlRawPlugin` for `*.sql?raw` imports; `load-emberkit-config` transpiles `emberkit.config.ts` via esbuild
+- **Hydration:** `data-ek-bind` syncs `input`/`textarea`/`select` `.value` and button `disabled`
 
 ## 0.7.0
 

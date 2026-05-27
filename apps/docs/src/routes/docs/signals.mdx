@@ -77,6 +77,10 @@ console.log(doubled.value); // 6
 
 ## Effects with createEffect
 
+<Alert variant="info" title="0.8.0+">
+  <code>createEffect</code> and <code>createMemo</code> now track signal dependencies and re-run when those signals change (with <code>batch</code> / <code>untrack</code> support). Effects do not run during SSR.
+</Alert>
+
 Effects run side effects when signals change:
 
 ```tsx
