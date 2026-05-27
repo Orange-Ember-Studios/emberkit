@@ -1,15 +1,98 @@
 import type { Signal, SignalOptions } from '../types.js';
 
 let sigIndex = 0;
-const sigRegistry = new Map<number, { subscribe: (fn: (v: unknown) => void) => () => void }>();
+const sigRegistry = new Map<
+  number,
+  { subscribe: (fn: (v: unknown) => void) => () => void; peek: () => unknown }
+>();
+
+type EffectRunner = () => void;
+type DepSet = Set<EffectRunner>;
+
+let activeEffect: EffectRunner | null = null;
+let untrackDepth = 0;
+let batchDepth = 0;
+const batchedEffects = new Set<EffectRunner>();
+const batchedSubs = new Set<() => void>();
+
+const effectDeps = new Map<EffectRunner, Set<DepSet>>();
+
+function track(depSet: DepSet): void {
+  if (!activeEffect || untrackDepth > 0) return;
+  depSet.add(activeEffect);
+  let deps = effectDeps.get(activeEffect);
+  if (!deps) {
+    deps = new Set();
+    effectDeps.set(activeEffect, deps);
+  }
+  deps.add(depSet);
+}
+
+function clearEffectDeps(effect: EffectRunner): void {
+  const deps = effectDeps.get(effect);
+  if (!deps) return;
+  for (const depSet of deps) {
+    depSet.delete(effect);
+  }
+  effectDeps.delete(effect);
+}
+
+function scheduleEffect(effect: EffectRunner): void {
+  if (batchDepth > 0) {
+    batchedEffects.add(effect);
+    return;
+  }
+  effect();
+}
+
+function scheduleSub(fn: () => void): void {
+  if (batchDepth > 0) {
+    batchedSubs.add(fn);
+    return;
+  }
+  fn();
+}
+
+function flushBatch(): void {
+  const effects = [...batchedEffects];
+  batchedEffects.clear();
+  for (const effect of effects) {
+    effect();
+  }
+  const subs = [...batchedSubs];
+  batchedSubs.clear();
+  for (const fn of subs) {
+    fn();
+  }
+}
+
+function notifySignal<T>(subs: Set<(v: T) => void>, effects: DepSet, value: T): void {
+  for (const effect of [...effects]) {
+    scheduleEffect(effect);
+  }
+  if (subs.size > 0) {
+    const fns = [...subs];
+    for (let i = 0; i < fns.length; i++) {
+      const fn = fns[i] as (v: T) => void;
+      scheduleSub(() => fn(value));
+    }
+  }
+}
 
 export function resetSigIndex(): void {
   sigIndex = 0;
+  sigRegistry.clear();
+  effectDeps.clear();
+  activeEffect = null;
+  untrackDepth = 0;
+  batchDepth = 0;
+  batchedEffects.clear();
+  batchedSubs.clear();
 }
 
 export function getSignalByIndex(
   idx: number,
-): { subscribe: (fn: (v: unknown) => void) => () => void } | undefined {
+): { subscribe: (fn: (v: unknown) => void) => () => void; peek: () => unknown } | undefined {
   return sigRegistry.get(idx);
 }
 
@@ -19,23 +102,30 @@ export function createSignal<T>(
 ): [() => T, (newValue: T | ((prev: T) => T)) => void] & Signal<T> {
   let value = initialValue;
   const subs = new Set<(v: T) => void>();
+  const effects: DepSet = new Set();
   const equals = options.equals ?? ((a: T, b: T) => a === b);
 
   const idx = sigIndex++;
 
-  function getter(): T {
+  function read(): T {
+    track(effects);
     return value;
   }
-  (getter as any).__idx = idx;
+
+  function getter(): T {
+    return read();
+  }
+  (getter as { __idx?: number }).__idx = idx;
+
+  function commit(next: T): void {
+    if (equals(value, next)) return;
+    value = next;
+    notifySignal(subs, effects, value);
+  }
 
   function setter(newValue: T | ((prev: T) => T)): void {
     const next = typeof newValue === 'function' ? (newValue as (prev: T) => T)(value) : newValue;
-    if (equals(value, next)) return;
-    value = next;
-    if (subs.size > 0) {
-      const fns = [...subs];
-      for (let i = 0; i < fns.length; i++) fns[i](value);
-    }
+    commit(next);
   }
 
   function subscribe(fn: (v: T) => void): () => void {
@@ -43,20 +133,17 @@ export function createSignal<T>(
     return () => subs.delete(fn);
   }
 
-  sigRegistry.set(idx, { subscribe: subscribe as (fn: (v: unknown) => void) => () => void });
+  sigRegistry.set(idx, {
+    subscribe: subscribe as (fn: (v: unknown) => void) => () => void,
+    peek: () => value,
+  });
 
   const signal = {
     get value(): T {
-      return value;
+      return read();
     },
     set value(newValue: T | ((prev: T) => T)) {
-      const next = typeof newValue === 'function' ? (newValue as (prev: T) => T)(value) : newValue;
-      if (equals(value, next)) return;
-      value = next;
-      if (subs.size > 0) {
-        const fns = [...subs];
-        for (let i = 0; i < fns.length; i++) fns[i](value);
-      }
+      setter(newValue);
     },
     peek(): T {
       return value;
@@ -70,7 +157,7 @@ export function createSignal<T>(
           if (index < methods.length) {
             return { value: methods[index++], done: false };
           }
-          return { done: true } as IteratorResult<any>;
+          return { done: true } as IteratorResult<(() => T) | ((newValue: T) => void)>;
         },
         [Symbol.iterator](): IterableIterator<(() => T) | ((newValue: T) => void)> {
           return this;
@@ -81,7 +168,7 @@ export function createSignal<T>(
 
   signal[0] = getter;
   signal[1] = setter;
-  (signal as any).length = 2;
+  Object.defineProperty(signal, 'length', { value: 2 });
 
   return signal;
 }
@@ -89,23 +176,42 @@ export function createSignal<T>(
 export function createMemo<T>(computation: () => T, _options?: SignalOptions<T>): Signal<T> {
   void _options;
   let value: T;
-  let isStale = true;
+  const subs = new Set<(v: T) => void>();
+  const effects: DepSet = new Set();
+
+  const memoRunner: EffectRunner = () => {
+    const prev = value;
+    recompute();
+    if (prev !== value) {
+      notifySignal(subs, effects, value);
+    }
+  };
+
+  function recompute(): void {
+    clearEffectDeps(memoRunner);
+    const prevEffect = activeEffect;
+    activeEffect = memoRunner;
+    try {
+      value = computation();
+    } finally {
+      activeEffect = prevEffect;
+    }
+  }
+
+  recompute();
 
   return {
     get value(): T {
-      if (isStale) {
-        value = computation();
-        isStale = false;
-      }
+      track(effects);
       return value;
     },
     peek(): T {
-      if (isStale) {
-        return computation();
-      }
       return value;
     },
-    subscribe: () => (() => {}) as () => void,
+    subscribe(fn: (v: T) => void): () => void {
+      subs.add(fn);
+      return () => subs.delete(fn);
+    },
   };
 }
 
@@ -113,6 +219,12 @@ export function createEffect(callback: () => void | (() => void)): () => void {
   if (typeof window === 'undefined') return () => {};
 
   let cleanup: (() => void) | void;
+  let disposed = false;
+
+  const effectRunner: EffectRunner = () => {
+    if (disposed) return;
+    run();
+  };
 
   function run(): void {
     if (cleanup) {
@@ -120,12 +232,21 @@ export function createEffect(callback: () => void | (() => void)): () => void {
       cleanup = undefined;
       fn();
     }
-    cleanup = callback();
+    clearEffectDeps(effectRunner);
+    const prevEffect = activeEffect;
+    activeEffect = effectRunner;
+    try {
+      cleanup = callback();
+    } finally {
+      activeEffect = prevEffect;
+    }
   }
 
   run();
 
   return () => {
+    disposed = true;
+    clearEffectDeps(effectRunner);
     if (cleanup) {
       const fn = cleanup as () => void;
       cleanup = undefined;
@@ -135,11 +256,24 @@ export function createEffect(callback: () => void | (() => void)): () => void {
 }
 
 export function batch<T>(fn: () => T): T {
-  return fn();
+  batchDepth++;
+  try {
+    return fn();
+  } finally {
+    batchDepth--;
+    if (batchDepth === 0) {
+      flushBatch();
+    }
+  }
 }
 
 export function untrack<T>(fn: () => T): T {
-  return fn();
+  untrackDepth++;
+  try {
+    return fn();
+  } finally {
+    untrackDepth--;
+  }
 }
 
 export function signal<T>(initialValue: T): Signal<T> {

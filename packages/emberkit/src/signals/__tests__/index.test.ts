@@ -42,6 +42,15 @@ describe('createSignal', () => {
 });
 
 describe('createMemo', () => {
+  it('should recompute when dependencies change', () => {
+    const base = createSignal(1);
+    const doubled = createMemo(() => base.value * 2);
+
+    expect(doubled.value).toBe(2);
+    base.value = 3;
+    expect(doubled.value).toBe(6);
+  });
+
   it('should compute value', () => {
     const double = createMemo(() => 2 * 2);
     expect(double.value).toBe(4);
@@ -109,6 +118,35 @@ describe('createEffect', () => {
 
     expect(effectRun).toBe(1);
   });
+
+  it('should re-run when a tracked signal changes', () => {
+    const count = createSignal(0);
+    let last = -1;
+
+    createEffect(() => {
+      last = count.value;
+    });
+
+    expect(last).toBe(0);
+    count.value = 2;
+    expect(last).toBe(2);
+  });
+
+  it('should not re-run for reads inside untrack', () => {
+    const count = createSignal(0);
+    let runs = 0;
+
+    createEffect(() => {
+      runs++;
+      untrack(() => {
+        void count.value;
+      });
+    });
+
+    expect(runs).toBe(1);
+    count.value = 1;
+    expect(runs).toBe(1);
+  });
 });
 
 describe('batch', () => {
@@ -121,6 +159,23 @@ describe('batch', () => {
     });
 
     expect(count.value).toBe(2);
+  });
+
+  it('should notify effects once per batch', () => {
+    const count = createSignal(0);
+    let runs = 0;
+
+    createEffect(() => {
+      void count.value;
+      runs++;
+    });
+
+    expect(runs).toBe(1);
+    batch(() => {
+      count.value = 1;
+      count.value = 2;
+    });
+    expect(runs).toBe(2);
   });
 });
 
