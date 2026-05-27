@@ -47,7 +47,7 @@
     "vite": "^6.0.0"
   },
   "peerDependencies": {
-    "@emberkit/core": "^0.8.0",
+    "@emberkit/core": "^0.8.1",
     "vite": "^5.0.0 || ^6.0.0"
   },
   "peerDependenciesMeta": {

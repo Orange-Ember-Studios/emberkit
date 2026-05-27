@@ -1,5 +1,11 @@
 # @emberkit/core
 
+## 0.8.1
+
+### Patch Changes
+
+- docs: expand 0.8.0 changelog for published packages
+
 ## 0.8.0
 
 ### Minor Changes
