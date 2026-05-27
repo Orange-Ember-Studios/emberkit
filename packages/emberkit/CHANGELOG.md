@@ -1,5 +1,11 @@
 # @emberkit/core
 
+## 0.8.2
+
+### Patch Changes
+
+- fix(vite-plugin): bundle sqlRaw and harden compression imports
+
 ## 0.8.1
 
 ### Patch Changes

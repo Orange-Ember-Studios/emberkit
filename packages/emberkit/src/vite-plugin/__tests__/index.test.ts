@@ -47,6 +47,15 @@ describe('emberkitVitePlugin', () => {
     expect(plugin.config).toBeTypeOf('function');
   });
 
+  it('should register sqlRawPlugin via config hook', async () => {
+    const plugin = emberkitVitePlugin() as Plugin;
+    const result = await (plugin.config as (config: { root?: string }) => Promise<unknown>)({
+      root: process.cwd(),
+    });
+    const nested = (result as { plugins?: Plugin[] }).plugins ?? [];
+    expect(nested.some((p) => p.name === 'emberkit-sql-raw')).toBe(true);
+  });
+
   it('should have resolveId function for virtual modules', async () => {
     const plugin = emberkitVitePlugin() as Plugin;
     expect(plugin.resolveId).toBeTypeOf('function');
