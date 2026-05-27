@@ -3,6 +3,7 @@ import { renderToString, getHandler, clearHandlers } from './helpers/render.js';
 import { getSignalByIndex } from '../signals/helpers/core.js';
 import { matchRoute } from './helpers/match.js';
 import { hydrateLazyInView } from '../viewport/index.js';
+import { initViewTransitions } from '../navigation/helpers/view-transitions.js';
 import { runLoader } from '../loader/helpers/loader.js';
 import type { LoaderFunction } from '../loader/types.js';
 import { readLoaderStateFromDocument, clearLoaderStateScript } from '../ssr/helpers/loader-state.js';
@@ -136,6 +137,22 @@ function renderToTarget(
   hydrateLazyInView(target);
 }
 
+function applySignalBoundValue(el: Element, val: unknown): void {
+  if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
+    el.value = String(val ?? '');
+    return;
+  }
+  if (el instanceof HTMLSelectElement) {
+    el.value = String(val ?? '');
+    return;
+  }
+  if (el instanceof HTMLButtonElement && typeof val === 'boolean') {
+    el.disabled = val;
+    return;
+  }
+  el.textContent = String(val);
+}
+
 export function hydrateSignalBindings(container: Element): void {
   const els = container.querySelectorAll('[data-ek-bind]');
   els.forEach((el) => {
@@ -151,7 +168,7 @@ export function hydrateSignalBindings(container: Element): void {
     const activeClass = el.getAttribute('data-ek-active-class');
     const inactiveClassAttr = el.getAttribute('data-ek-inactive-class');
 
-    sig.subscribe((val: unknown) => {
+    const sync = (val: unknown) => {
       if (activeWhen != null && activeClass != null && activeClass.length > 0) {
         const isActive = String(val) === activeWhen;
         activeClass.split(' ').forEach((c) => {
@@ -189,8 +206,11 @@ export function hydrateSignalBindings(container: Element): void {
         }
         return;
       }
-      el.textContent = String(val);
-    });
+      applySignalBoundValue(el, val);
+    };
+
+    sig.subscribe(sync);
+    sync(sig.peek());
   });
 }
 
@@ -204,6 +224,7 @@ export function render(
   container: Element | string,
   options?: {
     hydrate?: boolean;
+    viewTransitions?: boolean | { rootId?: string };
     routes?: Array<{
       path: string;
       component: () => Promise<{ default: (props: Record<string, unknown>) => JSXNode }>;
@@ -330,6 +351,13 @@ export function render(
     originalReplaceState(...args);
     renderCurrentRoute();
   };
+
+  const viewTransitions = options?.viewTransitions;
+  if (viewTransitions) {
+    const vtOptions =
+      typeof viewTransitions === 'object' ? { rootId: viewTransitions.rootId } : undefined;
+    initViewTransitions(vtOptions);
+  }
 }
 
 export function hydrate(element: JSXElement | string | null, container: Element | string): void {
