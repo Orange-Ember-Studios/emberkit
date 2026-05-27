@@ -1,6 +1,9 @@
 export * from "./adapters/core.js";
 export * from "./adapters/cloudflare.js";
 export * from "./adapters/deno.js";
+export * from "./cloudflare/inject-public-env.js";
+export * from "./cloudflare/wrangler-config.js";
+export * from "./cloudflare/worker.js";
 
 export const EDGE_BUNDLE_SIZE_WARNING = 1024;
 export const MAX_BUNDLE_SIZE = 8 * 1024;

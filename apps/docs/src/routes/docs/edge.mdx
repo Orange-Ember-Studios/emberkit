@@ -41,25 +41,51 @@ pnpm preview   # emberkit preview
 ## Cloudflare Workers
 
 ```bash
-pnpm add -D wrangler @emberkit/edge
+pnpm add -D wrangler @cloudflare/workers-types @emberkit/edge
 ```
 
-```toml
-# wrangler.toml
-name = "my-app"
-main = "dist/_worker.js"
-compatibility_date = "2025-01-01"
-
-[site]
-bucket = "dist"
+```jsonc
+// wrangler.jsonc — production pattern (Orange Ember website)
+{
+  "name": "my-app",
+  "main": "worker.ts",
+  "compatibility_date": "2026-04-03",
+  "compatibility_flags": ["global_fetch_strictly_public", "nodejs_compat"],
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application"
+  },
+  "observability": { "enabled": true }
+}
 ```
 
-Wire the Cloudflare adapter from `@emberkit/edge` to your worker entry (see package README). Static assets from `dist/` can be served from the site bucket; SSR handlers call your render function per request.
+Or build the same defaults in TypeScript:
 
-```bash
-pnpm build
-pnpm wrangler deploy
+```ts
+import { defineWranglerConfig } from '@emberkit/edge';
+
+export default defineWranglerConfig({
+  name: 'my-app',
+  main: 'worker.ts',
+});
 ```
+
+Worker entry (shared API + static `dist/`):
+
+```ts
+import { createCloudflareWorker } from '@emberkit/edge';
+import { handleApiRequest } from './src/server/api-router';
+
+export default createCloudflareWorker({
+  handleApi: handleApiRequest,
+  injectPublicEnv: true, // exposes PUBLIC_* on window.__CF_ENV__
+});
+```
+
+Scripts: `pnpm build && wrangler deploy`, `pnpm build && wrangler dev` for preview, `wrangler types` for `Env` bindings.
+
+Use `sqlRawPlugin` / bare `import sql from './schema.sql'` (via `emberkitVitePlugin`) so SQL migrations bundle without a filesystem at runtime.
 
 ## Deno Deploy
 

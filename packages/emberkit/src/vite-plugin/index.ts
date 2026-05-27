@@ -1303,11 +1303,14 @@ function processParagraphs(html: string, breaks?: boolean): string {
 }
 
 export type { EmberKitPluginOptions, EmberKitMode, DevApiPluginOptions } from './types.js';
-export { sqlRawPlugin } from './sql-raw.js';
+export { sqlRawPlugin, sqlTextPlugin } from './sql-raw.js';
 export {
+  createNodeDevApiHandler,
   devApiPlugin,
+  incomingMessageToRequest,
   registerDevApiMiddleware,
   registerFileBasedDevApiMiddleware,
+  writeFetchResponseToNode,
   VIRTUAL_API_DEV_ENTRY,
 } from './dev-api.js';
 export type { DevApiHandler } from './dev-api.js';

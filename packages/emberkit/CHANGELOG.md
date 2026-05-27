@@ -1,5 +1,11 @@
 # @emberkit/core
 
+## 0.9.0
+
+### Minor Changes
+
+- Extract Cloudflare Workers patterns from Orange Ember website: createCloudflareWorker, injectPublicEnv, defineWranglerConfig; bare .sql bundling and createNodeDevApiHandler for dev/prod API parity.
+
 ## 0.8.2
 
 ### Patch Changes

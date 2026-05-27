@@ -12,16 +12,37 @@ pnpm add @emberkit/edge
 
 ## Cloudflare Workers
 
+Production pattern (API + static `dist/` assets, SPA fallback):
+
+```ts
+import { createCloudflareWorker, defineWranglerConfig } from '@emberkit/edge';
+import { handleApiRequest } from './src/server/api-router';
+
+export default createCloudflareWorker({
+  handleApi: handleApiRequest,
+  injectPublicEnv: true,
+  beforeAssets(request) {
+    // optional: redirects, admin auth
+    return null;
+  },
+});
+```
+
+`wrangler.jsonc` defaults:
+
+```ts
+import { defineWranglerConfig } from '@emberkit/edge';
+
+export default defineWranglerConfig({ name: 'my-app', main: 'worker.ts' });
+```
+
+Lower-level adapter (streaming SSR stub):
+
 ```ts
 import { createCloudflareAdapter } from '@emberkit/edge';
 
 const adapter = createCloudflareAdapter();
-
-export default {
-  fetch(request, env, ctx) {
-    return adapter.fetch(request, env, ctx);
-  },
-};
+export default { fetch: (req, env, ctx) => adapter.fetch(req, env, ctx) };
 ```
 
 ## Deno Deploy

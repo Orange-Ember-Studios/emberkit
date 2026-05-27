@@ -93,6 +93,21 @@ export async function handleApiRequestNode(
 
 Share <code>handleApiRequest(request, env)</code> between dev (Node) and production (Workers) so behavior stays consistent.
 
+Use <code>createNodeDevApiHandler</code> to avoid duplicating cookie-safe header bridging:
+
+```ts
+import { createNodeDevApiHandler } from '@emberkit/core/vite-plugin';
+import { handleApiRequest } from './api-router.ts';
+
+export const handleApiRequestNode = createNodeDevApiHandler(
+  handleApiRequest,
+  () => ({
+    TURSO_DATABASE_URL: process.env.TURSO_DATABASE_URL ?? '',
+    // ...
+  }),
+);
+```
+
 ## File-based API routes
 
 Add handlers under <code>src/routes/_api/</code>:

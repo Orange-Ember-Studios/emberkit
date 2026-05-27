@@ -1,6 +1,6 @@
 {
   "name": "@emberkit/edge",
-  "version": "0.2.4",
+  "version": "0.3.0",
   "type": "module",
   "private": false,
   "description": "Edge runtime adapter for EmberKit",
@@ -36,6 +36,7 @@
     "build": "tsc",
     "lint": "eslint src --ext .ts",
     "format": "prettier --write \"src/**/*.ts\"",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {},
@@ -43,6 +44,7 @@
     "@eslint/js": "^10.0.1",
     "eslint": "^10.0.0",
     "eslint-plugin-perfectionist": "^5.9.0",
-    "typescript-eslint": "^8.59.3"
+    "typescript-eslint": "^8.59.3",
+    "vitest": "^4.1.6"
   }
 }

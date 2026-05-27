@@ -84,6 +84,18 @@ function matchesApiPrefix(url: string, prefix: string): boolean {
   return pathname === normalized || pathname.startsWith(`${normalized}/`);
 }
 
+/** Wrap a shared Workers-style `handleApiRequest(request, env)` for Node dev middleware. */
+export function createNodeDevApiHandler<E>(
+  handleApi: (request: Request, env: E) => Response | Promise<Response>,
+  getEnv: () => E,
+): DevApiHandler {
+  return async (req, res) => {
+    const request = await incomingMessageToRequest(req);
+    const response = await handleApi(request, getEnv());
+    await writeFetchResponseToNode(res, response);
+  };
+}
+
 export function registerDevApiMiddleware(
   server: ViteDevServer,
   options: DevApiPluginOptions,
