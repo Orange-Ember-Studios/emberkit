@@ -14,6 +14,7 @@ import { fileURLToPath } from 'node:url';
 import { compile } from '@mdx-js/mdx';
 import remarkGfm from 'remark-gfm';
 import { loadEmberKitConfig } from './load-emberkit-config.js';
+import { sqlRawPlugin } from './sql-raw.js';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const VIRTUAL_EMBERKIT_CONFIG = 'virtual:emberkit-config';
@@ -47,14 +48,29 @@ export function emberkitVitePlugin(userOptions: EmberKitPluginOptions = {}): Plu
       const pkgRoot = resolve(__dirname, '..', '..');
       const srcDir = join(pkgRoot, 'src');
 
-      const plugins: Plugin[] = [];
+      const plugins: Plugin[] = [sqlRawPlugin()];
+
       if (options.compression?.gzip) {
-        const { compression } = await import('vite-plugin-compression2');
-        plugins.push(compression({ algorithm: 'gzip' } as any));
+        try {
+          const { compression } = await import('vite-plugin-compression2');
+          plugins.push(compression({ algorithm: 'gzip' } as any));
+        } catch (error) {
+          console.warn(
+            '[emberkit] vite-plugin-compression2 (gzip) is not installed; skipping.',
+            error,
+          );
+        }
       }
       if (options.compression?.brotli) {
-        const { compression } = await import('vite-plugin-compression2');
-        plugins.push(compression({ algorithm: 'brotliCompress' } as any));
+        try {
+          const { compression } = await import('vite-plugin-compression2');
+          plugins.push(compression({ algorithm: 'brotliCompress' } as any));
+        } catch (error) {
+          console.warn(
+            '[emberkit] vite-plugin-compression2 (brotli) is not installed; skipping.',
+            error,
+          );
+        }
       }
 
       const isWorkspace = existsSync(join(pkgRoot, 'src', 'index.ts'));

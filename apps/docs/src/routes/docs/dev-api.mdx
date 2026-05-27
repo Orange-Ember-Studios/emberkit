@@ -21,10 +21,12 @@ import { Badge, Alert, Card, Text } from '@emberkit/ui';
 | <strong>File-based</strong> <code>src/routes/_api/*</code> | REST handlers colocated with routes, similar to Next.js Route Handlers |
 | <strong>Custom handler module</strong> | Existing Express-style routers, Turso migrations on first request, shared <code>handleApiRequest</code> for dev and Workers |
 
-## Option A — emberkit.config.ts
+## Recommended — emberkit.config.ts
 
 ```ts
 import { defineConfig } from '@emberkit/core';
+import { emberkitVitePlugin } from '@emberkit/core/vite-plugin';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
   mode: 'ssr',
@@ -33,14 +35,21 @@ export default defineConfig({
     export: 'handleApiRequestNode',
     prefix: '/api', // optional, default '/api'
   },
+  vite: {
+    plugins: [emberkitVitePlugin(), tailwindcss()],
+  },
 });
 ```
 
-<code>emberkitVitePlugin()</code> registers the middleware when <code>devApi</code> is set.
+<code>emberkitVitePlugin()</code> automatically:
 
-## Option B — explicit Vite plugin
+- Loads <code>devApi</code> from this file and registers dev middleware
+- Enables <code>sqlRawPlugin</code> for <code>*.sql?raw</code> imports
+- Falls back to <code>src/routes/_api/*</code> when <code>devApi</code> is omitted
 
-Use this when you compose plugins in <code>vite.plugins.ts</code> (Vitest, CI shims):
+## Option B — explicit Vite plugins (advanced)
+
+Only needed if you cannot use <code>devApi</code> in <code>emberkit.config.ts</code> or need a custom plugin order:
 
 ```ts
 import {
@@ -59,7 +68,7 @@ export const appVitePlugins = [
 ];
 ```
 
-Register <code>devApiPlugin</code> <strong>before</strong> <code>emberkitVitePlugin</code> so API requests are handled before SSR HTML middleware.
+Do <strong>not</strong> duplicate <code>devApi</code> in config and <code>devApiPlugin</code> at the same time.
 
 ## Custom Node handler
 
