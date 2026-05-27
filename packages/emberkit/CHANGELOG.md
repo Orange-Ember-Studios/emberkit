@@ -1,5 +1,11 @@
 # @emberkit/core
 
+## 0.8.0
+
+### Minor Changes
+
+- Reactive effects, view transitions, dev API routing, and sqlRaw plugin
+
 ## 0.7.0
 
 ### Minor Changes
