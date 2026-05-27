@@ -1,6 +1,8 @@
 import type { Plugin, ViteDevServer } from 'vite';
 import type { EmberKitPluginOptions, EmberKitMode } from './types.js';
 import { DEFAULT_CONFIG } from './types.js';
+import { registerDevApiMiddleware, registerFileBasedDevApiMiddleware, VIRTUAL_API_DEV_ENTRY } from './dev-api.js';
+import { collectApiRouteEntries, generateApiRoutesManifestCode } from './api-routes.js';
 import { readdirSync, statSync, existsSync } from 'node:fs';
 import { join, relative, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -48,6 +50,8 @@ function resolveConfig(userOptions: EmberKitPluginOptions = {}, fileConfig: Part
 export function emberkitVitePlugin(userOptions: EmberKitPluginOptions = {}): Plugin {
   let options = resolveConfig(userOptions);
   let routesCode = `export const routes = [];`;
+  let apiRoutesCode = '';
+  let apiRouteCount = 0;
   let projectRoot = process.cwd();
 
   return {
@@ -96,6 +100,9 @@ export function emberkitVitePlugin(userOptions: EmberKitPluginOptions = {}): Plu
       const routeDir = join(root, options.routeDir ?? 'src/routes');
       const files = scanRouteFiles(routeDir);
       routesCode = generateRoutesCode(files, routeDir);
+      const apiEntries = collectApiRouteEntries(files, routeDir);
+      apiRouteCount = apiEntries.length;
+      apiRoutesCode = generateApiRoutesManifestCode(apiEntries);
     },
 
     resolveId(id: string) {
@@ -107,6 +114,9 @@ export function emberkitVitePlugin(userOptions: EmberKitPluginOptions = {}): Plu
       }
       if (id === VIRTUAL_SSR_ENTRY) {
         return VIRTUAL_SSR_ENTRY;
+      }
+      if (id === VIRTUAL_API_DEV_ENTRY) {
+        return VIRTUAL_API_DEV_ENTRY;
       }
       return null;
     },
@@ -121,10 +131,19 @@ export function emberkitVitePlugin(userOptions: EmberKitPluginOptions = {}): Plu
       if (id === VIRTUAL_SSR_ENTRY) {
         return generateSSREntry(options.site);
       }
+      if (id === VIRTUAL_API_DEV_ENTRY) {
+        return apiRoutesCode;
+      }
       return null;
     },
 
     configureServer(server: ViteDevServer) {
+      if (options.devApi) {
+        registerDevApiMiddleware(server, options.devApi);
+      } else if (apiRouteCount > 0) {
+        registerFileBasedDevApiMiddleware(server);
+      }
+
       if (options.mode === 'spa') {
         return;
       }
@@ -1281,7 +1300,22 @@ function processParagraphs(html: string, breaks?: boolean): string {
     .join('');
 }
 
-export type { EmberKitPluginOptions, EmberKitMode };
+export type { EmberKitPluginOptions, EmberKitMode, DevApiPluginOptions } from './types.js';
+export { sqlRawPlugin } from './sql-raw.js';
+export {
+  devApiPlugin,
+  registerDevApiMiddleware,
+  registerFileBasedDevApiMiddleware,
+  VIRTUAL_API_DEV_ENTRY,
+} from './dev-api.js';
+export type { DevApiHandler } from './dev-api.js';
+export { handleFileBasedApiRequest } from './api-dev-handler.js';
+export type { ApiRouteEntry } from './api-dev-handler.js';
+export {
+  isApiRouteRelativePath,
+  relativeApiPathToRoutePath,
+  collectApiRouteEntries,
+} from './api-routes.js';
 
 function siteConfigToHeadOptions(site?: import('./types.js').SiteConfig): string {
   if (!site?.url) {

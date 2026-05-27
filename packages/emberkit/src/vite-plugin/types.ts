@@ -30,10 +30,18 @@ export interface EmberKitPluginOptions {
   markdown?: Partial<MarkdownConfig>;
   mdx?: MDXConfig;
   site?: SiteConfig;
+  /** Optional custom dev `/api/*` handler (overrides auto `_api` routing) */
+  devApi?: DevApiPluginOptions;
   compression?: {
     gzip?: boolean;
     brotli?: boolean;
   };
+}
+
+export interface DevApiPluginOptions {
+  handler: string;
+  export?: string;
+  prefix?: string;
 }
 
 export interface MarkdownConfig {
