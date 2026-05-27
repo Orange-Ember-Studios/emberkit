@@ -10,7 +10,7 @@ export type DevApiHandler = (
   res: ServerResponse,
 ) => void | Promise<void>;
 
-function isApiRequest(url: string): boolean {
+export function isApiRequest(url: string): boolean {
   const pathname = url.split('?')[0] ?? url;
   return pathname === '/api' || pathname.startsWith('/api/');
 }
@@ -78,18 +78,24 @@ export async function writeFetchResponseToNode(
   res.end(body);
 }
 
+function matchesApiPrefix(url: string, prefix: string): boolean {
+  const pathname = url.split('?')[0] ?? url;
+  const normalized = prefix.endsWith('/') ? prefix.slice(0, -1) : prefix;
+  return pathname === normalized || pathname.startsWith(`${normalized}/`);
+}
+
 export function registerDevApiMiddleware(
   server: ViteDevServer,
   options: DevApiPluginOptions,
 ): void {
-  const prefix = options.prefix ?? '/api/';
+  const prefix = options.prefix ?? '/api';
   const exportName = options.export ?? 'default';
   const modulePath = normalizeHandlerModulePath(options.handler);
   let handler: DevApiHandler | null = null;
 
   server.middlewares.use(async (req, res, next) => {
     const url = req.url ?? '';
-    if (!url.startsWith(prefix)) {
+    if (!matchesApiPrefix(url, prefix)) {
       next();
       return;
     }

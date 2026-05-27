@@ -1,42 +1,24 @@
 import type { Plugin, ViteDevServer } from 'vite';
 import type { EmberKitPluginOptions, EmberKitMode } from './types.js';
 import { DEFAULT_CONFIG } from './types.js';
-import { registerDevApiMiddleware, registerFileBasedDevApiMiddleware, VIRTUAL_API_DEV_ENTRY } from './dev-api.js';
+import {
+  registerDevApiMiddleware,
+  registerFileBasedDevApiMiddleware,
+  isApiRequest,
+  VIRTUAL_API_DEV_ENTRY,
+} from './dev-api.js';
 import { collectApiRouteEntries, generateApiRoutesManifestCode } from './api-routes.js';
 import { readdirSync, statSync, existsSync } from 'node:fs';
 import { join, relative, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { compile } from '@mdx-js/mdx';
 import remarkGfm from 'remark-gfm';
+import { loadEmberKitConfig } from './load-emberkit-config.js';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const VIRTUAL_EMBERKIT_CONFIG = 'virtual:emberkit-config';
 const VIRTUAL_EMBERKIT_ROUTES = 'virtual:emberkit-routes';
 const VIRTUAL_SSR_ENTRY = 'virtual:emberkit-ssr-entry';
-
-async function loadEmberKitConfig(root: string): Promise<Partial<EmberKitPluginOptions>> {
-  const { pathToFileURL } = await import('node:url');
-  
-  const configPaths = [
-    join(root, 'emberkit.config.ts'),
-    join(root, 'emberkit.config.js'),
-    join(root, 'emberkit.config.mjs'),
-  ];
-  
-  for (const configPath of configPaths) {
-    if (existsSync(configPath)) {
-      try {
-        const configUrl = pathToFileURL(configPath).href;
-        const mod = await import(configUrl);
-        return mod.default || mod;
-      } catch {
-        continue;
-      }
-    }
-  }
-  
-  return {};
-}
 
 function resolveConfig(userOptions: EmberKitPluginOptions = {}, fileConfig: Partial<EmberKitPluginOptions> = {}) {
   return {
@@ -150,6 +132,10 @@ export function emberkitVitePlugin(userOptions: EmberKitPluginOptions = {}): Plu
 
       server.middlewares.use(async (req, res, next) => {
         const url = req.url ?? '/';
+
+        if (isApiRequest(url)) {
+          return next();
+        }
 
         if (
           url.startsWith('/@') ||
