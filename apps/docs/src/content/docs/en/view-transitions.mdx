@@ -1,0 +1,118 @@
+---
+title: View Transitions
+---
+
+import { Badge, Alert, Card, Text } from '@emberkit/ui';
+
+# View Transitions
+
+<Text color="muted" className="mb-6">
+  EmberKit integrates the <a href="https://developer.mozilla.org/en-US/docs/Web/API/View_Transitions_API" className="text-primary-400 underline">View Transitions API</a> for smooth SPA navigation. Transitions wait until route HTML is written into the app root before the browser captures snapshots.
+</Text>
+
+## Quick start
+
+Enable transitions when bootstrapping the client router:
+
+```tsx
+// src/index.tsx
+import { render } from '@emberkit/core';
+import App from './routes/_layout.tsx';
+import { routes } from 'virtual:emberkit-routes';
+
+render(App, document.getElementById('app')!, {
+  routes,
+  viewTransitions: true,
+});
+```
+
+Internal links are intercepted in the capture phase so navigation runs once inside <code>startViewTransition</code>.
+
+## Programmatic navigation
+
+```tsx
+import { navigate, navigateWithViewTransition } from '@emberkit/core';
+
+// Per navigation
+await navigate('/docs/api', { viewTransition: true });
+
+// Dedicated helper
+await navigateWithViewTransition('/docs/api');
+```
+
+## CSS
+
+Style the default cross-fade on the root:
+
+```css
+::view-transition-old(root) {
+  animation: fade-out 0.3s ease-in-out forwards;
+}
+::view-transition-new(root) {
+  animation: fade-in 0.3s ease-in-out forwards;
+}
+```
+
+This docs site uses similar rules in <code>src/styles/globals.css</code>.
+
+## API reference
+
+| Export | Description |
+|--------|-------------|
+| <code>supportsViewTransitions()</code> | Whether <code>document.startViewTransition</code> exists |
+| <code>withViewTransition(callback)</code> | Wraps async work in a transition when supported |
+| <code>waitForAppUpdate(href, options?)</code> | SPA navigation that resolves after <code>#app</code> mutates |
+| <code>initViewTransitions(options?)</code> | Link click interceptor (called automatically by <code>render</code>) |
+| <code>navigateWithViewTransition(href, options?)</code> | Navigate with transition + DOM update wait |
+
+<code>render()</code> option:
+
+```ts
+viewTransitions?: boolean | { rootId?: string };
+```
+
+Use <code>rootId</code> if your mount element is not <code>id="app"</code>.
+
+## How timing works
+
+1. User clicks an internal link (or you call <code>navigate</code> with <code>viewTransition: true</code>).
+2. EmberKit starts a view transition.
+3. <code>history.pushState</code> (or <code>replaceState</code>) runs the patched router.
+4. <code>renderCurrentRoute()</code> updates the app root’s HTML.
+5. A <code>MutationObserver</code> on the app root resolves when child nodes change.
+6. The browser animates from old snapshot to new snapshot.
+
+This avoids flashing empty content between routes.
+
+## Opt out per link
+
+Add <code>data-no-transition</code> on an anchor, or use modifier keys (Ctrl/Cmd click). External links, <code>target="_blank"</code>, and same-page hash-only links are skipped automatically.
+
+## Browser support
+
+| Browser | Support |
+|---------|---------|
+| Chrome / Edge 111+ | Full API |
+| Safari / Firefox | Falls back to instant navigation (no errors) |
+
+Users with <code>prefers-reduced-motion</code> should get reduced motion from the browser.
+
+## Docs site pattern
+
+This app uses a thin wrapper so every <code>useNavigate()</code> call enables transitions by default:
+
+```tsx
+// apps/docs/src/hooks/useNavigate.ts
+import { navigate as coreNavigate } from '@emberkit/core';
+
+export function useNavigate() {
+  return (path: string, options = {}) =>
+    coreNavigate(path, { ...options, viewTransition: options.skipTransition ? false : true });
+}
+```
+
+## Related
+
+- [Release 0.8.0](/en/docs/release-0-8)
+- [API Reference — Navigation](/en/docs/api#navigation)
+- [Routing](/en/docs/routing)

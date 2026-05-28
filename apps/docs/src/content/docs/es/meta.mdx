@@ -1,0 +1,133 @@
+import { Badge, Alert, Card, Text } from '@emberkit/ui';
+
+# SEO y meta
+
+<Text color="muted" className="mb-6">Generación programática de meta tags y JSON-LD para servidores, scripts y plantillas. Para tags declarativos de <code className="text-primary-400">{'<head>'}</code> en componentes, usa el componente <code className="text-primary-400">{'<Head>'}</code> — documentado en [Head](/es/docs/head).</Text>
+
+<Alert variant="info" title="Metadatos de ruta">
+  El pipeline SSR por defecto también soporta <code>export const metadata = {'{ title, description }'}</code> en módulos de ruta. Consulta [SSR y SSG](/es/docs/ssr#route-metadata-built-in-ssr-head).
+</Alert>
+
+## generateMeta
+
+`generateMeta` devuelve una cadena HTML de <code>{'<title>'}</code>, <code>{'<meta>'}</code>, Open Graph, Twitter y tags canónicos:
+
+```tsx
+import { generateMeta } from '@emberkit/core';
+
+const metaHtml = generateMeta({
+  title: 'My Page - EmberKit',
+  description: 'A page built with EmberKit',
+  keywords: ['emberkit', 'framework', 'typescript'],
+  author: 'EmberKit Team',
+  robots: 'index, follow',
+});
+```
+
+Inyecta el resultado en el <code>{'<head>'}</code> de tu documento (servidor personalizado, plantilla estática, etc.).
+
+### Open Graph
+
+```tsx
+const metaHtml = generateMeta({
+  title: 'My Page',
+  description: 'Page description',
+  openGraph: {
+    title: 'My Page',
+    description: 'Page description for social sharing',
+    type: 'article',
+    url: 'https://example.com/my-page',
+    images: [
+      { url: 'https://example.com/og-image.png', width: 1200, height: 630, alt: 'My Page' },
+    ],
+    locale: 'en_US',
+    siteName: 'My Site',
+  },
+});
+```
+
+### Twitter Cards
+
+```tsx
+const metaHtml = generateMeta({
+  twitter: {
+    card: 'summary_large_image',
+    site: '@emberkit',
+    creator: '@author',
+    title: 'My Page',
+    description: 'Page description',
+    image: 'https://example.com/twitter-image.png',
+    imageAlt: 'My Page',
+  },
+});
+```
+
+### URLs canónicas
+
+```tsx
+const metaHtml = generateMeta({
+  canonical: 'https://example.com/my-page',
+});
+```
+
+## Datos estructurados (JSON-LD)
+
+### Esquema Article
+
+```tsx
+import { generateArticleSchema } from '@emberkit/core';
+import { Head } from '@emberkit/core';
+
+function ArticlePage() {
+  const schema = generateArticleSchema({
+    title: 'My Article',
+    description: 'Article description',
+    author: 'John Doe',
+    publishedAt: '2025-01-15',
+    url: 'https://example.com/article',
+    image: 'https://example.com/article.png',
+  });
+
+  return (
+    <>
+      <Head>
+        <title>My Article</title>
+        <script type="application/ld+json">{schema}</script>
+      </Head>
+      <article>...</article>
+    </>
+  );
+}
+```
+
+### Esquema Product
+
+```tsx
+import { generateProductSchema } from '@emberkit/core';
+
+const jsonLd = generateProductSchema({
+  name: 'EmberKit Pro',
+  description: 'Premium features',
+  price: '29.99',
+  currency: 'USD',
+  image: 'https://example.com/product.png',
+});
+```
+
+### Migas de pan
+
+```tsx
+import { generateBreadcrumbs } from '@emberkit/core';
+
+const breadcrumbs = generateBreadcrumbs([
+  { name: 'Home', url: 'https://example.com' },
+  { name: 'Docs', url: 'https://example.com/docs' },
+  { name: 'SEO', url: 'https://example.com/docs/meta' },
+]);
+```
+
+## Próximos pasos
+
+- [Head](/es/docs/head) — <code>{'<Head>'}</code> declarativo en JSX
+- [SSR y SSG](/es/docs/ssr) — Export <code>metadata</code> integrado y pipeline SSR
+- [Markdown/MDX](/es/docs/markdown) — Frontmatter para páginas de contenido

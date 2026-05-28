@@ -1,0 +1,77 @@
+---
+title: Built with EmberKit
+---
+
+import { Alert, Card, Text } from '@emberkit/ui';
+
+# Built with EmberKit
+
+<Text color="muted" className="mb-6">This documentation site runs on EmberKit — chosen for <strong>speed</strong> (HTML-first delivery, minimal client JS on doc pages) and the same stack described in the guides below.</Text>
+
+## Stack at a glance
+
+| Piece | How this site uses it |
+|-------|------------------------|
+| **Speed** | SSR sends full HTML per request; MDX pages stay mostly static — fast FCP without hydrating every paragraph |
+| **Rendering** | `mode: 'ssr'` in `apps/docs/emberkit.config.ts` — HTML on every doc request in dev and production |
+| **Routes** | `src/routes/**/*.mdx` and `.tsx` under file-based routing |
+| **Layout** | `src/routes/_layout.tsx` with sidebar + MDX content |
+| **Interactivity** | `useNavigate`, signals, and `data-ek-bind` on the UI showcase — not on every doc page |
+| **Styling** | Tailwind 4 via `@tailwindcss/vite` |
+| **Tooling** | `emberkit dev` / `emberkit build` from the monorepo root |
+
+For rendering modes (hybrid, static, spa) and build artifacts, see [SSR & SSG](/en/docs/ssr) — the canonical reference.
+
+## What we do not duplicate here
+
+The following are documented once elsewhere; this page only points to them:
+
+- **Hydration & `data-ek-bind`** → [Hydration](/en/docs/hydration)
+- **Signals API** → [Signals](/en/docs/signals)
+- **File routes & params** → [Routing](/en/docs/routing)
+- **`<Head>` & `generateMeta`** → [Head](/en/docs/head) and [SEO & Meta](/en/docs/meta)
+
+## Doc routes as MDX
+
+Content pages are MDX files compiled by the Vite plugin:
+
+```
+apps/docs/src/routes/docs/
+├── introduction.mdx
+├── ssr.mdx
+├── quick-start.mdx
+└── …
+```
+
+Each file maps to `/docs/<name>` without a manual route table.
+
+## Selective hydration in practice
+
+Most MDX pages are static HTML after SSR. Interactive pieces (homepage CTAs, sidebar navigation, UI component demos) use client handlers or signal bindings. That matches the model in [Components](/en/docs/components): only regions with `onClick` or `data-ek-bind` pay for client JS.
+
+Below-the-fold sections use framework [`LazyInView`](/en/docs/hydration#viewport-lazy-loading-lazyinview) on the homepage (features, code preview, CTA), the [icons](/en/docs/icons) grid, and large blocks on the [UI](/en/docs/ui) reference page so initial paint stays light.
+
+## Local development
+
+From the repo root:
+
+```bash
+pnpm --filter docs dev    # or emberkit dev inside apps/docs
+```
+
+View source on any doc URL — content should appear inside `#app` before JavaScript runs.
+
+## Production build
+
+```bash
+pnpm --filter docs build
+pnpm --filter docs preview   # emberkit preview
+```
+
+Deploy `dist/` to your host, or run `emberkit serve` for SSR/hybrid-style routing. See [Edge Deployment](/en/docs/edge) for CDN and Workers patterns.
+
+## Next steps
+
+- [SSR & SSG](/en/docs/ssr) — How builds and pre-rendering work
+- [Quick Start](/en/docs/quick-start) — Start your own project
+- [UI Components](/en/docs/ui) — Live examples of signal hydration

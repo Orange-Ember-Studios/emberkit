@@ -45,6 +45,15 @@
 - [x] **5.4** — Meta tags & SEO
 - [x] **5.5** — Prefetch & cache control
 
+### Phase 6: Internationalization (v0.6.0)
+
+- [x] **6.1** — Built-in i18n core (`createI18n`, `t`, `tp`, `Intl` formatters)
+- [x] **6.2** — `createI18nContext` / `useI18n` provider
+- [x] **6.3** — SSR locale resolution (`resolveLocaleFromRequest`)
+- [x] **6.4** — Path-prefix helpers for `[locale]` routes
+- [x] **6.5** — Docs & CLI `generate i18n` template
+- [x] **6.6** — JSON translation files (import, glob, fetch, Node directory loader)
+
 ---
 
 ## Completed
@@ -75,3 +84,4 @@
 | 5.4 Meta + SEO | 2026-05-11 |
 | 5.5 Cache + prefetch | 2026-05-11 |
 | MD/MDX support | 2026-05-11 |
+| 6.1–6.5 i18n core + docs | 2026-05-28 |

@@ -1,0 +1,118 @@
+---
+title: View Transitions
+---
+
+import { Badge, Alert, Card, Text } from '@emberkit/ui';
+
+# View Transitions
+
+<Text color="muted" className="mb-6">
+  EmberKit intègre la <a href="https://developer.mozilla.org/en-US/docs/Web/API/View_Transitions_API" className="text-primary-400 underline">View Transitions API</a> pour une navigation SPA fluide. Les transitions attendent que le HTML de route soit écrit dans la racine app avant que le navigateur capture les snapshots.
+</Text>
+
+## Démarrage rapide
+
+Activez les transitions au bootstrap du routeur client :
+
+```tsx
+// src/index.tsx
+import { render } from '@emberkit/core';
+import App from './routes/_layout.tsx';
+import { routes } from 'virtual:emberkit-routes';
+
+render(App, document.getElementById('app')!, {
+  routes,
+  viewTransitions: true,
+});
+```
+
+Les liens internes sont interceptés en phase capture pour que la navigation s'exécute une fois dans <code>startViewTransition</code>.
+
+## Navigation programmatique
+
+```tsx
+import { navigate, navigateWithViewTransition } from '@emberkit/core';
+
+// Per navigation
+await navigate('/docs/api', { viewTransition: true });
+
+// Dedicated helper
+await navigateWithViewTransition('/docs/api');
+```
+
+## CSS
+
+Stylisez le cross-fade par défaut sur la racine :
+
+```css
+::view-transition-old(root) {
+  animation: fade-out 0.3s ease-in-out forwards;
+}
+::view-transition-new(root) {
+  animation: fade-in 0.3s ease-in-out forwards;
+}
+```
+
+Ce site docs utilise des règles similaires dans <code>src/styles/globals.css</code>.
+
+## Référence API
+
+| Export | Description |
+|--------|-------------|
+| <code>supportsViewTransitions()</code> | Si <code>document.startViewTransition</code> existe |
+| <code>withViewTransition(callback)</code> | Enveloppe du travail async dans une transition si supporté |
+| <code>waitForAppUpdate(href, options?)</code> | Navigation SPA qui se résout après mutation de <code>#app</code> |
+| <code>initViewTransitions(options?)</code> | Intercepteur de clics sur liens (appelé automatiquement par <code>render</code>) |
+| <code>navigateWithViewTransition(href, options?)</code> | Naviguer avec transition + attente mise à jour DOM |
+
+Option de <code>render()</code> :
+
+```ts
+viewTransitions?: boolean | { rootId?: string };
+```
+
+Utilisez <code>rootId</code> si votre élément de montage n'est pas <code>id="app"</code>.
+
+## Fonctionnement du timing
+
+1. L'utilisateur clique un lien interne (ou vous appelez <code>navigate</code> avec <code>viewTransition: true</code>).
+2. EmberKit démarre une view transition.
+3. <code>history.pushState</code> (ou <code>replaceState</code>) exécute le routeur patché.
+4. <code>renderCurrentRoute()</code> met à jour le HTML de la racine app.
+5. Un <code>MutationObserver</code> sur la racine app se résout quand les nœuds enfants changent.
+6. Le navigateur anime de l'ancien snapshot au nouveau.
+
+Cela évite les flashs de contenu vide entre routes.
+
+## Désactivation par lien
+
+Ajoutez <code>data-no-transition</code> sur une ancre, ou utilisez les touches modificateurs (Ctrl/Cmd clic). Liens externes, <code>target="_blank"</code> et liens hash-only sur la même page sont ignorés automatiquement.
+
+## Support navigateurs
+
+| Navigateur | Support |
+|---------|---------|
+| Chrome / Edge 111+ | API complète |
+| Safari / Firefox | Retour à navigation instantanée (sans erreurs) |
+
+Les utilisateurs avec <code>prefers-reduced-motion</code> doivent obtenir un mouvement réduit du navigateur.
+
+## Pattern du site docs
+
+Cette app utilise un wrapper fin pour que chaque appel <code>useNavigate()</code> active les transitions par défaut :
+
+```tsx
+// apps/docs/src/hooks/useNavigate.ts
+import { navigate as coreNavigate } from '@emberkit/core';
+
+export function useNavigate() {
+  return (path: string, options = {}) =>
+    coreNavigate(path, { ...options, viewTransition: options.skipTransition ? false : true });
+}
+```
+
+## Liens connexes
+
+- [Release 0.8.0](/fr/docs/release-0-8)
+- [Référence API — Navigation](/fr/docs/api#navigation)
+- [Routing](/fr/docs/routing)

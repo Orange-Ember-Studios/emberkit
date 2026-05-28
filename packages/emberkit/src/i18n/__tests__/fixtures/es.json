@@ -1,0 +1,9 @@
+{
+  "greeting": "Hola {name}",
+  "farewell": "Adiós",
+  "nav": {
+    "home": "Inicio",
+    "about": "Acerca de"
+  },
+  "items": "one {count} artículo | other {count} artículos"
+}

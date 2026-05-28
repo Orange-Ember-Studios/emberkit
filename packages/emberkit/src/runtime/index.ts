@@ -28,18 +28,26 @@ export function createElement(
   };
 }
 
+const INTERACTIVE_EVENT_ATTRS: Array<{ attr: string; event: string }> = [
+  { attr: 'data-ekclick', event: 'click' },
+  { attr: 'data-ekchange', event: 'change' },
+  { attr: 'data-ekinput', event: 'input' },
+  { attr: 'data-eksubmit', event: 'submit' },
+];
+
 export function attachEventHandlers(container: Element): void {
-  const elements = container.querySelectorAll('[data-ekclick]');
-  elements.forEach((el) => {
-    const id = el.getAttribute('data-ekclick');
-    if (id) {
+  for (const { attr, event } of INTERACTIVE_EVENT_ATTRS) {
+    const elements = container.querySelectorAll(`[${attr}]`);
+    elements.forEach((el) => {
+      const id = el.getAttribute(attr);
+      if (!id) return;
       const handler = getHandler(id);
       if (handler) {
-        el.addEventListener('click', handler);
-        el.removeAttribute('data-ekclick');
+        el.addEventListener(event, handler);
+        el.removeAttribute(attr);
       }
-    }
-  });
+    });
+  }
 }
 
 interface RouteProps {

@@ -1,0 +1,306 @@
+import { Badge, Alert, Card, Text } from '@emberkit/ui';
+
+# Ejemplos
+
+<Text color="muted" className="mb-6">Ejemplos del mundo real para ayudarte a construir con EmberKit.</Text>
+
+## Contador
+
+El contador clásico — demuestra signals y manejo de eventos:
+
+```tsx
+import { createSignal } from '@emberkit/core';
+
+function Counter() {
+  const [count, setCount] = createSignal(0);
+
+  return (
+    <div>
+      <p>Count: {count()}</p>
+      <button onClick={() => setCount(c => c + 1)}>Increment</button>
+      <button onClick={() => setCount(c => c - 1)}>Decrement</button>
+      <button onClick={() => setCount(0)}>Reset</button>
+    </div>
+  );
+}
+```
+
+## Lista de tareas
+
+Una app de todos completa con añadir, alternar y eliminar:
+
+```tsx
+import { createSignal, createMemo } from '@emberkit/core';
+
+interface Todo {
+  id: number;
+  text: string;
+  done: boolean;
+}
+
+function TodoApp() {
+  const [todos, setTodos] = createSignal<Todo[]>([]);
+  const [input, setInput] = createSignal('');
+  const remaining = createMemo(() => todos().filter(t => !t.done).length);
+
+  function addTodo() {
+    if (!input()) return;
+    setTodos(prev => [
+      ...prev,
+      { id: Date.now(), text: input(), done: false },
+    ]);
+    setInput('');
+  }
+
+  function toggleTodo(id: number) {
+    setTodos(prev =>
+      prev.map(t => t.id === id ? { ...t, done: !t.done } : t)
+    );
+  }
+
+  function removeTodo(id: number) {
+    setTodos(prev => prev.filter(t => t.id !== id));
+  }
+
+  return (
+    <div>
+      <h1>Todos ({remaining()} remaining)</h1>
+      <form onSubmit={(e) => { e.preventDefault(); addTodo(); }}>
+        <input
+          value={input()}
+          onInput={(e) => setInput(e.target.value)}
+          placeholder="What needs to be done?"
+        />
+        <button type="submit">Add</button>
+      </form>
+      <ul>
+        {todos().map(todo => (
+          <li key={todo.id}>
+            <input
+              type="checkbox"
+              checked={todo.done}
+              onChange={() => toggleTodo(todo.id)}
+            />
+            <span style={{ textDecoration: todo.done ? 'line-through' : 'none' }}>
+              {todo.text}
+            </span>
+            <button onClick={() => removeTodo(todo.id)}>Delete</button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
+
+## Alternador de tema
+
+Cambio de tema basado en context:
+
+```tsx
+import { createContext, useContext, createSignal } from '@emberkit/core';
+
+const ThemeContext = createContext<{ theme: string; toggle: () => void }>();
+
+function App() {
+  const [theme, setTheme] = createSignal('light');
+  const toggle = () => setTheme(t => t === 'light' ? 'dark' : 'light');
+
+  return (
+    <ThemeContext.Provider value={{ theme: theme(), toggle }}>
+      <div className={theme()}>
+        <Header />
+        <main>Content</main>
+      </div>
+    </ThemeContext.Provider>
+  );
+}
+
+function Header() {
+  const { theme, toggle } = useContext(ThemeContext);
+  return (
+    <header>
+      <span>Theme: {theme}</span>
+      <button onClick={toggle}>Toggle</button>
+    </header>
+  );
+}
+```
+
+## Filtro de búsqueda
+
+Filtra una lista con valores computados:
+
+```tsx
+import { createSignal, createMemo } from '@emberkit/core';
+
+const items = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry'];
+
+function SearchFilter() {
+  const [query, setQuery] = createSignal('');
+  const filtered = createMemo(() =>
+    items.filter(item =>
+      item.toLowerCase().includes(query().toLowerCase())
+    )
+  );
+
+  return (
+    <div>
+      <input
+        value={query()}
+        onInput={(e) => setQuery(e.target.value)}
+        placeholder="Search fruits..."
+      />
+      <ul>
+        {filtered().map(item => (
+          <li key={item}>{item}</li>
+        ))}
+      </ul>
+      <p>{filtered().length} results</p>
+    </div>
+  );
+}
+```
+
+## Obtención de datos
+
+Obtén y muestra datos con estados de carga:
+
+```tsx
+import { createSignal, createEffect } from '@emberkit/core';
+
+interface User {
+  id: number;
+  name: string;
+  email: string;
+}
+
+function UserList() {
+  const [users, setUsers] = createSignal<User[]>([]);
+  const [loading, setLoading] = createSignal(true);
+  const [error, setError] = createSignal<string | null>(null);
+
+  createEffect(async () => {
+    try {
+      const res = await fetch('https://api.example.com/users');
+      const data = await res.json();
+      setUsers(data);
+    } catch (err) {
+      setError('Failed to load users');
+    } finally {
+      setLoading(false);
+    }
+  });
+
+  if (loading()) return <p>Loading...</p>;
+  if (error()) return <p className="error">{error()}</p>;
+
+  return (
+    <ul>
+      {users().map(user => (
+        <li key={user.id}>
+          <strong>{user.name}</strong> — {user.email}
+        </li>
+      ))}
+    </ul>
+  );
+}
+```
+
+## Validación de formularios
+
+Formulario validado con visualización de errores:
+
+```tsx
+import { createSignal } from '@emberkit/core';
+import { createFormValidator, handleFormSubmit } from '@emberkit/core';
+
+const validator = createFormValidator({
+  fields: {
+    email: { required: true, pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ },
+    password: { required: true, minLength: 8 },
+  },
+});
+
+function LoginForm() {
+  const [errors, setErrors] = createSignal<Record<string, string>>({});
+
+  return (
+    <form onSubmit={async (e) => {
+      e.preventDefault();
+      const form = e.target as HTMLFormElement;
+      const data = Object.fromEntries(new FormData(form));
+      const validationErrors = validator.validate(data);
+
+      if (Object.keys(validationErrors).length > 0) {
+        setErrors(validationErrors);
+        return;
+      }
+
+      await fetch('/api/login', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+    }}>
+      <div>
+        <input name="email" type="email" placeholder="Email" />
+        {errors().email && <span className="error">{errors().email}</span>}
+      </div>
+      <div>
+        <input name="password" type="password" placeholder="Password" />
+        {errors().password && <span className="error">{errors().password}</span>}
+      </div>
+      <button type="submit">Login</button>
+    </form>
+  );
+}
+```
+
+## Internacionalización (JSON)
+
+Almacena traducciones como JSON y cárgalas con `createI18nFromGlob`:
+
+```json
+// src/locales/en.json
+{
+  "welcome": "Welcome, {name}",
+  "nav": { "home": "Home" }
+}
+```
+
+```ts
+// src/lib/i18n.ts
+import { createI18nFromGlob, createI18nContext } from '@emberkit/core';
+
+const modules = import.meta.glob('../locales/*.json', { eager: true });
+
+export const i18n = createI18nFromGlob(modules, {
+  locales: ['en', 'es'] as const,
+  defaultLocale: 'en',
+});
+
+export const { Provider: I18nProvider, useI18n } = createI18nContext();
+```
+
+```tsx
+// src/routes/[locale]/_layout.tsx
+import { I18nProvider, i18n } from '../../lib/i18n';
+
+export default function LocaleLayout({ locale, children }) {
+  return (
+    <I18nProvider i18n={i18n} locale={locale}>
+      {children}
+    </I18nProvider>
+  );
+}
+```
+
+Consulta [Internacionalización](/es/docs/i18n) para detección de locale en SSR, carga lazy y helpers de filesystem en Node.
+
+## Próximos pasos
+
+- [Componentes](/es/docs/components) — Patrones de componentes
+- [Signals](/es/docs/signals) — Estado reactivo
+- [Context](/es/docs/context) — Compartir estado
+- [Internacionalización](/es/docs/i18n) — Traducciones JSON y rutas por locale
+- [Referencia de API](/es/docs/api) — Documentación completa de la API

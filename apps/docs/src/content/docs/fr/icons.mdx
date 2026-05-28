@@ -1,0 +1,77 @@
+---
+title: Icônes
+---
+
+import IconShowcase from '../../../components/icon-grid';
+
+# Icônes
+
+`@emberkit/icons` est une bibliothèque d'icônes SVG légère et tree-shakeable, conçue pour EmberKit, avec plus de 130 icônes.
+
+## Installation
+
+```bash
+pnpm add @emberkit/icons
+```
+
+## Utilisation de base
+
+```tsx
+import { IconSearch, IconMenu, IconX } from '@emberkit/icons';
+
+function Header() {
+  return (
+    <header>
+      <IconMenu size={24} />
+      <IconSearch size={20} />
+      <IconX size={16} />
+    </header>
+  );
+}
+```
+
+## Props
+
+Toutes les icônes acceptent les props suivantes :
+
+| Prop | Type | Par défaut | Description |
+|------|------|---------|-------------|
+| `size` | `number` | `24` | Largeur et hauteur en pixels |
+| `color` | `string` | `currentColor` | Couleur de trait/remplissage |
+| `className` | `string` | — | Classes CSS supplémentaires |
+
+## Catégories
+
+### UI générale
+
+Icônes pour les éléments d'interface courants : navigation, actions, médias, communication, etc.
+
+### Réseaux sociaux
+
+Logos officiels de marques : X (Twitter), LinkedIn, Facebook, Instagram, YouTube, Discord, Reddit, Twitch, Slack, TikTok, WhatsApp, Dribbble, Behance, Pinterest.
+
+### Frameworks et outils
+
+Logos de frameworks web modernes : Astro, Vue, Angular, React, Svelte, Next.js, Remix, Nuxt, Solid, Electron, Vite.
+
+### Outils de développement
+
+Icônes d'outils et runtimes de développement : Node.js, npm, Yarn, pnpm, Bun, Deno, TypeScript, JavaScript.
+
+### Build et bundling
+
+Logos de bundlers et outils CSS : Tailwind CSS, Webpack, Rollup, esbuild.
+
+### Infrastructure
+
+Logos de plateformes et services : Docker, Kubernetes, Git, GitHub, GitLab, Bitbucket, Figma, VS Code, Vim, IntelliJ IDEA, Chrome, Firefox, Windows, Apple, Linux, Android.
+
+### Cloud et déploiement
+
+Logos de fournisseurs cloud : Heroku, Vercel, Netlify, Cloudflare, AWS, Google Cloud, Microsoft Azure.
+
+## Toutes les icônes
+
+Cliquez sur une icône pour voir son nom et copier l'instruction d'import.
+
+<IconShowcase />

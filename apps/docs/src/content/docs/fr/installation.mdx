@@ -1,0 +1,162 @@
+---
+title: Installation
+---
+
+import { Badge, Alert, Card, Text } from '@emberkit/ui';
+
+# Installation
+
+<Text color="muted" className="mb-6">Mettez EmberKit en route en quelques minutes.</Text>
+
+## Prérequis
+
+- Node.js 18+ (Bun et Deno pris en charge pour exécuter les outils)
+- pnpm (recommandé), npm ou yarn
+
+## Installation rapide
+
+```bash
+# Scaffolder un nouveau projet (starter kit avec Tailwind)
+npx @emberkit/cli@latest create my-app
+cd my-app
+pnpm install
+pnpm dev
+```
+
+Le CLI génère `vite.config.ts`, `src/index.tsx`, `src/routes/` et des scripts branchés sur `emberkit dev`, `emberkit build` et `emberkit preview`.
+
+## Configuration manuelle
+
+```bash
+mkdir my-app && cd my-app
+pnpm init
+
+pnpm add @emberkit/core
+pnpm add -D @emberkit/cli vite typescript
+```
+
+### vite.config.ts
+
+```typescript
+import { defineConfig } from 'vite';
+import { emberkitVitePlugin } from '@emberkit/core/vite-plugin';
+
+export default defineConfig({
+  plugins: [emberkitVitePlugin()],
+  server: { port: 3000, host: 'localhost' },
+  esbuild: { jsxImportSource: '@emberkit/core' },
+});
+```
+
+### emberkit.config.ts
+
+Optionnel mais recommandé pour le mode de build et les paramètres serveur :
+
+```typescript
+import { defineConfig } from '@emberkit/core';
+
+export default defineConfig({
+  mode: 'hybrid', // 'static' | 'ssr' | 'spa' | 'hybrid'
+  server: { port: 3000, host: 'localhost' },
+  build: { outDir: 'dist', target: 'esnext' },
+});
+```
+
+### index.html
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My App</title>
+</head>
+<body id="app">
+  <script type="module" src="/src/index.tsx"></script>
+</body>
+</html>
+```
+
+### src/index.tsx
+
+```typescript
+import { render } from '@emberkit/core';
+import { routes } from 'virtual:emberkit-routes';
+import App from './routes/_layout';
+
+const root = document.getElementById('app');
+if (root) {
+  render(App, root, { routes });
+}
+```
+
+## Scripts package.json
+
+```json
+{
+  "scripts": {
+    "dev": "emberkit dev",
+    "build": "emberkit build",
+    "preview": "emberkit preview"
+  }
+}
+```
+
+Utilisez `emberkit serve` après `build` pour un serveur de type production avec routage du manifest SSR (voir [SSR et SSG](/fr/docs/ssr)).
+
+## Structure du projet
+
+```
+my-app/
+├── emberkit.config.ts    # mode, server, build (optionnel)
+├── vite.config.ts        # Vite + emberkitVitePlugin()
+├── index.html
+├── src/
+│   ├── index.tsx         # Entrée client
+│   └── routes/
+│       ├── index.tsx     # → /
+│       ├── about.tsx     # → /about
+│       └── _layout.tsx   # Enveloppe les routes
+└── package.json
+```
+
+## tsconfig.json
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "jsxImportSource": "@emberkit/core",
+    "strict": true,
+    "noEmit": true,
+    "lib": ["ES2022", "DOM", "DOM.Iterable"]
+  },
+  "include": ["src"]
+}
+```
+
+## Vérifier l'installation
+
+```bash
+pnpm dev
+```
+
+Ouvrez http://localhost:3000. En mode hybrid ou SSR, affichez le code source de la page — vous devriez voir du HTML rendu dans `#app`, pas une coquille vide.
+
+## Dépannage
+
+<Alert variant="warning" title="Port déjà utilisé">
+  Définissez <code>server.port</code> dans <code>emberkit.config.ts</code> ou <code>vite.config.ts</code>.
+</Alert>
+
+<Alert variant="warning" title="Erreurs de résolution de modules">
+  Vérifiez que <code>jsxImportSource</code> vaut <code>@emberkit/core</code> et que <code>moduleResolution</code> vaut <code>bundler</code>.
+</Alert>
+
+<Alert variant="warning" title="SSR vide en dev">
+  Confirmez que <code>mode</code> n'est pas <code>spa</code> et que <code>emberkitVitePlugin()</code> figure dans le tableau de plugins Vite.
+</Alert>

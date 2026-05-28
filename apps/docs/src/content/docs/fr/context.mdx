@@ -1,0 +1,143 @@
+import { Badge, Alert, Card, Text } from '@emberkit/ui';
+
+# Context
+
+<Text color="muted" className="mb-6">Context permet de partager l'état entre composants sans prop drilling.</Text>
+
+## Créer un context
+
+```tsx
+import { createContext } from '@emberkit/core';
+
+interface ThemeContext {
+  theme: 'light' | 'dark';
+  toggle: () => void;
+}
+
+const ThemeContext = createContext<ThemeContext>({
+  theme: 'light',
+  toggle: () => {},
+});
+```
+
+## Fournir des valeurs
+
+Utilisez le `Provider` pour rendre une valeur disponible aux composants descendants :
+
+```tsx
+import { createContext, createSignal } from '@emberkit/core';
+
+const ThemeContext = createContext<{ theme: string; toggle: () => void }>();
+
+function App() {
+  const [theme, setTheme] = createSignal('light');
+  const toggle = () => setTheme(t => t === 'light' ? 'dark' : 'light');
+
+  return (
+    <ThemeContext.Provider value={{ theme: theme(), toggle }}>
+      <Header />
+      <main>...</main>
+    </ThemeContext.Provider>
+  );
+}
+```
+
+## Consommer des valeurs
+
+Utilisez `useContext` pour lire le context dans n'importe quel composant descendant :
+
+```tsx
+import { useContext } from '@emberkit/core';
+
+function Header() {
+  const ctx = useContext(ThemeContext);
+  return (
+    <header>
+      <span>Current theme: {ctx.theme}</span>
+      <button onClick={ctx.toggle}>Toggle</button>
+    </header>
+  );
+}
+```
+
+## Utiliser la méthode use
+
+Chaque context retourné par `createContext` a aussi un raccourci `use` :
+
+```tsx
+const ThemeContext = createContext<{ theme: string }>({ theme: 'light' });
+
+function Header() {
+  const { theme } = ThemeContext.use();
+  return <span>Theme: {theme}</span>;
+}
+```
+
+## Valeurs par défaut
+
+S'il n'y a pas de Provider au-dessus d'un consommateur, la valeur par défaut est utilisée :
+
+```tsx
+const UserContext = createContext<{ name: string }>({ name: 'Guest' });
+
+// Dans un composant sans Provider au-dessus :
+function Greeting() {
+  const user = useContext(UserContext);
+  return <span>Hello, {user.name}</span>; // "Hello, Guest"
+}
+```
+
+## Exemple complet
+
+```tsx
+import { createContext, useContext, createSignal } from '@emberkit/core';
+
+interface AuthContext {
+  user: string | null;
+  login: (name: string) => void;
+  logout: () => void;
+}
+
+const AuthContext = createContext<AuthContext>({
+  user: null,
+  login: () => {},
+  logout: () => {},
+});
+
+function AuthProvider({ children }: { children: unknown }) {
+  const [user, setUser] = createSignal<string | null>(null);
+
+  return (
+    <AuthContext.Provider value={{
+      user: user(),
+      login: (name) => setUser(name),
+      logout: () => setUser(null),
+    }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+function Navbar() {
+  const { user, logout } = useContext(AuthContext);
+
+  return (
+    <nav>
+      {user ? (
+        <>
+          <span>Welcome, {user}</span>
+          <button onClick={logout}>Logout</button>
+        </>
+      ) : (
+        <span>Please log in</span>
+      )}
+    </nav>
+  );
+}
+```
+
+## Prochaines étapes
+
+- [Signals](/fr/docs/signals) — Primitives d'état réactif
+- [Composants](/fr/docs/components) — Patterns de composants
+- [Routing](/fr/docs/routing) — Context au niveau route

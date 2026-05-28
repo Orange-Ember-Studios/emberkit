@@ -1,0 +1,111 @@
+import { Badge, Alert, Card, Text } from '@emberkit/ui';
+
+# Optimisation d’images
+
+<Text color="muted" className="mb-6">EmberKit fournit une optimisation d’images intégrée avec conversion automatique de format, tailles adaptatives et chargement différé.</Text>
+
+## Plugin d’images
+
+Activez le plugin d’images dans votre config Vite :
+
+```typescript
+import { defineConfig } from 'vite';
+import { createImageVitePlugin } from '@emberkit/core';
+
+export default defineConfig({
+  plugins: [
+    createImageVitePlugin({
+      quality: 80,
+      formats: ['webp', 'jpeg'],
+      sizes: [320, 640, 1024, 1920],
+      lazy: true,
+      placeholder: 'blur',
+    }),
+  ],
+});
+```
+
+## Configuration
+
+<Card title="Options du plugin" variant="outline">
+  <table>
+    <thead>
+      <tr><th>Option</th><th>Défaut</th><th>Description</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>quality</code></td><td><code>80</code></td><td>Qualité d’image (1-100)</td></tr>
+      <tr><td><code>formats</code></td><td><code>['webp', 'jpeg']</code></td><td>Formats de sortie</td></tr>
+      <tr><td><code>sizes</code></td><td><code>[320, 640, 1024, 1920]</code></td><td>Points de rupture adaptatifs</td></tr>
+      <tr><td><code>lazy</code></td><td><code>true</code></td><td>Activer le chargement différé</td></tr>
+      <tr><td><code>placeholder</code></td><td><code>'blur'</code></td><td>Type de placeholder</td></tr>
+    </tbody>
+  </table>
+</Card>
+
+## Chargement différé
+
+Les images se chargent en différé par défaut :
+
+```tsx
+function Gallery() {
+  return (
+    <img
+      src="/images/photo.jpg"
+      alt="A beautiful scene"
+      loading="lazy"
+      decoding="async"
+    />
+  );
+}
+```
+
+## Placeholders flous
+
+Affichez un placeholder flou pendant le chargement :
+
+```tsx
+// Le processeur d’images génère automatiquement des placeholders flous
+<img
+  src="/images/hero.jpg"
+  alt="Hero image"
+  style={{
+    backgroundImage: 'url(data:image/jpeg;base64,...)',
+    backgroundSize: 'cover',
+  }}
+/>
+```
+
+## Images adaptatives
+
+Générez plusieurs tailles pour différents viewports :
+
+```html
+<picture>
+  <source
+    srcset="/images/photo-320.webp 320w, /images/photo-640.webp 640w, /images/photo-1024.webp 1024w"
+    type="image/webp"
+  />
+  <source
+    srcset="/images/photo-320.jpg 320w, /images/photo-640.jpg 640w, /images/photo-1024.jpg 1024w"
+    type="image/jpeg"
+  />
+  <img src="/images/photo-640.jpg" alt="Photo" loading="lazy" />
+</picture>
+```
+
+## Fournisseurs personnalisés
+
+Configurez des fournisseurs d’images externes :
+
+```typescript
+createImageVitePlugin({
+  provider: 'cloudinary',
+  baseUrl: 'https://res.cloudinary.com/mycloud',
+});
+```
+
+## Étapes suivantes
+
+- [Déploiement edge](/fr/docs/edge) - Optimiser pour la livraison edge
+- [Composants](/fr/docs/components) - Modèles de composants image
+- [SSR](/fr/docs/ssr) - Images rendues côté serveur

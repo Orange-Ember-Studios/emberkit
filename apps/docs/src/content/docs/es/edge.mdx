@@ -1,0 +1,138 @@
+import { Badge, Alert, Card, Text } from '@emberkit/ui';
+
+# Despliegue en el edge
+
+<Text color="muted" className="mb-6">Despliega aplicaciones EmberKit en runtimes edge o servidores Node tradicionales. La salida estática pre-renderizada funciona en cualquier CDN; las rutas dinámicas usan el bundle SSR de <code className="text-primary-400">dist/server/entry-server.js</code>.</Text>
+
+## Plataformas compatibles
+
+<Card variant="outline">
+  <table>
+    <thead>
+      <tr><th>Plataforma</th><th>Runtime</th><th>Configuración típica</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>CDN estático</td><td>—</td><td><code>mode: 'static'</code> o pre-render híbrido → subir <code>dist/</code></td></tr>
+      <tr><td>Node.js 18+</td><td>Node</td><td><code>emberkit serve</code> tras <code>emberkit build</code></td></tr>
+      <tr><td>Cloudflare Workers</td><td>Aislamientos V8</td><td>Adaptador <code>@emberkit/edge</code> + Wrangler</td></tr>
+      <tr><td>Deno Deploy</td><td>Deno</td><td>Adaptador Deno de <code>@emberkit/edge</code></td></tr>
+      <tr><td>Bun</td><td>Bun</td><td>Ejecutar entrada SSR o <code>dist/</code> estático</td></tr>
+    </tbody>
+  </table>
+</Card>
+
+## Servidor de producción Node
+
+Tras compilar en modo `ssr` o `hybrid`:
+
+```bash
+pnpm build
+pnpm exec emberkit serve
+```
+
+`serve` lee `dist/ssr-manifest.json`, sirve HTML pre-renderizado y recurre a `dist/server/entry-server.js` para rutas dinámicas.
+
+Para una comprobación local más ligera:
+
+```bash
+pnpm preview   # emberkit preview
+```
+
+## Cloudflare Workers
+
+```bash
+pnpm add -D wrangler @cloudflare/workers-types @emberkit/edge
+```
+
+```jsonc
+// wrangler.jsonc — patrón de producción (sitio Orange Ember)
+{
+  "name": "my-app",
+  "main": "worker.ts",
+  "compatibility_date": "2026-04-03",
+  "compatibility_flags": ["global_fetch_strictly_public", "nodejs_compat"],
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application"
+  },
+  "observability": { "enabled": true }
+}
+```
+
+O define los mismos valores por defecto en TypeScript:
+
+```ts
+import { defineWranglerConfig } from '@emberkit/edge';
+
+export default defineWranglerConfig({
+  name: 'my-app',
+  main: 'worker.ts',
+});
+```
+
+Entrada del worker (API compartida + `dist/` estático):
+
+```ts
+import { createCloudflareWorker } from '@emberkit/edge';
+import { handleApiRequest } from './src/server/api-router';
+
+export default createCloudflareWorker({
+  handleApi: handleApiRequest,
+  injectPublicEnv: true, // expone PUBLIC_* en window.__CF_ENV__
+});
+```
+
+Scripts: `pnpm build && wrangler deploy`, `pnpm build && wrangler dev` para vista previa, `wrangler types` para bindings `Env`.
+
+Usa `sqlRawPlugin` / `import sql from './schema.sql'` sin más (vía `emberkitVitePlugin`) para que las migraciones SQL se empaqueten sin sistema de archivos en runtime.
+
+## Deno Deploy
+
+Usa el adaptador Deno de `@emberkit/edge` con una salida `dist/` compilada, o sirve solo archivos estáticos pre-renderizados:
+
+```bash
+deployctl deploy --project=my-app ./dist
+```
+
+## Utilidades de tamaño de bundle
+
+`@emberkit/edge` incluye utilidades para comprobar bundles edge:
+
+```typescript
+import { analyzeBundle, minifyHTML, StaticPage } from '@emberkit/edge';
+
+const stats = analyzeBundle(workerCode);
+// stats.size, stats.warnings, stats.errors (límite duro 8KB)
+
+const html = minifyHTML('<div>  <p>  Hello  </p>  </div>');
+
+const page = new StaticPage('<html>...</html>');
+page.addStyle('/styles/main.css');
+page.addScript('/app.js');
+const output = page.toHTML();
+```
+
+Constantes: `EDGE_BUNDLE_SIZE_WARNING` (1KB), `MAX_BUNDLE_SIZE` (8KB).
+
+## Patrones de despliegue
+
+| Tipo de app | Config | Host |
+|----------|--------|------|
+| Marketing / docs | `static` o `hybrid` | Netlify, Cloudflare Pages, S3 |
+| Estático + dinámico | `hybrid` | CDN para estático + Node/Worker para SSR |
+| App autenticada | `spa` o `ssr` | Cualquier host estático + API |
+
+## Objetivos de rendimiento
+
+La velocidad es el primer principio de EmberKit. Los despliegues edge-friendly combinan:
+
+- **HTML pre-renderizado** en rutas estáticas — TTFB bajo y First Contentful Paint rápido en el CDN
+- **SSR en el edge** solo donde las rutas necesitan datos por petición
+- **Hidratación selectiva** — bundles cliente pequeños vía `data-ek-bind` y JS mínimo en páginas de contenido
+
+## Siguientes pasos
+
+- [SSR y SSG](/es/docs/ssr) — Modos de renderizado y salida de build
+- [Hidratación](/es/docs/hydration) — Enlaces en el cliente
+- [SEO y meta](/es/docs/meta) — Meta tags y JSON-LD

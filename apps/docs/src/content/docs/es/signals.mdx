@@ -1,0 +1,199 @@
+import { Badge, Alert, Card, Text } from '@emberkit/ui';
+
+# Signals
+
+<Text color="muted" className="mb-6">Los signals son las primitivas reactivas de EmberKit. Almacenan estado y notifican a los suscriptores cuando cambian los valores — sin re-renderizar toda la página.</Text>
+
+## Crear un signal
+
+```tsx
+import { createSignal } from '@emberkit/core';
+
+const [count, setCount] = createSignal(0);
+
+// Leer el valor
+console.log(count()); // 0
+
+// Actualizar el valor
+setCount(1);
+console.log(count()); // 1
+```
+
+Un signal devuelve una tupla: una función getter y una función setter.
+
+## Actualizar signals
+
+```tsx
+// Asignar un valor estático
+setCount(5);
+
+// Actualizar según el valor anterior (sintaxis de updater con función)
+setCount((prev) => prev + 1);
+```
+
+## Opciones de signal
+
+```tsx
+const [name, setName] = createSignal('Alice', {
+  equals: (prev, next) => prev === next, // comprobación de igualdad personalizada
+});
+```
+
+## Suscribirse a cambios
+
+Cada signal tiene un método `subscribe` que registra un callback, ejecutado cuando cambia el valor. El callback recibe el nuevo valor.
+
+```tsx
+const [count, setCount] = createSignal(0);
+
+const unsub = count.subscribe((newVal) => {
+  console.log('count changed to', newVal);
+});
+
+setCount(5); // logs "count changed to 5"
+
+// Limpiar la suscripción cuando termines
+unsub();
+```
+
+<Alert variant="info" title="Cómo funciona">
+  La hidratación usa <code>subscribe</code> para actualizar nodos DOM enlazados. Consulta [Hidratación](/es/docs/hydration).
+</Alert>
+
+## Valores computados con createMemo
+
+`createMemo` deriva un valor a partir de otros signals. Solo recalcula cuando cambian las dependencias:
+
+```tsx
+import { createSignal, createMemo } from '@emberkit/core';
+
+const [count, setCount] = createSignal(0);
+const doubled = createMemo(() => count() * 2);
+
+console.log(doubled.value); // 0
+setCount(3);
+console.log(doubled.value); // 6
+```
+
+## Efectos con createEffect
+
+<Alert variant="info" title="0.8.0+">
+  <code>createEffect</code> y <code>createMemo</code> ahora rastrean dependencias de signals y se re-ejecutan cuando esos signals cambian (con soporte de <code>batch</code> / <code>untrack</code>). Los effects no se ejecutan durante SSR.
+</Alert>
+
+Los effects ejecutan efectos secundarios cuando cambian los signals:
+
+```tsx
+import { createSignal, createEffect } from '@emberkit/core';
+
+const [theme, setTheme] = createSignal('light');
+
+createEffect(() => {
+  document.body.className = theme();
+});
+
+// Más tarde: dispara el effect
+setTheme('dark');
+```
+
+Los effects pueden devolver una función de limpieza:
+
+```tsx
+createEffect(() => {
+  const handler = () => console.log('resize');
+  window.addEventListener('resize', handler);
+
+  return () => {
+    window.removeEventListener('resize', handler);
+  };
+});
+```
+
+## Actualizaciones en batch
+
+`batch` agrupa múltiples actualizaciones de signals en una sola notificación:
+
+```tsx
+import { createSignal, batch } from '@emberkit/core';
+
+const [firstName, setFirstName] = createSignal('John');
+const [lastName, setLastName] = createSignal('Doe');
+
+batch(() => {
+  setFirstName('Jane');
+  setLastName('Smith');
+});
+// Solo se envía una notificación
+```
+
+## Untracking
+
+`untrack` lee un signal sin rastrearlo como dependencia:
+
+```tsx
+const [count, setCount] = createSignal(0);
+
+createEffect(() => {
+  console.log(count());
+
+  untrack(() => {
+    console.log(count());
+  });
+});
+```
+
+## Enlace al DOM (signals → DOM)
+
+Los signals se combinan con `data-ek-bind` para que las actualizaciones lleguen a nodos concretos en lugar de re-renderizar el árbol:
+
+```tsx
+const [count, setCount] = createSignal(0);
+return <span data-ek-bind={count}>{count()}</span>;
+```
+
+Todos los atributos de enlace (`data-ek-show`, `data-ek-hide`, `data-ek-show-when`, …) están documentados en [Hidratación](/es/docs/hydration).
+
+### Componentes que aceptan signals
+
+Los componentes pueden detectar props signal y cablear bindings internamente. Pasa un signal o un booleano simple para salida solo SSR:
+
+```tsx
+<Modal open={open} onClose={() => setOpen(false)} />
+<Modal open={true} />
+```
+
+Consulta [Componentes](/es/docs/components#static-vs-interactive).
+
+## Ejemplo completo
+
+```tsx
+import { createSignal, createMemo, createEffect } from '@emberkit/core';
+
+function Counter() {
+  const [count, setCount] = createSignal(0);
+  const doubled = createMemo(() => count() * 2);
+  const isEven = createMemo(() => count() % 2 === 0);
+
+  createEffect(() => {
+    document.title = `Count: ${count()}`;
+  });
+
+  return (
+    <div>
+      <p>Count: {count()}</p>
+      <p>Doubled: {doubled.value}</p>
+      <p>{isEven.value ? 'Even' : 'Odd'}</p>
+      <button type="button" onClick={() => setCount((c) => c + 1)}>Increment</button>
+      <button type="button" onClick={() => setCount(0)}>Reset</button>
+      <span data-ek-bind={count}>{count()}</span>
+    </div>
+  );
+}
+```
+
+## Próximos pasos
+
+- [Hidratación](/es/docs/hydration) — Referencia de `data-ek-bind`
+- [Context](/es/docs/context) — Compartir signals entre componentes
+- [Componentes](/es/docs/components) — Componentes estáticos vs interactivos
+- [Componentes UI](/es/docs/ui) — Demos de Modal, Tabs, Counter

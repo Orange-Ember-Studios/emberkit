@@ -1,0 +1,72 @@
+import { Badge, Alert, Card, Text } from '@emberkit/ui';
+
+# Introducción
+
+<Text color="muted" className="mb-6">EmberKit es un <strong>framework JSX minimalista y TypeScript-first</strong> construido en torno a tres principios — <strong>velocidad primero</strong>, luego peso mínimo, y cero JavaScript por defecto.</Text>
+
+## Velocidad
+
+El rendimiento es la prioridad máxima. EmberKit optimiza todo el camino del servidor a la pantalla:
+
+- **HTML renderizado en el servidor** — Las páginas llegan como marcado en desarrollo y producción (`hybrid`, `ssr`, `static`). Los usuarios ven contenido antes de que se ejecute JavaScript.
+- **Rutas estáticas pre-renderizadas** — En modos `hybrid` y `static`, las rutas fijas se convierten en HTML en tiempo de build para TTFB y First Contentful Paint rápidos en el CDN.
+- **Hidratación selectiva** — Sin reconciliación de DOM virtual en el cliente. Las señales actualizan nodos enlazados vía `data-ek-bind`; solo las regiones interactivas cargan JS.
+- **Actualizaciones dirigidas** — Cuando cambia el estado, el runtime toca nodos DOM concretos en lugar de re-renderizar árboles de componentes.
+
+Consulta [SSR y SSG](/es/docs/ssr) para modos y el pipeline de build.
+
+## Peso
+
+Un runtime tree-shakeable centrado en enrutamiento, señales y enlace al DOM — no un reconciliador grande. Pagas solo lo que usas. Las páginas estáticas pueden enviar **cero JS del framework** cuando no tienen manejadores ni enlaces.
+
+## Cero JS por defecto
+
+El marcado estático permanece HTML. La interactividad es opt-in:
+
+- `data-ek-bind` — conecta señales a nodos DOM ([Hidratación](/es/docs/hydration))
+- Manejadores de eventos — conectados tras la carga vía `data-ekclick`
+- Componentes con `onClick` o enlaces — solo esas regiones se hidratan
+
+```tsx
+function Hero() {
+  return <h1>Hello</h1>; // fast paint, no client JS
+}
+
+function Counter() {
+  const [count, setCount] = createSignal(0);
+  return (
+    <>
+      <span data-ek-bind={count}>{count()}</span>
+      <button type="button" onClick={() => setCount((n) => n + 1)}>+</button>
+    </>
+  );
+}
+```
+
+## De un vistazo
+
+| | |
+|--|--|
+| Enrutamiento | Convenciones de archivos en `src/routes/` |
+| Renderizado | Híbrido por defecto: pre-render de rutas estáticas, SSR para rutas dinámicas |
+| Estado | Señales + actualizaciones DOM dirigidas |
+| Herramientas | `emberkit dev`, `build`, `preview`, `serve` |
+
+## Novedades en 0.8.0
+
+- **Efectos reactivos** — <code>createEffect</code> / <code>createMemo</code> se re-ejecutan cuando cambian las dependencias
+- **View Transitions** — <code>render(..., &#123; viewTransitions: true &#125;)</code> para navegación SPA
+- **Dev API** — <code>devApiPlugin</code> y <code>src/routes/_api/*</code> en desarrollo
+- **sqlRawPlugin** — importar <code>*.sql?raw</code> para despliegues edge
+- **i18n** — archivos JSON de traducción con <code>createI18nFromGlob</code> ([guía](/es/docs/i18n))
+
+Consulta las notas completas de [Release 0.8.0](/es/docs/release-0-8).
+
+## Siguientes pasos
+
+- [Instalación](/es/docs/installation) — Crear un proyecto
+- [Inicio rápido](/es/docs/quick-start) — Primeras rutas y señales
+- [Release 0.8.0](/es/docs/release-0-8) — Última versión
+- [SSR y SSG](/es/docs/ssr) — Cómo se logra la velocidad en cada modo
+- [Hidratación](/es/docs/hydration) — Interactividad selectiva en el cliente
+- [Internacionalización](/es/docs/i18n) — Traducciones JSON y rutas por locale

@@ -3,6 +3,9 @@ import { renderToString } from '../../runtime/helpers/render.js';
 
 const SYNC_SELECTORS: Array<{ selector: string; attr: string }> = [
   { selector: '[data-ekclick]', attr: 'data-ekclick' },
+  { selector: '[data-ekchange]', attr: 'data-ekchange' },
+  { selector: '[data-ekinput]', attr: 'data-ekinput' },
+  { selector: '[data-eksubmit]', attr: 'data-eksubmit' },
   { selector: '[data-ek-lazy-in-view]', attr: 'data-ek-lazy-in-view' },
   { selector: '[data-ek-bind]', attr: 'data-ek-bind' },
 ];

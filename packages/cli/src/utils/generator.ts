@@ -15,6 +15,7 @@ import { layoutRoutesTemplate } from "../templates/layoutRoutes/index.js";
 import { signalTemplate } from "../templates/signal/index.js";
 import { contextTemplate } from "../templates/context/index.js";
 import { formTemplate } from "../templates/form/index.js";
+import { i18nTemplate } from "../templates/i18n/index.js";
 
 export interface GenerateResult {
   success: boolean;
@@ -49,6 +50,7 @@ export async function generate(
     signal: signalTemplate,
     context: contextTemplate,
     form: formTemplate,
+    i18n: i18nTemplate,
   };
 
   const templateContent = templates[template] ?? routeTemplate;

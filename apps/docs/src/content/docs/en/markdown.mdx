@@ -1,0 +1,170 @@
+import { Badge, Alert, Card, Text } from '@emberkit/ui';
+
+# Markdown & MDX
+
+<Text color="muted" className="mb-6">EmberKit has built-in Markdown and MDX support. Write content in Markdown, render it as JSX components.</Text>
+
+## Basic Usage
+
+```tsx
+import { renderMarkdown } from '@emberkit/core';
+
+const html = renderMarkdown('# Hello\n\nThis is **bold** and *italic*.');
+```
+
+## Inline Markdown in Routes
+
+The simplest approach — write Markdown as template literals:
+
+```tsx
+import type { RouteComponent } from '@emberkit/core';
+import { renderMarkdown } from '@emberkit/core';
+
+const content = `# My Page
+
+This is a paragraph with **bold** and *italic* text.
+
+## Section
+
+- Item 1
+- Item 2
+- Item 3
+`;
+
+const MyPage: RouteComponent = () => {
+  const html = renderMarkdown(content);
+  return <div dangerouslySetInnerHTML={{ __html: html }} />;
+};
+```
+
+## Native Markdown Files
+
+Place `.md` files in `src/routes/` and they become routes automatically. The Vite plugin wraps them into components:
+
+```markdown
+---
+title: My Page
+description: A page written in Markdown
+---
+
+# Hello World
+
+This is a **Markdown** file that becomes a route.
+
+- No TSX needed
+- Auto-wrapped into a component
+- Frontmatter exports available as named exports
+```
+
+## Frontmatter
+
+Extract metadata from Markdown:
+
+```tsx
+import { extractFrontmatter } from '@emberkit/core';
+
+const result = extractFrontmatter(`---
+title: My Post
+date: 2025-01-15
+tags: [emberkit, tutorial]
+---
+
+# Content here
+`);
+
+console.log(result.data); // { title: 'My Post', date: '2025-01-15', tags: [...] }
+```
+
+## Markdown Features
+
+<Card title="Supported Features" variant="outline">
+  <table>
+    <thead>
+      <tr><th>Feature</th><th>Syntax</th><th>Status</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>GFM</td><td><code>~~strikethrough~~</code>, <code>==highlight==</code></td><td><Badge variant="success">Supported</Badge></td></tr>
+      <tr><td>Tables</td><td>Pipe tables</td><td><Badge variant="success">Supported</Badge></td></tr>
+      <tr><td>Task Lists</td><td><code>- [x] Done</code></td><td><Badge variant="success">Supported</Badge></td></tr>
+      <tr><td>Code Blocks</td><td>Fenced with language</td><td><Badge variant="success">Supported</Badge></td></tr>
+      <tr><td>Inline Code</td><td>Backticks</td><td><Badge variant="success">Supported</Badge></td></tr>
+      <tr><td>Links</td><td><code>{'[text](url)'}</code></td><td><Badge variant="success">Supported</Badge></td></tr>
+      <tr><td>Images</td><td><code>{'![alt](src)'}</code></td><td><Badge variant="success">Supported</Badge></td></tr>
+      <tr><td>Blockquotes</td><td><code>&gt; quote</code></td><td><Badge variant="success">Supported</Badge></td></tr>
+      <tr><td>Footnotes</td><td><code>[^1]</code></td><td><Badge variant="success">Supported</Badge></td></tr>
+      <tr><td>Definition Lists</td><td><code>term: definition</code></td><td><Badge variant="success">Supported</Badge></td></tr>
+    </tbody>
+  </table>
+</Card>
+
+## MDX Compiler
+
+For more complex use cases, use the MDX compiler. MDX files support all Markdown features plus JSX:
+
+```tsx
+import { compileMDX } from '@emberkit/core';
+
+const component = await compileMDX(`
+# Title
+
+Some content with **markup**.
+
+- [x] Task 1
+- [ ] Task 2
+
+| Column 1 | Column 2 |
+|----------|----------|
+| Cell 1   | Cell 2   |
+`);
+
+// component is a function that returns JSX
+const element = component({});
+```
+
+## Sync Compilation
+
+```tsx
+import { compileSync, useMDX } from '@emberkit/core';
+
+const component = compileSync('# Hello World');
+// or
+const component = useMDX('# Hello World');
+```
+
+## Custom Components
+
+Override how Markdown elements render:
+
+```tsx
+import { renderMarkdown } from '@emberkit/core';
+
+const html = renderMarkdown(content, {
+  components: {
+    h1: 'h2',    // Render h1 as h2
+    table: 'div', // Wrap tables in div
+  },
+});
+```
+
+## Reading Time
+
+```tsx
+import { getReadingTime } from '@emberkit/core';
+
+const minutes = getReadingTime(content); // ~200 WPM
+```
+
+## Word Count
+
+```tsx
+import { getWordCount, getCharacterCount } from '@emberkit/core';
+
+const words = getWordCount(content);
+const chars = getCharacterCount(content, false); // excluding spaces
+```
+
+## Next Steps
+
+- [Components](/en/docs/components) - Component rendering
+- [SEO & Meta](/en/docs/meta) - Frontmatter meta tags
+- [Routing](/en/docs/routing) - Route-level content

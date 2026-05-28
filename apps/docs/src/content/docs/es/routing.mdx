@@ -1,0 +1,201 @@
+import { Badge, Alert, Card, Text } from '@emberkit/ui';
+
+# Routing
+
+<Text color="muted" className="mb-6">EmberKit usa routing basado en archivos. Los archivos bajo <code className="text-primary-400">src/routes/</code> se mapean a URLs. El plugin de Vite genera <code className="text-primary-400">virtual:emberkit-routes</code> para el cliente; el build escribe las mismas rutas en <code className="text-primary-400">ssr-manifest.json</code> para SSR y pre-renderizado.</Text>
+
+## Rutas básicas
+
+| Archivo | URL |
+|------|-----|
+| `src/routes/index.tsx` | `/` |
+| `src/routes/about.tsx` | `/about` |
+| `src/routes/docs/index.tsx` | `/docs` |
+| `src/routes/docs/installation.tsx` | `/docs/installation` |
+| `src/routes/blog/[slug].tsx` | `/blog/:slug` |
+| `src/routes/docs/[...rest].tsx` | `/docs/:rest*` (catch-all) |
+
+Extensiones soportadas: `.tsx`, `.ts`, `.jsx`, `.js`, `.md`, `.mdx`.
+
+## Props del componente de ruta
+
+Las rutas dinámicas reciben params tipados en servidor y cliente:
+
+```tsx
+// src/routes/blog/[slug].tsx
+import type { RouteParams } from '@emberkit/core';
+
+export default function BlogPost({ params }: RouteParams<{ slug: string }>) {
+  return <h1>Post: {params.slug}</h1>;
+}
+```
+
+`RouteParams` también incluye:
+
+- `query` — search params parseados (`Record<string, string | string[]>`)
+- `request` — `Request` construido desde la URL actual (navegación en cliente)
+
+Los params catch-all usan el nombre del bracket: `[...rest].tsx` → `params.rest`.
+
+## Rutas con prefijo de locale
+
+Para URLs internacionalizadas, añade un segmento `[locale]` y conecta i18n en el loader del layout:
+
+```
+src/routes/[locale]/index.tsx   →  /en, /es
+src/routes/[locale]/about.tsx   →  /en/about
+```
+
+Consulta [Internacionalización](/es/docs/i18n) para catálogos JSON, `createI18nFromGlob` y `resolveLocaleFromRequest`.
+
+## Layouts
+
+`_layout.tsx` envuelve las rutas en el mismo árbol de directorios:
+
+```tsx
+// src/routes/_layout.tsx — envuelve todas las rutas
+import type { RouteComponent } from '@emberkit/core';
+
+const RootLayout: RouteComponent = ({ children }) => (
+  <div className="app">
+    <nav>...</nav>
+    <main>{children}</main>
+  </div>
+);
+
+export default RootLayout;
+```
+
+```tsx
+// src/routes/docs/_layout.tsx — envuelve /docs/*
+export default function DocsLayout({ children }: { children: unknown }) {
+  return (
+    <div className="docs">
+      <aside>Sidebar</aside>
+      <article>{children}</article>
+    </div>
+  );
+}
+```
+
+Archivos especiales (no son segmentos de URL): `_layout.tsx`, `_error.tsx`, `_loading.tsx` y todo lo que esté bajo `_api/`.
+
+## Páginas de error personalizadas
+
+| Archivo | Propósito |
+|------|---------|
+| `src/routes/404.tsx` | Se muestra cuando ninguna ruta coincide (404) |
+| `src/routes/500.tsx` | Se muestra cuando el renderizado lanza un error (500) |
+| `src/routes/_error.tsx` | Error boundary a nivel de ruta (planificado / errores de layout) |
+
+```tsx
+// src/routes/404.tsx
+export default function NotFound() {
+  return <h1>404 — Not found</h1>;
+}
+```
+
+## Metadatos de ruta
+
+Exporta `metadata` para el inyector de head SSR integrado:
+
+```tsx
+export const metadata = {
+  title: 'Blog — My App',
+  description: 'Latest posts',
+};
+
+export default function BlogIndex() {
+  return <h1>Blog</h1>;
+}
+```
+
+## Navegación
+
+### Enlaces y navegación programática
+
+```tsx
+import { navigate, preload } from '@emberkit/core';
+
+// Navegación en cliente (opcionalmente con View Transitions)
+navigate('/about');
+navigate('/settings', { replace: true });
+
+// Hint de prefetch
+preload('/about');
+```
+
+Prefiere `<a href="/path">` para enlaces que deban funcionar sin JavaScript y participen en SSR.
+
+## Loaders de ruta
+
+Los loaders devuelven un `LoaderResult<T>` discriminado:
+
+```tsx
+import type { LoaderFunction } from '@emberkit/core';
+import { createLoaderData } from '@emberkit/core';
+
+interface PostData {
+  title: string;
+  content: string;
+}
+
+export const loader: LoaderFunction<PostData> = async ({ params }) => {
+  const res = await fetch(`/api/posts/${params.slug}`);
+  if (!res.ok) {
+    return {
+      error: { code: 'NOT_FOUND', message: 'Post not found', status: 404 },
+    };
+  }
+  const post = await res.json();
+  return createLoaderData(post);
+};
+
+export default function BlogPost({ data }: { data: PostData }) {
+  return (
+    <article>
+      <h1>{data.title}</h1>
+    </article>
+  );
+}
+```
+
+Usa `createLoaderData` u objetos `{ data }` / `{ error }` que coincidan con `LoaderResult<T>`.
+
+## Estados de carga
+
+```tsx
+// src/routes/_loading.tsx
+export default function Loading() {
+  return <div className="spinner">Loading...</div>;
+}
+```
+
+## Rutas API
+
+Los handlers solo de servidor bajo `src/routes/_api/` quedan excluidos del manifiesto de páginas:
+
+```typescript
+// src/routes/_api/hello.ts
+export async function GET(request: Request) {
+  return new Response(JSON.stringify({ message: 'Hello' }), {
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
+```
+
+## Comportamiento SSR y estático
+
+| Tipo de ruta | Build `hybrid` | Petición `hybrid` |
+|------------|----------------|------------------|
+| Estática (`/about`) | Pre-renderizada a `dist/about/index.html` | Servida como HTML estático |
+| Dinámica (`/blog/:slug`) | No pre-renderizada | Renderizada vía `entry-server.js` |
+
+Consulta [SSR y SSG](/es/docs/ssr) para detalles de modos.
+
+## Próximos pasos
+
+- [SSR y SSG](/es/docs/ssr) — Pipeline de build y modos de renderizado
+- [Signals](/es/docs/signals) — Estado reactivo
+- [Head](/es/docs/head) — Etiquetas head declarativas
+- [Hidratación](/es/docs/hydration) — Bindings en cliente tras SSR

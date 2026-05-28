@@ -1,0 +1,77 @@
+---
+title: Iconos
+---
+
+import IconShowcase from '../../../components/icon-grid';
+
+# Iconos
+
+`@emberkit/icons` es una biblioteca de iconos SVG ligera y tree-shakeable, creada para EmberKit, con más de 130 iconos.
+
+## Instalación
+
+```bash
+pnpm add @emberkit/icons
+```
+
+## Uso básico
+
+```tsx
+import { IconSearch, IconMenu, IconX } from '@emberkit/icons';
+
+function Header() {
+  return (
+    <header>
+      <IconMenu size={24} />
+      <IconSearch size={20} />
+      <IconX size={16} />
+    </header>
+  );
+}
+```
+
+## Props
+
+Todos los iconos aceptan las siguientes props:
+
+| Prop | Tipo | Por defecto | Descripción |
+|------|------|---------|-------------|
+| `size` | `number` | `24` | Ancho y alto en píxeles |
+| `color` | `string` | `currentColor` | Color de trazo/relleno |
+| `className` | `string` | — | Clases CSS adicionales |
+
+## Categorías
+
+### UI general
+
+Iconos para elementos comunes de interfaz: navegación, acciones, medios, comunicación y más.
+
+### Redes sociales
+
+Logos oficiales de marcas: X (Twitter), LinkedIn, Facebook, Instagram, YouTube, Discord, Reddit, Twitch, Slack, TikTok, WhatsApp, Dribbble, Behance, Pinterest.
+
+### Frameworks y herramientas
+
+Logos de frameworks web modernos: Astro, Vue, Angular, React, Svelte, Next.js, Remix, Nuxt, Solid, Electron, Vite.
+
+### Herramientas de desarrollo
+
+Iconos de herramientas y runtimes de desarrollo: Node.js, npm, Yarn, pnpm, Bun, Deno, TypeScript, JavaScript.
+
+### Build y bundling
+
+Logos de bundlers y herramientas CSS: Tailwind CSS, Webpack, Rollup, esbuild.
+
+### Infraestructura
+
+Logos de plataformas y servicios: Docker, Kubernetes, Git, GitHub, GitLab, Bitbucket, Figma, VS Code, Vim, IntelliJ IDEA, Chrome, Firefox, Windows, Apple, Linux, Android.
+
+### Cloud y deploy
+
+Logos de proveedores cloud: Heroku, Vercel, Netlify, Cloudflare, AWS, Google Cloud, Microsoft Azure.
+
+## Todos los iconos
+
+Haz clic en cualquier icono para ver su nombre y copiar la sentencia de importación.
+
+<IconShowcase />

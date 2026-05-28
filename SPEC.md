@@ -870,7 +870,7 @@ The plugin handles:
 - [x] ~~Will we support TypeScript-first or JavaScript?~~ **Answer: TypeScript-first**
 - [ ] How to handle CSS/styling? (CSS-in-JS, Tailwind, CSS Modules)
 - [ ] Image optimization built-in or plugin?
-- [ ] Internationalization strategy?
+- [x] ~~Internationalization strategy?~~ **Answer: Built-in `@emberkit/core` i18n** — message catalogs, context provider, SSR locale resolution, `Intl` formatters; optional path-prefix routing
 - [ ] Database ORM integration? (Drizzle, Prisma, none)
 - [ ] Authentication strategy built-in or middleware?
 - [ ] Deployment targets: Node.js, Deno, Bun, Edge (Cloudflare Workers)?

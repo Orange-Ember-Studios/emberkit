@@ -1,66 +1,73 @@
 import type { RouteComponent } from '@emberkit/core';
+import { useNavigate } from '@emberkit/core';
+import {
+  DEFAULT_DOCS_LOCALE,
+  I18nProvider,
+  i18n,
+  isDocsLocale,
+  localeFromPathname,
+  docsNavPath,
+  useI18n,
+} from '../lib/i18n.js';
 
-const NotFound: RouteComponent = () => {
+const NotFoundContent: RouteComponent = () => {
+  const navigate = useNavigate();
+  const { t, locale } = useI18n();
+
   return (
-    <div style={{ padding: '40px 20px', textAlign: 'center', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: '#0f172a' }}>
-      <div style={{ maxWidth: '600px' }}>
-        <div style={{ fontSize: '72px', fontWeight: 'bold', marginBottom: '20px', color: '#fb923c' }}>
-          404
-        </div>
-        <h1 style={{ fontSize: '32px', fontWeight: 'bold', marginBottom: '10px', color: '#fff' }}>
-          Page Not Found
-        </h1>
-        <p style={{ fontSize: '18px', marginBottom: '30px', color: '#9ca3af' }}>
-          The page you're looking for doesn't exist or has been moved.
-        </p>
+    <div className="flex min-h-[70vh] flex-col items-center justify-center px-6 text-center">
+      <div className="max-w-lg">
+        <div className="mb-5 text-7xl font-bold text-orange-400">404</div>
+        <h1 className="mb-3 text-3xl font-bold text-white">{t('notFound.title')}</h1>
+        <p className="mb-8 text-lg text-gray-400">{t('notFound.body')}</p>
 
-        <a
-          href="/"
-          style={{
-            display: 'inline-block',
-            backgroundColor: '#fb923c',
-            color: '#fff',
-            padding: '12px 24px',
-            borderRadius: '8px',
-            textDecoration: 'none',
-            fontWeight: '600',
-            marginBottom: '40px',
-          }}
+        <button
+          type="button"
+          className="mb-10 inline-block rounded-lg bg-orange-500 px-6 py-3 font-semibold text-white transition hover:bg-orange-400"
+          onClick={() => navigate(`/${locale}`)}
         >
-          Go Back Home
-        </a>
+          {t('notFound.home')}
+        </button>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginTop: '40px', textAlign: 'left' }}>
+        <div className="grid grid-cols-1 gap-4 text-left sm:grid-cols-2">
           <a
-            href="/docs/introduction"
-            style={{
-              padding: '20px',
-              border: '1px solid rgba(255,255,255,0.1)',
-              borderRadius: '8px',
-              textDecoration: 'none',
-              color: 'inherit',
+            href={docsNavPath('introduction', locale)}
+            onClick={(e) => {
+              e.preventDefault();
+              navigate(docsNavPath('introduction', locale));
             }}
+            className="rounded-xl border border-white/10 p-5 no-underline text-inherit hover:border-orange-500/30"
           >
-            <div style={{ fontWeight: '600', marginBottom: '8px', color: '#fff' }}>Documentation</div>
-            <div style={{ fontSize: '14px', color: '#9ca3af' }}>Learn about EmberKit</div>
+            <div className="font-semibold text-white">{t('notFound.docsTitle')}</div>
+            <div className="text-sm text-gray-400">{t('notFound.docsDesc')}</div>
           </a>
-
           <a
-            href="/docs/quick-start"
-            style={{
-              padding: '20px',
-              border: '1px solid rgba(255,255,255,0.1)',
-              borderRadius: '8px',
-              textDecoration: 'none',
-              color: 'inherit',
+            href={docsNavPath('quick-start', locale)}
+            onClick={(e) => {
+              e.preventDefault();
+              navigate(docsNavPath('quick-start', locale));
             }}
+            className="rounded-xl border border-white/10 p-5 no-underline text-inherit hover:border-orange-500/30"
           >
-            <div style={{ fontWeight: '600', marginBottom: '8px', color: '#fff' }}>Quick Start</div>
-            <div style={{ fontSize: '14px', color: '#9ca3af' }}>Get started in minutes</div>
+            <div className="font-semibold text-white">{t('notFound.quickStartTitle')}</div>
+            <div className="text-sm text-gray-400">{t('notFound.quickStartDesc')}</div>
           </a>
         </div>
       </div>
     </div>
+  );
+};
+
+const NotFound: RouteComponent = () => {
+  const locale =
+    typeof window !== 'undefined'
+      ? localeFromPathname(window.location.pathname)
+      : DEFAULT_DOCS_LOCALE;
+
+  return (
+    <I18nProvider i18n={i18n} locale={isDocsLocale(locale) ? locale : DEFAULT_DOCS_LOCALE}>
+      <NotFoundContent />
+    </I18nProvider>
   );
 };
 

@@ -21,6 +21,25 @@ const handlerRegistry = new Map<string, (e: Event) => void>();
 let renderDepth = 0;
 const MAX_RENDER_DEPTH = 100;
 
+const EVENT_HANDLER_PROPS: Array<[prop: string, attr: string]> = [
+  ['onClick', 'data-ekclick'],
+  ['onChange', 'data-ekchange'],
+  ['onInput', 'data-ekinput'],
+  ['onSubmit', 'data-eksubmit'],
+];
+
+function registerEventHandlers(props: JSXElementProps): string {
+  let attrs = '';
+  for (const [prop, attr] of EVENT_HANDLER_PROPS) {
+    const handler = props[prop] as ((e: Event) => void) | undefined;
+    if (typeof handler !== 'function') continue;
+    const id = `ekh${++handlerCounter}`;
+    handlerRegistry.set(id, handler);
+    attrs += ` ${attr}="${id}"`;
+  }
+  return attrs;
+}
+
 export function getHandler(id: string): ((e: Event) => void) | undefined {
   return handlerRegistry.get(id);
 }
@@ -125,22 +144,15 @@ export function renderElementToHTML(element: JSXElement): string {
     })
     .join('');
 
-  // Register onClick handler as data attribute
-  const onClick = props.onClick as ((e: Event) => void) | undefined;
-  let onclickAttr = '';
-  if (typeof onClick === 'function') {
-    const id = `ekh${++handlerCounter}`;
-    handlerRegistry.set(id, onClick);
-    onclickAttr = ` data-ekclick="${id}"`;
-  }
+  const eventHandlerAttrs = registerEventHandlers(props);
 
   if (SELF_CLOSING_TAGS.has(currentType as string)) {
     renderDepth--;
-    return `<${currentType}${attributes}${onclickAttr}/>`;
+    return `<${currentType}${attributes}${eventHandlerAttrs}/>`;
   }
 
   renderDepth--;
-  return `<${currentType}${attributes}${onclickAttr}>${innerHtml}</${currentType}>`;
+  return `<${currentType}${attributes}${eventHandlerAttrs}>${innerHtml}</${currentType}>`;
 }
 
 export function escapeHtml(str: string): string {

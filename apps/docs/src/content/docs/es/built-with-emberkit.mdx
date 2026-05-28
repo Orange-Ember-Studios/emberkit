@@ -1,0 +1,77 @@
+---
+title: Construido con EmberKit
+---
+
+import { Alert, Card, Text } from '@emberkit/ui';
+
+# Construido con EmberKit
+
+<Text color="muted" className="mb-6">Este sitio de documentación corre sobre EmberKit — elegido por la <strong>velocidad</strong> (entrega HTML-first, JS mínimo en el cliente en las páginas de docs) y la misma stack descrita en las guías siguientes.</Text>
+
+## Stack de un vistazo
+
+| Pieza | Cómo lo usa este sitio |
+|-------|------------------------|
+| **Velocidad** | SSR envía HTML completo por petición; las páginas MDX permanecen mayormente estáticas — FCP rápido sin hidratar cada párrafo |
+| **Rendering** | `mode: 'ssr'` en `apps/docs/emberkit.config.ts` — HTML en cada petición de doc en dev y producción |
+| **Rutas** | `src/routes/**/*.mdx` y `.tsx` bajo routing basado en archivos |
+| **Layout** | `src/routes/_layout.tsx` con sidebar + contenido MDX |
+| **Interactividad** | `useNavigate`, signals y `data-ek-bind` en el showcase de UI — no en cada página de doc |
+| **Estilos** | Tailwind 4 vía `@tailwindcss/vite` |
+| **Tooling** | `emberkit dev` / `emberkit build` desde la raíz del monorepo |
+
+Para modos de renderizado (hybrid, static, spa) y artefactos de build, consulta [SSR y SSG](/es/docs/ssr) — la referencia canónica.
+
+## Lo que no duplicamos aquí
+
+Lo siguiente está documentado una sola vez en otro lugar; esta página solo apunta a ello:
+
+- **Hidratación y `data-ek-bind`** → [Hidratación](/es/docs/hydration)
+- **API de Signals** → [Signals](/es/docs/signals)
+- **Rutas por archivo y params** → [Enrutamiento](/es/docs/routing)
+- **`<Head>` y `generateMeta`** → [Head](/es/docs/head) y [SEO y Meta](/es/docs/meta)
+
+## Rutas de docs como MDX
+
+Las páginas de contenido son archivos MDX compilados por el plugin de Vite:
+
+```
+apps/docs/src/routes/docs/
+├── introduction.mdx
+├── ssr.mdx
+├── quick-start.mdx
+└── …
+```
+
+Cada archivo mapea a `/docs/<name>` sin una tabla de rutas manual.
+
+## Hidratación selectiva en la práctica
+
+La mayoría de páginas MDX son HTML estático tras SSR. Las piezas interactivas (CTAs de la homepage, navegación del sidebar, demos de componentes UI) usan handlers del cliente o bindings de signals. Eso coincide con el modelo en [Componentes](/es/docs/components): solo las regiones con `onClick` o `data-ek-bind` pagan JS en el cliente.
+
+Las secciones below-the-fold usan [`LazyInView`](/es/docs/hydration#viewport-lazy-loading-lazyinview) del framework en la homepage (features, vista previa de código, CTA), la cuadrícula de [iconos](/es/docs/icons) y bloques grandes en la página de referencia [UI](/es/docs/ui) para mantener la pintura inicial ligera.
+
+## Desarrollo local
+
+Desde la raíz del repo:
+
+```bash
+pnpm --filter docs dev    # o emberkit dev dentro de apps/docs
+```
+
+Consulta el código fuente de cualquier URL de doc — el contenido debería aparecer dentro de `#app` antes de que se ejecute JavaScript.
+
+## Build de producción
+
+```bash
+pnpm --filter docs build
+pnpm --filter docs preview   # emberkit preview
+```
+
+Despliega `dist/` en tu host, o ejecuta `emberkit serve` para routing estilo SSR/hybrid. Consulta [Despliegue en edge](/es/docs/edge) para patrones con CDN y Workers.
+
+## Próximos pasos
+
+- [SSR y SSG](/es/docs/ssr) — Cómo funcionan los builds y el pre-renderizado
+- [Inicio rápido](/es/docs/quick-start) — Empieza tu propio proyecto
+- [Componentes UI](/es/docs/ui) — Ejemplos en vivo de hidratación con signals

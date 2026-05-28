@@ -1,0 +1,240 @@
+import { Badge, Alert, Card, Text, Heading } from '@emberkit/ui';
+
+# Composant Head
+
+<Text color="muted" className="mb-6">Le composant <code className="text-primary-400">{'<Head>'}</code> gère les balises <code className="text-primary-400">{'<head>'}</code> depuis JSX. Il ne rend rien dans le body ; côté client, il met à jour <code className="text-primary-400">document.head</code> directement. Pour les chaînes HTML programmatiques (Open Graph, helpers JSON-LD), voir [SEO et meta](/fr/docs/meta). Pour les titres de route dans le build SSR par défaut, utilisez <code className="text-primary-400">export const metadata</code> — [SSR et SSG](/fr/docs/ssr#route-metadata-built-in-ssr-head).</Text>
+
+## Utilisation de base
+
+```tsx
+import { Head } from '@emberkit/core';
+
+function MyPage() {
+  return (
+    <>
+      <Head>
+        <title>My Page - EmberKit</title>
+        <meta name="description" content="A page built with EmberKit" />
+      </Head>
+      <h1>Hello World</h1>
+    </>
+  );
+}
+```
+
+Lors du SSR, cela produit :
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Page - EmberKit</title>
+  <meta name="description" content="A page built with EmberKit">
+</head>
+<body>
+  <h1>Hello World</h1>
+</body>
+</html>
+```
+
+## Props raccourcies
+
+Pour les balises courantes, utilisez des props plutôt que du JSX brut :
+
+```tsx
+<Head
+  title="My Page"
+  description="Page description"
+  keywords={['emberkit', 'framework', 'typescript']}
+  author="EmberKit Team"
+  robots="index, follow"
+  canonical="https://example.com/my-page"
+/>
+```
+
+### Props prises en charge
+
+<Card title="Référence des props raccourcies" variant="outline">
+  <table>
+    <thead>
+      <tr>
+        <th>Prop</th>
+        <th>Type</th>
+        <th>Sortie HTML</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td><code>title</code></td><td><code>string</code></td><td><code>{'<title>'} + {'<meta name="title">'}</code></td></tr>
+      <tr><td><code>description</code></td><td><code>string</code></td><td><code>{'<meta name="description">'}</code></td></tr>
+      <tr><td><code>keywords</code></td><td><code>string[]</code></td><td><code>{'<meta name="keywords">'}</code> (séparées par des virgules)</td></tr>
+      <tr><td><code>author</code></td><td><code>string</code></td><td><code>{'<meta name="author">'}</code></td></tr>
+      <tr><td><code>robots</code></td><td><code>string</code></td><td><code>{'<meta name="robots">'}</code></td></tr>
+      <tr><td><code>canonical</code></td><td><code>string</code></td><td><code>{'<link rel="canonical">'}</code></td></tr>
+    </tbody>
+  </table>
+</Card>
+
+## Open Graph
+
+```tsx
+<Head
+  og={{
+    type: 'article',
+    title: 'My Page',
+    description: 'Page description for social sharing',
+    url: 'https://example.com/my-page',
+    image: 'https://example.com/og-image.png',
+    locale: 'en_US',
+    siteName: 'My Site',
+  }}
+/>
+```
+
+## Twitter Cards
+
+```tsx
+<Head
+  twitter={{
+    card: 'summary_large_image',
+    site: '@emberkit',
+    creator: '@author',
+    title: 'My Page',
+    description: 'Page description',
+    image: 'https://example.com/twitter-image.png',
+  }}
+/>
+```
+
+## Combiner children et props
+
+Vous pouvez mélanger props raccourcies et children JSX bruts :
+
+```tsx
+<Head title="My Page" description="Description">
+  <meta property="og:image" content="https://example.com/og.png" />
+  <link rel="icon" href="/favicon.ico" />
+</Head>
+```
+
+Lorsque des `children` sont fournis, ils priment — les props raccourcies sont ignorées.
+
+## Plusieurs composants <code className="text-primary-400">{'<Head>'}</code>
+
+Utilisez plusieurs composants <code className="text-primary-400">{'<Head>'}</code> dans votre arbre de composants. Toutes les balises sont collectées et fusionnées dans <code className="text-primary-400">{'<head>'}</code> :
+
+```tsx
+// Le layout fournit les meta par défaut
+function Layout({ children }) {
+  return (
+    <>
+      <Head>
+        <meta name="theme-color" content="#0b0f19" />
+        <meta property="og:site_name" content="My Site" />
+      </Head>
+      {children}
+    </>
+  );
+}
+
+// La page fournit les meta spécifiques
+function AboutPage() {
+  return (
+    <>
+      <Head>
+        <title>About Us - My Site</title>
+        <meta name="description" content="Learn about our team" />
+      </Head>
+      <h1>About Us</h1>
+    </>
+  );
+}
+```
+
+## Données structurées (JSON-LD)
+
+Utilisez des children pour les scripts de données structurées :
+
+```tsx
+import { Head, generateArticleSchema } from '@emberkit/core';
+
+function ArticlePage() {
+  const schema = generateArticleSchema({
+    title: 'My Article',
+    description: 'Article description',
+    author: 'John Doe',
+    publishedAt: '2025-01-15',
+    url: 'https://example.com/article',
+  });
+
+  return (
+    <>
+      <Head>
+        <title>My Article</title>
+        <script type="application/ld+json">{schema}</script>
+      </Head>
+      <article>
+        <h1>My Article</h1>
+      </article>
+    </>
+  );
+}
+```
+
+## Fonctionnement
+
+### SSR
+
+Lors du rendu côté serveur, <code className="text-primary-400">{'<Head>'}</code> :
+
+1. Rend ses children en chaîne HTML
+2. Enregistre le HTML dans un registre interne de contenu head
+3. Retourne `null` (rien dans le body de la page)
+
+Lors du SSR, les balises enregistrées sont disponibles via `drainHeadContent()` depuis `@emberkit/core`. L'entrée serveur CLI intégrée injecte les exports `metadata` des routes ; utilisez un `src/entry-server.tsx` personnalisé si vous devez fusionner `drainHeadContent()` dans votre modèle HTML.
+
+### Navigation côté client
+
+Lors de la navigation SPA, <code className="text-primary-400">{'<Head>'}</code> :
+
+1. Rend ses children en chaîne HTML
+2. Parse le HTML et met à jour `document.head` directement
+3. Les balises sont marquées avec `data-ek-head` pour que les re-rendus remplacent (et ne dupliquent pas) les balises gérées
+
+### Référence API
+
+```typescript
+interface HeadProps {
+  children?: JSXNode | JSXNode[];
+  title?: string;
+  description?: string;
+  og?: {
+    title?: string;
+    description?: string;
+    type?: string;
+    url?: string;
+    image?: string;
+    locale?: string;
+    siteName?: string;
+  };
+  twitter?: {
+    card?: string;
+    site?: string;
+    creator?: string;
+    title?: string;
+    description?: string;
+    image?: string;
+  };
+  canonical?: string;
+  robots?: string;
+  keywords?: string[];
+  author?: string;
+}
+```
+
+## Prochaines étapes
+
+- [SEO et meta](/fr/docs/meta) — Génération programmatique de meta avec `generateMeta()`
+- [SSR](/fr/docs/ssr) — Pipeline de rendu côté serveur
+- [Composants](/fr/docs/components) — Patrons de composants

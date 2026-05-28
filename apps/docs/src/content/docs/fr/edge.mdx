@@ -1,0 +1,138 @@
+import { Badge, Alert, Card, Text } from '@emberkit/ui';
+
+# Déploiement edge
+
+<Text color="muted" className="mb-6">Déployez des applications EmberKit sur des runtimes edge ou des serveurs Node classiques. La sortie statique pré-rendue fonctionne sur tout CDN ; les routes dynamiques utilisent le bundle SSR depuis <code className="text-primary-400">dist/server/entry-server.js</code>.</Text>
+
+## Plateformes prises en charge
+
+<Card variant="outline">
+  <table>
+    <thead>
+      <tr><th>Plateforme</th><th>Runtime</th><th>Configuration type</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>CDN statique</td><td>—</td><td><code>mode: 'static'</code> ou pré-rendu hybride → envoyer <code>dist/</code></td></tr>
+      <tr><td>Node.js 18+</td><td>Node</td><td><code>emberkit serve</code> après <code>emberkit build</code></td></tr>
+      <tr><td>Cloudflare Workers</td><td>Isolats V8</td><td>Adaptateur <code>@emberkit/edge</code> + Wrangler</td></tr>
+      <tr><td>Deno Deploy</td><td>Deno</td><td>Adaptateur Deno <code>@emberkit/edge</code></td></tr>
+      <tr><td>Bun</td><td>Bun</td><td>Exécuter l’entrée SSR ou <code>dist/</code> statique</td></tr>
+    </tbody>
+  </table>
+</Card>
+
+## Serveur de production Node
+
+Après un build en mode `ssr` ou `hybrid` :
+
+```bash
+pnpm build
+pnpm exec emberkit serve
+```
+
+`serve` lit `dist/ssr-manifest.json`, sert le HTML pré-rendu et bascule sur `dist/server/entry-server.js` pour les routes dynamiques.
+
+Pour une vérification locale plus légère :
+
+```bash
+pnpm preview   # emberkit preview
+```
+
+## Cloudflare Workers
+
+```bash
+pnpm add -D wrangler @cloudflare/workers-types @emberkit/edge
+```
+
+```jsonc
+// wrangler.jsonc — modèle de production (site Orange Ember)
+{
+  "name": "my-app",
+  "main": "worker.ts",
+  "compatibility_date": "2026-04-03",
+  "compatibility_flags": ["global_fetch_strictly_public", "nodejs_compat"],
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application"
+  },
+  "observability": { "enabled": true }
+}
+```
+
+Ou définissez les mêmes valeurs par défaut en TypeScript :
+
+```ts
+import { defineWranglerConfig } from '@emberkit/edge';
+
+export default defineWranglerConfig({
+  name: 'my-app',
+  main: 'worker.ts',
+});
+```
+
+Point d’entrée worker (API partagée + `dist/` statique) :
+
+```ts
+import { createCloudflareWorker } from '@emberkit/edge';
+import { handleApiRequest } from './src/server/api-router';
+
+export default createCloudflareWorker({
+  handleApi: handleApiRequest,
+  injectPublicEnv: true, // expose PUBLIC_* sur window.__CF_ENV__
+});
+```
+
+Scripts : `pnpm build && wrangler deploy`, `pnpm build && wrangler dev` pour l’aperçu, `wrangler types` pour les bindings `Env`.
+
+Utilisez `sqlRawPlugin` / `import sql from './schema.sql'` seul (via `emberkitVitePlugin`) pour empaqueter les migrations SQL sans système de fichiers au runtime.
+
+## Deno Deploy
+
+Utilisez l’adaptateur Deno de `@emberkit/edge` avec une sortie `dist/` buildée, ou servez uniquement des fichiers statiques pré-rendus :
+
+```bash
+deployctl deploy --project=my-app ./dist
+```
+
+## Utilitaires de taille de bundle
+
+`@emberkit/edge` inclut des utilitaires pour contrôler les bundles edge :
+
+```typescript
+import { analyzeBundle, minifyHTML, StaticPage } from '@emberkit/edge';
+
+const stats = analyzeBundle(workerCode);
+// stats.size, stats.warnings, stats.errors (limite stricte 8 Ko)
+
+const html = minifyHTML('<div>  <p>  Hello  </p>  </div>');
+
+const page = new StaticPage('<html>...</html>');
+page.addStyle('/styles/main.css');
+page.addScript('/app.js');
+const output = page.toHTML();
+```
+
+Constantes : `EDGE_BUNDLE_SIZE_WARNING` (1 Ko), `MAX_BUNDLE_SIZE` (8 Ko).
+
+## Modèles de déploiement
+
+| Type d’app | Config | Hébergeur |
+|----------|--------|------|
+| Marketing / docs | `static` ou `hybrid` | Netlify, Cloudflare Pages, S3 |
+| Statique + dynamique | `hybrid` | CDN pour le statique + Node/Worker pour le SSR |
+| App authentifiée | `spa` ou `ssr` | Tout hébergeur statique + API |
+
+## Objectifs de performance
+
+La vitesse est le premier principe d’EmberKit. Les déploiements edge-friendly combinent :
+
+- **HTML pré-rendu** pour les routes statiques — TTFB faible et First Contentful Paint rapide au CDN
+- **SSR à l’edge** uniquement là où les routes ont besoin de données par requête
+- **Hydratation sélective** — petits bundles client via `data-ek-bind` et JS minimal sur les pages de contenu
+
+## Étapes suivantes
+
+- [SSR et SSG](/fr/docs/ssr) — Modes de rendu et sortie de build
+- [Hydratation](/fr/docs/hydration) — Liaisons côté client
+- [SEO et meta](/fr/docs/meta) — Balises meta et JSON-LD

@@ -1,0 +1,161 @@
+---
+title: Dev API
+---
+
+import { Badge, Alert, Card, Text } from '@emberkit/ui';
+
+# Dev API
+
+<Text color="muted" className="mb-6">
+  Pendant <code>emberkit dev</code>, EmberKit peut intercepter <code>/api</code> et <code>/api/*</code> et exécuter votre logique backend dans Node — sans serveur proxy séparé.
+</Text>
+
+<Alert variant="info" title="Production">
+  Le middleware Dev API est <strong>uniquement pour le développement</strong>. En production, branchez les APIs via votre hôte (Cloudflare Workers, serveur Node, etc.). Le site Orange Ember utilise <code>worker.ts</code> en production et <code>devApiPlugin</code> en local.
+</Alert>
+
+## Quand l'utiliser
+
+| Approche | Idéal pour |
+|----------|----------|
+| <strong>Basé sur fichiers</strong> <code>src/routes/_api/*</code> | Handlers REST colocalisés avec les routes, similaire à Next.js Route Handlers |
+| <strong>Module handler personnalisé</strong> | Routeurs style Express existants, migrations Turso à la première requête, <code>handleApiRequest</code> partagé pour dev et Workers |
+
+## Recommandé — emberkit.config.ts
+
+```ts
+import { defineConfig } from '@emberkit/core';
+import { emberkitVitePlugin } from '@emberkit/core/vite-plugin';
+import tailwindcss from '@tailwindcss/vite';
+
+export default defineConfig({
+  mode: 'ssr',
+  devApi: {
+    handler: './src/server/api-router.node.ts',
+    export: 'handleApiRequestNode',
+    prefix: '/api', // optional, default '/api'
+  },
+  vite: {
+    plugins: [emberkitVitePlugin(), tailwindcss()],
+  },
+});
+```
+
+<code>emberkitVitePlugin()</code> automatiquement :
+
+- Charge <code>devApi</code> depuis ce fichier et enregistre le middleware dev
+- Active <code>sqlRawPlugin</code> pour imports <code>*.sql?raw</code>
+- Retombe sur <code>src/routes/_api/*</code> quand <code>devApi</code> est omis
+
+## Option B — plugins Vite explicites (avancé)
+
+Nécessaire seulement si vous ne pouvez pas utiliser <code>devApi</code> dans <code>emberkit.config.ts</code> ou avez besoin d'un ordre de plugins personnalisé :
+
+```ts
+import {
+  devApiPlugin,
+  emberkitVitePlugin,
+  sqlRawPlugin,
+} from '@emberkit/core/vite-plugin';
+
+export const appVitePlugins = [
+  sqlRawPlugin(),
+  devApiPlugin({
+    handler: './src/server/api-router.node.ts',
+    export: 'handleApiRequestNode',
+  }),
+  emberkitVitePlugin(),
+];
+```
+
+Ne <strong>dupliquez pas</strong> <code>devApi</code> dans config et <code>devApiPlugin</code> en même temps.
+
+## Handler Node personnalisé
+
+Exportez une fonction avec la signature <code>IncomingMessage</code> / <code>ServerResponse</code> de Node :
+
+```ts
+// src/server/api-router.node.ts
+import type { IncomingMessage, ServerResponse } from 'node:http';
+import { handleApiRequest } from './api-router.ts';
+
+export async function handleApiRequestNode(
+  req: IncomingMessage,
+  res: ServerResponse,
+): Promise<void> {
+  const host = req.headers.host ?? 'localhost';
+  const url = `http://${host}${req.url ?? '/'}`;
+  const request = new Request(url, { method: req.method, headers: req.headers });
+  const response = await handleApiRequest(request, env);
+  // copy status, headers, body to res ...
+}
+```
+
+Partagez <code>handleApiRequest(request, env)</code> entre dev (Node) et production (Workers) pour un comportement cohérent.
+
+Utilisez <code>createNodeDevApiHandler</code> pour éviter de dupliquer le pont headers/cookies sûr :
+
+```ts
+import { createNodeDevApiHandler } from '@emberkit/core/vite-plugin';
+import { handleApiRequest } from './api-router.ts';
+
+export const handleApiRequestNode = createNodeDevApiHandler(
+  handleApiRequest,
+  () => ({
+    TURSO_DATABASE_URL: process.env.TURSO_DATABASE_URL ?? '',
+    // ...
+  }),
+);
+```
+
+## Routes API basées sur fichiers
+
+Ajoutez des handlers sous <code>src/routes/_api/</code> :
+
+```
+src/routes/_api/
+  health.ts      →  GET /api/health
+  blog/
+    list.ts      →  GET /api/blog/list
+```
+
+Quand <code>devApi</code> n'est <strong>pas</strong> défini en config et qu'au moins une route <code>_api</code> existe, EmberKit active automatiquement le routage dev API basé sur fichiers.
+
+<Alert variant="warning" title="devApi personnalisé remplace l'auto routing">
+  Si vous définissez <code>devApi.handler</code>, les routes <code>_api</code> basées sur fichiers ne sont <strong>pas</strong> utilisées sauf si vous les appelez depuis votre handler.
+</Alert>
+
+## Routage des requêtes
+
+1. Le pathname de l'URL est <code>/api</code> ou commence par <code>/api/</code>.
+2. Le middleware dev s'exécute <strong>avant</strong> le rendu SSR des pages (SSR ignore les URLs API).
+3. Le module handler est chargé une fois via <code>server.ssrLoadModule()</code> et mis en cache.
+
+## Tests locaux
+
+```bash
+pnpm dev
+curl -s "http://localhost:4321/api/health"
+curl -s "http://localhost:4321/api/blog/list?lang=en"
+```
+
+Si le port est occupé, EmberKit choisit le suivant libre — consultez la bannière du dev server.
+
+## Exports Vite
+
+Depuis <code>@emberkit/core/vite-plugin</code> :
+
+| Export | Description |
+|--------|-------------|
+| <code>devApiPlugin(options)</code> | Plugin Vite pour handler personnalisé |
+| <code>registerDevApiMiddleware(server, options)</code> | Enregistrer middleware sur un dev server existant |
+| <code>registerFileBasedDevApiMiddleware(server)</code> | Enregistrer routage fichiers <code>_api</code> |
+| <code>isApiRequest(url)</code> | Retourne true pour <code>/api</code> et <code>/api/*</code> |
+| <code>incomingMessageToRequest(req)</code> | Convertir requête Node en Fetch <code>Request</code> |
+| <code>writeFetchResponseToNode(res, response)</code> | Écrire Fetch <code>Response</code> vers Node |
+
+## Liens connexes
+
+- [Release 0.8.0](/fr/docs/release-0-8)
+- [SSR et SSG](/fr/docs/ssr)
+- [Déploiement edge](/fr/docs/edge)

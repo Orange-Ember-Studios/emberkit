@@ -1,0 +1,592 @@
+import { Badge, Alert, Card, Text } from '@emberkit/ui';
+
+# API Reference
+
+<Text color="muted" className="mb-8">Complete API reference for <code class="text-primary-400">@emberkit/core</code>.</Text>
+
+## Runtime
+
+### render
+
+```typescript
+render(
+  element: JSXElement | string | null | ((props: Record<string, unknown>) => JSXNode),
+  container: Element | string,
+  options?: {
+    hydrate?: boolean;
+    viewTransitions?: boolean | { rootId?: string };
+    routes?: Array<{
+      path: string;
+      component: () => Promise<{ default: (props: Record<string, unknown>) => JSXNode }>;
+    }>;
+  }
+): void
+```
+
+Renders a JSX element into a DOM container. Pass <code>routes</code> from <code>virtual:emberkit-routes</code> for file-based client routing.
+
+```tsx
+import { render } from '@emberkit/core';
+import { routes } from 'virtual:emberkit-routes';
+import App from './routes/_layout.tsx';
+
+render(App, document.getElementById('app')!, {
+  routes,
+  viewTransitions: true,
+});
+```
+
+See [View Transitions](/en/docs/view-transitions).
+
+### hydrate
+
+```typescript
+hydrate(
+  element: JSXElement | string | null,
+  container: Element | string
+): void
+```
+
+Hydrates server-rendered HTML with client-side interactivity.
+
+### createElement
+
+```typescript
+createElement(
+  type: string | ((props) => JSXNode),
+  props?: Record<string, unknown> | null,
+  ...children: unknown[]
+): DOMElement
+```
+
+Creates a JSX element. Used by the JSX transform.
+
+## Signals
+
+### createSignal
+
+```typescript
+createSignal<T>(
+  initialValue: T,
+  options?: { equals?: (prev: T, next: T) => boolean }
+): [() => T, (newValue: T) => void] & Signal<T>
+```
+
+Creates a reactive signal.
+
+```tsx
+const [count, setCount] = createSignal(0);
+console.log(count()); // 0
+setCount(1);
+```
+
+### createMemo
+
+```typescript
+createMemo<T>(
+  computation: () => T,
+  options?: SignalOptions<T>
+): Signal<T>
+```
+
+Creates a derived value that updates when dependencies change.
+
+```tsx
+const doubled = createMemo(() => count() * 2);
+console.log(doubled.value); // reactive
+```
+
+### createEffect
+
+```typescript
+createEffect(
+  callback: () => void | (() => void)
+): () => void
+```
+
+Runs a side effect when dependencies change. Returns a cleanup function.
+
+```tsx
+const dispose = createEffect(() => {
+  document.title = `Count: ${count()}`;
+  return () => { /* cleanup */ };
+});
+```
+
+### batch
+
+```typescript
+batch<T>(fn: () => T): T
+```
+
+Groups multiple signal updates into a single notification.
+
+### untrack
+
+```typescript
+untrack<T>(fn: () => T): T
+```
+
+Reads signals without tracking them as dependencies.
+
+## Context
+
+### createContext
+
+```typescript
+createContext<T>(defaultValue?: T): ContextBridge<T>
+```
+
+Creates a context with Provider and use methods.
+
+```tsx
+const ThemeContext = createContext<'light' | 'dark'>('light');
+```
+
+### useContext
+
+```typescript
+useContext<T>(context: Context<T>): T
+```
+
+Reads the nearest context value above the current component.
+
+## Viewport (lazy in view)
+
+Defer rendering and hydrating heavy sections until they are near the viewport. See [Hydration — Viewport lazy loading](/en/docs/hydration#viewport-lazy-loading-lazyinview) for concepts and testing.
+
+### LazyInView
+
+```typescript
+function LazyInView(props: LazyInViewProps): JSXNode
+```
+
+```typescript
+interface LazyInViewProps {
+  children: JSXNode | (() => JSXNode);
+  fallback?: JSXNode;
+  rootMargin?: string;      // default '200px'
+  minHeight?: string | number;
+  once?: boolean;             // default true
+  ssr?: 'lazy' | 'eager';     // default 'lazy'
+  as?: string;                // default 'div'
+  className?: string;
+  style?: Record<string, unknown>;
+}
+```
+
+```tsx
+import { LazyInView } from '@emberkit/core';
+
+<LazyInView minHeight="20rem" fallback={<div className="min-h-80 animate-pulse" />}>
+  <ExpensiveSection />
+</LazyInView>
+```
+
+Called automatically after client `render()` — you rarely call the helpers below unless you implement a custom mount flow.
+
+### hydrateLazyInView
+
+```typescript
+hydrateLazyInView(container: Element): void
+```
+
+Finds `[data-ek-lazy-in-view]:not([data-ek-lazy-loaded])` under `container`, observes each host, mounts registered children when visible, then runs subtree hydration (handlers + signals).
+
+### clearLazyRegistry
+
+```typescript
+clearLazyRegistry(): void
+```
+
+Clears in-memory content loaders. Useful in tests or full app teardown.
+
+## Navigation
+
+### navigate
+
+```typescript
+navigate(
+  to: string,
+  options?: {
+    replace?: boolean;
+    state?: Record<string, unknown>;
+    viewTransition?: boolean;
+  }
+): Promise<void>
+```
+
+Programmatic navigation.
+
+```tsx
+navigate('/about');
+navigate('/new', { replace: true });
+await navigate('/docs', { viewTransition: true });
+```
+
+### View transition helpers
+
+```typescript
+supportsViewTransitions(): boolean
+withViewTransition(callback: () => void | Promise<void>): Promise<void>
+waitForAppUpdate(href: string, options?: { replace?: boolean; rootId?: string }): Promise<void>
+initViewTransitions(options?: { rootId?: string }): void
+navigateWithViewTransition(href: string, options?: { replace?: boolean; rootId?: string }): Promise<void>
+```
+
+See [View Transitions](/en/docs/view-transitions).
+
+### getCached / setCache
+
+```typescript
+getCached<T>(key: string): T | null
+setCache<T>(key: string, data: T, ttl?: number): void
+```
+
+In-memory cache for client-side data sharing (e.g. preload before <code>render()</code>). Pair with [hydration guidance for dynamic lists](/en/docs/hydration#dynamic-lists-after-ssr) when using SSR + <code>.map()</code>.
+
+### preload
+
+```typescript
+preload(path: string): void
+```
+
+Prefetches a page by adding a prefetch link to the document head.
+
+### redirect
+
+```typescript
+redirect(to: string, status?: number): never
+```
+
+Server-side redirect. Throws a Response.
+
+## Markdown
+
+### renderMarkdown
+
+```typescript
+renderMarkdown(
+  content: string,
+  options?: MarkdownOptions
+): string
+```
+
+Renders Markdown to HTML.
+
+### extractFrontmatter
+
+```typescript
+extractFrontmatter(
+  content: string
+): { data: Record<string, unknown>; content: string } | null
+```
+
+Extracts YAML frontmatter from Markdown.
+
+### getReadingTime
+
+```typescript
+getReadingTime(text: string, wpm?: number): number
+```
+
+Estimates reading time in minutes.
+
+## Forms
+
+### handleFormSubmit
+
+```typescript
+handleFormSubmit(
+  event: SubmitEvent,
+  config: FormConfig
+): Promise<boolean>
+```
+
+Handles form submission with validation.
+
+### createFormValidator
+
+```typescript
+createFormValidator(schema: ValidationSchema): FormValidator
+```
+
+Creates a form validator from a schema.
+
+### parseFormData
+
+```typescript
+parseFormData(form: HTMLFormElement): Record<string, unknown>
+```
+
+Extracts form data as a plain object.
+
+## Internationalization
+
+See the full guide: [Internationalization (i18n)](/en/docs/i18n).
+
+### createI18n
+
+```typescript
+createI18n(config, options?: { strict?: boolean }): I18nInstance
+```
+
+Creates an i18n instance from in-memory message catalogs (TypeScript or parsed JSON objects).
+
+```ts
+const i18n = createI18n({
+  locales: ['en', 'es'] as const,
+  defaultLocale: 'en',
+  messages: { en, es },
+});
+```
+
+### createI18nFromJson
+
+```typescript
+createI18nFromJson(
+  config: { locales; defaultLocale; fallbackLocale?; messages: Record<Locale, unknown> },
+  options?: { strict?: boolean }
+): I18nInstance
+```
+
+Creates an i18n instance from JSON objects (static imports or parsed data). Nested JSON is flattened to dot keys.
+
+```ts
+import en from './locales/en.json';
+import es from './locales/es.json';
+
+const i18n = createI18nFromJson({
+  locales: ['en', 'es'] as const,
+  defaultLocale: 'en',
+  messages: { en, es },
+});
+```
+
+### createI18nFromGlob
+
+```typescript
+createI18nFromGlob(
+  modules: Record<string, { default?: unknown } | unknown>,
+  config: { locales; defaultLocale; fallbackLocale? },
+  options?: { strict?: boolean }
+): I18nInstance
+```
+
+Loads every locale from Vite `import.meta.glob` results. Locale code is derived from the file name (`en.json` → `en`).
+
+```ts
+const modules = import.meta.glob('./locales/*.json', { eager: true });
+const i18n = createI18nFromGlob(modules, {
+  locales: ['en', 'es'] as const,
+  defaultLocale: 'en',
+});
+```
+
+### createI18nFromUrls
+
+```typescript
+createI18nFromUrls(
+  urls: Record<Locale, string>,
+  config: { locales; defaultLocale; fallbackLocale? },
+  options?: { strict?: boolean }
+): Promise<I18nInstance>
+```
+
+Fetches JSON catalogs over the network and creates an i18n instance. Use with files in `public/locales/`.
+
+### fetchLocaleMessages
+
+```typescript
+fetchLocaleMessages(urls: Record<Locale, string>): Promise<Record<Locale, MessageCatalog>>
+```
+
+Fetches and parses locale JSON without creating an instance.
+
+### createI18nContext
+
+```typescript
+createI18nContext<TKeys extends string = string>(): {
+  Provider: (props: { i18n; locale?; children? }) => JSXNode;
+  useI18n: () => I18nInstance<TKeys>;
+  context: ContextBridge;
+}
+```
+
+Provides locale-aware `t()` via React-style context.
+
+### I18nInstance
+
+```typescript
+interface I18nInstance {
+  locale: string;
+  t(key, values?): string;
+  tp(key, count, values?): string;
+  setLocale(locale): void;
+  getLocale(): string;
+  hasKey(key, locale?): boolean;
+  formatDate(value, options?): string;
+  formatNumber(value, options?): string;
+  formatRelativeTime(value, unit, options?): string;
+}
+```
+
+### resolveLocaleFromRequest
+
+```typescript
+resolveLocaleFromRequest(request: Request, options: {
+  locales: readonly string[];
+  defaultLocale: string;
+  strategy?: 'path-prefix' | 'header' | 'cookie' | 'query' | Array<...>;
+  cookieName?: string;
+  queryParam?: string;
+}): string
+```
+
+Resolves the active locale from an incoming `Request` (SSR loaders, edge handlers).
+
+### Path helpers
+
+```typescript
+extractLocaleFromPath(pathname, supported): { locale; pathnameWithoutLocale }
+stripLocalePrefix(pathname, supported): string
+addLocalePrefix(pathname, locale): string
+localizePath(pathname, locale, supported): string
+```
+
+Utilities for `[locale]` URL prefixes.
+
+### Catalog helpers
+
+```typescript
+defineMessages(catalog): typeof catalog
+parseMessageCatalog(input: unknown): MessageCatalog
+parseMessageCatalogJson(json: string): MessageCatalog
+mergeMessageCatalogs(...catalogs): MessageCatalog
+localeFromJsonPath(path): string
+```
+
+### Node-only (`@emberkit/core/i18n/node`)
+
+```typescript
+readLocaleCatalog(filePath: string): MessageCatalog
+loadLocalesFromDirectory(directory: string): Record<Locale, MessageCatalog>
+createI18nFromDirectory(directory, config, options?): I18nInstance
+```
+
+Filesystem loaders for Node.js SSR and scripts. Not available on edge runtimes.
+
+## Meta
+
+### generateMeta
+
+```typescript
+generateMeta(data: MetaData, baseUrl?: string): string
+```
+
+Generates HTML meta tags from metadata.
+
+### generateArticleSchema
+
+```typescript
+generateArticleSchema(data: ArticleData): string
+```
+
+Generates JSON-LD Article schema.
+
+### generateProductSchema
+
+```typescript
+generateProductSchema(data: ProductData): string
+```
+
+Generates JSON-LD Product schema.
+
+### generateBreadcrumbs
+
+```typescript
+generateBreadcrumbs(items: Array<{ name: string; url: string }>): string
+```
+
+Generates JSON-LD BreadcrumbList schema.
+
+## SSR & head
+
+### renderToHTMLString
+
+```typescript
+renderToHTMLString(element: JSXNode | null): string
+```
+
+Converts a JSX element tree to an HTML fragment. Text and string attributes are HTML-escaped.
+
+### drainHeadContent
+
+```typescript
+drainHeadContent(): string
+```
+
+Returns and clears tags registered by `<Head>` during the current render pass. Use in custom `entry-server` handlers.
+
+### RouteParams
+
+```typescript
+interface RouteParams<T extends Record<string, string> = Record<string, string>> {
+  params: T;
+  query: Record<string, string | string[]>;
+  request: Request;
+}
+```
+
+Props shape for dynamic route components (SSR and client).
+
+### LoaderFunction
+
+```typescript
+type LoaderFunction<T = unknown> = (
+  context: LoaderContext
+) => Promise<LoaderResult<T>> | LoaderResult<T>;
+```
+
+`LoaderContext` includes `params`, `query`, and `request`. Use with `createLoaderData()` for success results.
+
+## Config
+
+### defineConfig
+
+```typescript
+defineConfig(config: Record<string, unknown>): Record<string, unknown>
+```
+
+Used in `emberkit.config.ts` for `mode`, `server`, `build`, nested `vite` options, and optional `devApi`. See [SSR & SSG](/en/docs/ssr) and [Dev API](/en/docs/dev-api).
+
+```ts
+export default defineConfig({
+  mode: 'ssr',
+  devApi: {
+    handler: './src/server/api.node.ts',
+    export: 'handleRequest',
+  },
+});
+```
+
+## Vite plugin (`@emberkit/core/vite-plugin`)
+
+| Export | Description |
+|--------|-------------|
+| `emberkitVitePlugin(options?)` | Routes, SSR middleware, MDX, manifest |
+| `devApiPlugin(options)` | Dev-only `/api` → Node handler |
+| `sqlRawPlugin()` | Bundle `*.sql?raw` as string literals |
+| `registerDevApiMiddleware(server, options)` | Attach custom API middleware |
+| `registerFileBasedDevApiMiddleware(server)` | Attach `src/routes/_api/*` routing |
+| `isApiRequest(url)` | True for `/api` and `/api/*` |
+
+## Next Steps
+
+- [Release 0.8.0](/en/docs/release-0-8) - Latest features
+- [Dev API](/en/docs/dev-api) - Local API middleware
+- [View Transitions](/en/docs/view-transitions) - SPA transitions
+- [Internationalization](/en/docs/i18n) - JSON translations and locale routing
+- [Components](/en/docs/components) - Component patterns
+- [Signals](/en/docs/signals) - Reactive state
+- [Routing](/en/docs/routing) - File-based routing

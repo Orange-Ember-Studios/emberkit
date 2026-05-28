@@ -1,9 +1,13 @@
 import type { Plugin } from 'vite';
 
 const ROUTES_SEGMENT = '/src/routes/';
+const CONTENT_SEGMENT = '/src/content/';
 
 function routePathFromFile(id: string): string | null {
   const normalized = id.replace(/\\/g, '/');
+  if (normalized.includes(CONTENT_SEGMENT)) {
+    return null;
+  }
   const markerIndex = normalized.indexOf(ROUTES_SEGMENT);
   if (markerIndex === -1) {
     return null;
@@ -57,6 +61,10 @@ export function docsMetaPlugin(): Plugin {
       }
 
       if (!id.endsWith('.tsx') && !id.endsWith('.ts')) {
+        return null;
+      }
+
+      if (pathname.includes(':slug') || pathname.includes(':lang')) {
         return null;
       }
 

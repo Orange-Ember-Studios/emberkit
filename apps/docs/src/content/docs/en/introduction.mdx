@@ -1,0 +1,72 @@
+import { Badge, Alert, Card, Text } from '@emberkit/ui';
+
+# Introduction
+
+<Text color="muted" className="mb-6">EmberKit is a <strong>minimalist, TypeScript-first JSX framework</strong> built around three principles — <strong>speed first</strong>, then minimal weight, then zero JavaScript by default.</Text>
+
+## Speed
+
+Performance is the top priority. EmberKit optimizes the full path from server to screen:
+
+- **Server-rendered HTML** — Pages ship as markup in dev and production (`hybrid`, `ssr`, `static`). Users see content before JavaScript runs.
+- **Pre-rendered static routes** — In `hybrid` and `static` modes, fixed paths become HTML at build time for CDN-fast TTFB and First Contentful Paint.
+- **Selective hydration** — No virtual DOM reconciliation on the client. Signals update bound nodes via `data-ek-bind`; only interactive regions load JS.
+- **Targeted updates** — When state changes, the runtime touches specific DOM nodes instead of re-rendering component trees.
+
+See [SSR & SSG](/en/docs/ssr) for modes and the build pipeline.
+
+## Weight
+
+A tree-shakeable runtime focused on routing, signals, and DOM binding — not a large reconciler. You pay for what you use. Static pages can ship **no framework JS** at all when they have no handlers or bindings.
+
+## Zero JS by Default
+
+Static markup stays HTML. Interactivity is opt-in:
+
+- `data-ek-bind` — connect signals to DOM nodes ([Hydration](/en/docs/hydration))
+- Event handlers — wired after load via `data-ekclick`
+- Components with `onClick` or bindings — only those regions hydrate
+
+```tsx
+function Hero() {
+  return <h1>Hello</h1>; // fast paint, no client JS
+}
+
+function Counter() {
+  const [count, setCount] = createSignal(0);
+  return (
+    <>
+      <span data-ek-bind={count}>{count()}</span>
+      <button type="button" onClick={() => setCount((n) => n + 1)}>+</button>
+    </>
+  );
+}
+```
+
+## At a glance
+
+| | |
+|--|--|
+| Routing | `src/routes/` file conventions |
+| Rendering | Hybrid default: pre-render static paths, SSR for dynamic routes |
+| State | Signals + targeted DOM updates |
+| Tooling | `emberkit dev`, `build`, `preview`, `serve` |
+
+## What's new in 0.8.0
+
+- **Reactive effects** — <code>createEffect</code> / <code>createMemo</code> re-run when dependencies change
+- **View Transitions** — <code>render(..., &#123; viewTransitions: true &#125;)</code> for SPA navigation
+- **Dev API** — <code>devApiPlugin</code> and <code>src/routes/_api/*</code> in development
+- **sqlRawPlugin** — import <code>*.sql?raw</code> for edge deployments
+- **i18n** — JSON translation files with <code>createI18nFromGlob</code> ([guide](/en/docs/i18n))
+
+See the full [Release 0.8.0](/en/docs/release-0-8) notes.
+
+## Next Steps
+
+- [Installation](/en/docs/installation) — Create a project
+- [Quick Start](/en/docs/quick-start) — First routes and signals
+- [Release 0.8.0](/en/docs/release-0-8) — Latest release
+- [SSR & SSG](/en/docs/ssr) — How speed is delivered in each mode
+- [Hydration](/en/docs/hydration) — Selective client interactivity
+- [Internationalization](/en/docs/i18n) — JSON translations and locale routing

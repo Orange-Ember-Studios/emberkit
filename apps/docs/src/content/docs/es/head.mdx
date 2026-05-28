@@ -1,0 +1,240 @@
+import { Badge, Alert, Card, Text, Heading } from '@emberkit/ui';
+
+# Componente Head
+
+<Text color="muted" className="mb-6">El componente <code className="text-primary-400">{'<Head>'}</code> gestiona las etiquetas de <code className="text-primary-400">{'<head>'}</code> desde JSX. No renderiza nada en el body; en el cliente actualiza <code className="text-primary-400">document.head</code> directamente. Para cadenas HTML programáticas (Open Graph, helpers JSON-LD), consulta [SEO y meta](/es/docs/meta). Para títulos de ruta en el build SSR por defecto, usa <code className="text-primary-400">export const metadata</code> — [SSR y SSG](/es/docs/ssr#route-metadata-built-in-ssr-head).</Text>
+
+## Uso básico
+
+```tsx
+import { Head } from '@emberkit/core';
+
+function MyPage() {
+  return (
+    <>
+      <Head>
+        <title>My Page - EmberKit</title>
+        <meta name="description" content="A page built with EmberKit" />
+      </Head>
+      <h1>Hello World</h1>
+    </>
+  );
+}
+```
+
+Durante SSR, esto produce:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Page - EmberKit</title>
+  <meta name="description" content="A page built with EmberKit">
+</head>
+<body>
+  <h1>Hello World</h1>
+</body>
+</html>
+```
+
+## Props abreviadas
+
+Para etiquetas comunes, usa props en lugar de JSX crudo:
+
+```tsx
+<Head
+  title="My Page"
+  description="Page description"
+  keywords={['emberkit', 'framework', 'typescript']}
+  author="EmberKit Team"
+  robots="index, follow"
+  canonical="https://example.com/my-page"
+/>
+```
+
+### Props soportadas
+
+<Card title="Referencia de props abreviadas" variant="outline">
+  <table>
+    <thead>
+      <tr>
+        <th>Prop</th>
+        <th>Tipo</th>
+        <th>Salida HTML</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td><code>title</code></td><td><code>string</code></td><td><code>{'<title>'} + {'<meta name="title">'}</code></td></tr>
+      <tr><td><code>description</code></td><td><code>string</code></td><td><code>{'<meta name="description">'}</code></td></tr>
+      <tr><td><code>keywords</code></td><td><code>string[]</code></td><td><code>{'<meta name="keywords">'}</code> (separadas por comas)</td></tr>
+      <tr><td><code>author</code></td><td><code>string</code></td><td><code>{'<meta name="author">'}</code></td></tr>
+      <tr><td><code>robots</code></td><td><code>string</code></td><td><code>{'<meta name="robots">'}</code></td></tr>
+      <tr><td><code>canonical</code></td><td><code>string</code></td><td><code>{'<link rel="canonical">'}</code></td></tr>
+    </tbody>
+  </table>
+</Card>
+
+## Open Graph
+
+```tsx
+<Head
+  og={{
+    type: 'article',
+    title: 'My Page',
+    description: 'Page description for social sharing',
+    url: 'https://example.com/my-page',
+    image: 'https://example.com/og-image.png',
+    locale: 'en_US',
+    siteName: 'My Site',
+  }}
+/>
+```
+
+## Twitter Cards
+
+```tsx
+<Head
+  twitter={{
+    card: 'summary_large_image',
+    site: '@emberkit',
+    creator: '@author',
+    title: 'My Page',
+    description: 'Page description',
+    image: 'https://example.com/twitter-image.png',
+  }}
+/>
+```
+
+## Combinar children y props
+
+Puedes mezclar props abreviadas con children JSX crudos:
+
+```tsx
+<Head title="My Page" description="Description">
+  <meta property="og:image" content="https://example.com/og.png" />
+  <link rel="icon" href="/favicon.ico" />
+</Head>
+```
+
+Cuando se proporcionan `children`, tienen prioridad — las props abreviadas se ignoran.
+
+## Varios componentes <code className="text-primary-400">{'<Head>'}</code>
+
+Usa varios componentes <code className="text-primary-400">{'<Head>'}</code> en tu árbol de componentes. Todas las etiquetas se recopilan y fusionan en <code className="text-primary-400">{'<head>'}</code>:
+
+```tsx
+// El layout aporta meta por defecto
+function Layout({ children }) {
+  return (
+    <>
+      <Head>
+        <meta name="theme-color" content="#0b0f19" />
+        <meta property="og:site_name" content="My Site" />
+      </Head>
+      {children}
+    </>
+  );
+}
+
+// La página aporta meta específica
+function AboutPage() {
+  return (
+    <>
+      <Head>
+        <title>About Us - My Site</title>
+        <meta name="description" content="Learn about our team" />
+      </Head>
+      <h1>About Us</h1>
+    </>
+  );
+}
+```
+
+## Datos estructurados (JSON-LD)
+
+Usa children para scripts de datos estructurados:
+
+```tsx
+import { Head, generateArticleSchema } from '@emberkit/core';
+
+function ArticlePage() {
+  const schema = generateArticleSchema({
+    title: 'My Article',
+    description: 'Article description',
+    author: 'John Doe',
+    publishedAt: '2025-01-15',
+    url: 'https://example.com/article',
+  });
+
+  return (
+    <>
+      <Head>
+        <title>My Article</title>
+        <script type="application/ld+json">{schema}</script>
+      </Head>
+      <article>
+        <h1>My Article</h1>
+      </article>
+    </>
+  );
+}
+```
+
+## Cómo funciona
+
+### SSR
+
+Durante el renderizado en servidor, <code className="text-primary-400">{'<Head>'}</code>:
+
+1. Renderiza sus children a una cadena HTML
+2. Registra el HTML en un registro interno de contenido head
+3. Devuelve `null` (nada en el body de la página)
+
+Durante SSR, las etiquetas registradas están disponibles vía `drainHeadContent()` desde `@emberkit/core`. La entrada del servidor CLI integrada inyecta exports `metadata` de rutas; usa un `src/entry-server.tsx` personalizado si necesitas fusionar `drainHeadContent()` en tu plantilla HTML.
+
+### Navegación del lado del cliente
+
+Durante la navegación SPA, <code className="text-primary-400">{'<Head>'}</code>:
+
+1. Renderiza sus children a una cadena HTML
+2. Parsea el HTML y actualiza `document.head` directamente
+3. Las etiquetas se marcan con `data-ek-head` para que los re-renders reemplacen (no dupliquen) las etiquetas gestionadas
+
+### Referencia API
+
+```typescript
+interface HeadProps {
+  children?: JSXNode | JSXNode[];
+  title?: string;
+  description?: string;
+  og?: {
+    title?: string;
+    description?: string;
+    type?: string;
+    url?: string;
+    image?: string;
+    locale?: string;
+    siteName?: string;
+  };
+  twitter?: {
+    card?: string;
+    site?: string;
+    creator?: string;
+    title?: string;
+    description?: string;
+    image?: string;
+  };
+  canonical?: string;
+  robots?: string;
+  keywords?: string[];
+  author?: string;
+}
+```
+
+## Próximos pasos
+
+- [SEO y meta](/es/docs/meta) — Generación programática de meta con `generateMeta()`
+- [SSR](/es/docs/ssr) — Pipeline de renderizado en servidor
+- [Componentes](/es/docs/components) — Patrones de componentes

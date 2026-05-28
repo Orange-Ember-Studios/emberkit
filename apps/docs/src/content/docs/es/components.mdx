@@ -1,0 +1,136 @@
+import { Badge, Alert, Card, Text } from '@emberkit/ui';
+
+# Componentes
+
+<Text color="muted" className="mb-6">Los componentes de EmberKit son funciones simples que devuelven elementos JSX. Siguen el mismo modelo mental que React, pero con cero overhead de runtime por defecto.</Text>
+
+## Definir un componente
+
+```tsx
+function Button({ children, variant = 'primary' }: { children: unknown; variant?: string }) {
+  return (
+    <button className={`btn btn-${variant}`}>
+      {children}
+    </button>
+  );
+}
+```
+
+Los componentes reciben un único objeto de props y devuelven JSX. No hay componentes de clase, métodos de ciclo de vida ni enlace de `this`.
+
+## Usar componentes
+
+```tsx
+function App() {
+  return (
+    <div>
+      <Button>Click me</Button>
+      <Button variant="secondary">Cancel</Button>
+    </div>
+  );
+}
+```
+
+## Children
+
+Los componentes pueden aceptar `children` para actuar como contenedores:
+
+```tsx
+function Card({ children, title }: { children: unknown; title: string }) {
+  return (
+    <div className="card">
+      <h3 className="card-title">{title}</h3>
+      <div className="card-body">{children}</div>
+    </div>
+  );
+}
+```
+
+## Renderizado condicional
+
+Usa expresiones de JavaScript para la salida condicional:
+
+```tsx
+function Status({ online }: { online: boolean }) {
+  return (
+    <div>
+      {online ? <span className="badge-green">Online</span> : <span className="badge-red">Offline</span>}
+    </div>
+  );
+}
+```
+
+## Listas
+
+Usa `map` para renderizar listas con props `key`:
+
+```tsx
+function TodoList({ items }: { items: string[] }) {
+  return (
+    <ul>
+      {items.map((item) => (
+        <li key={item}>{item}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+## Estático vs interactivo
+
+<Alert variant="info" title="Concepto clave">
+  <strong>Estático</strong> — sin handlers, sin <code>data-ek-bind</code>: HTML puro, sin JS en el cliente.<br />
+  <strong>Interactivo</strong> — <code>onClick</code> / <code>data-ek-bind</code>: hidratación dirigida tras SSR.
+</Alert>
+
+```tsx
+function Title() {
+  return <h1>Hello</h1>;
+}
+
+function Counter() {
+  const [count, setCount] = createSignal(0);
+  return (
+    <div>
+      <button type="button" onClick={() => setCount((c) => c + 1)}>+</button>
+      <span data-ek-bind={count}>{count()}</span>
+    </div>
+  );
+}
+```
+
+Detalles: [Hidratación](/es/docs/hydration). Props signal en componentes: [Signals](/es/docs/signals#components-accepting-signals).
+
+## Interfaz de props
+
+Define los tipos de props con interfaces de TypeScript:
+
+```tsx
+interface ButtonProps {
+  children: unknown;
+  variant?: 'primary' | 'secondary' | 'ghost';
+  size?: 'sm' | 'md' | 'lg';
+  disabled?: boolean;
+  onClick?: () => void;
+}
+
+function Button({ children, variant = 'primary', size = 'md', disabled, onClick }: ButtonProps) {
+  return (
+    <button
+      className={`btn btn-${variant} btn-${size}`}
+      disabled={disabled}
+      onClick={onClick}
+    >
+      {children}
+    </button>
+  );
+}
+```
+
+## Próximos pasos
+
+- [Routing](/es/docs/routing) — Routing basado en archivos
+- [Signals](/es/docs/signals) — Estado reactivo
+- [SSR y SSG](/es/docs/ssr) — Modos de renderizado
+- [Context](/es/docs/context) — Estado compartido entre componentes
+- [Internacionalización](/es/docs/i18n) — Archivos JSON de traducción y rutas por locale

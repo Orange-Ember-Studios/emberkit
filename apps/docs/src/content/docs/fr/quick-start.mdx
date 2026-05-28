@@ -1,0 +1,122 @@
+---
+title: Démarrage rapide
+---
+
+import { Badge, Alert, Card, Text } from '@emberkit/ui';
+
+# Démarrage rapide
+
+<Text color="muted" className="mb-6">Créez votre première app EmberKit en quelques minutes.</Text>
+
+## 1. Créer un projet
+
+```bash
+npx @emberkit/cli@latest create my-app
+cd my-app && pnpm install && pnpm dev
+```
+
+## 2. Ajouter une route
+
+Les routes vivent dans `src/routes/`. Modifiez `index.tsx` ou ajoutez de nouveaux fichiers :
+
+```tsx
+// src/routes/index.tsx
+export default function HomePage() {
+  return (
+    <main>
+      <h1>Welcome to EmberKit</h1>
+      <p>Fast, light, and zero-JS by default.</p>
+    </main>
+  );
+}
+```
+
+Le layout dans `src/routes/_layout.tsx` enveloppe chaque page. L'entrée client (`src/index.tsx`) appelle `render()` avec `virtual:emberkit-routes`.
+
+## 3. Routes dynamiques
+
+```tsx
+// src/routes/blog/[slug].tsx
+import type { RouteParams } from '@emberkit/core';
+
+export default function PostPage({ params }: RouteParams<{ slug: string }>) {
+  return <h1>Post: {params.slug}</h1>;
+}
+```
+
+Naviguez vers `/blog/hello-world` — `params.slug` est disponible côté serveur et client.
+
+## 4. Signals et hydratation
+
+```tsx
+import { createSignal } from '@emberkit/core';
+
+function Counter() {
+  const [count, setCount] = createSignal(0);
+
+  return (
+    <div>
+      <p>
+        Count: <span data-ek-bind={count}>{count()}</span>
+      </p>
+      <button onClick={() => setCount((c) => c + 1)}>Increment</button>
+    </div>
+  );
+}
+```
+
+<Alert variant="info" title="Comment ça marche">
+  Le SSR écrit le compteur initial dans le HTML avec <code>data-ek-bind</code>. Après le chargement, seul le <code>span</code> lié se met à jour quand le signal change. Voir [Hydratation](/fr/docs/hydration) pour tous les attributs de liaison.
+</Alert>
+
+## 5. Navigation
+
+```tsx
+import { navigate } from '@emberkit/core';
+
+function Nav() {
+  return (
+    <nav>
+      <a href="/">Home</a>
+      <a href="/about">About</a>
+      <button type="button" onClick={() => navigate('/contact')}>
+        Contact
+      </button>
+    </nav>
+  );
+}
+```
+
+Utilisez des `<a href>` standard pour des liens compatibles SSR, ou `navigate()` pour un routage programmatique avec View Transitions optionnelles.
+
+## 6. Métadonnées de page
+
+```tsx
+export const metadata = {
+  title: 'About — My App',
+  description: 'About our team',
+};
+
+export default function About() {
+  return <h1>About</h1>;
+}
+```
+
+Ou utilisez `<Head>` de `@emberkit/core` dans les composants — voir [Head](/fr/docs/head).
+
+## 7. Build pour la production
+
+```bash
+pnpm build      # Sortie dans dist/ (mode depuis emberkit.config.ts)
+pnpm preview    # Serveur de preview local
+```
+
+Définissez `mode: 'static'` dans `emberkit.config.ts` pour une exportation entièrement statique, ou `hybrid` (par défaut) pour des pages statiques plus du SSR sur les routes dynamiques. Voir [SSR et SSG](/fr/docs/ssr).
+
+## Prochaines étapes
+
+- [Routage](/fr/docs/routing) — Layouts, loaders, routes API, pages d'erreur
+- [SSR et SSG](/fr/docs/ssr) — Modes de rendu et pipeline de build
+- [Signals](/fr/docs/signals) — État réactif
+- [Composants](/fr/docs/components) — UI statique vs interactive
+- [Internationalisation](/fr/docs/i18n) — Fichiers JSON de traduction

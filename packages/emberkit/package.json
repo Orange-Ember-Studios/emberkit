@@ -56,6 +56,10 @@
     "./logger/node": {
       "types": "./dist/logger/node.d.ts",
       "import": "./dist/logger/node.js"
+    },
+    "./i18n/node": {
+      "types": "./dist/i18n/node.d.ts",
+      "import": "./dist/i18n/node.js"
     }
   },
   "scripts": {

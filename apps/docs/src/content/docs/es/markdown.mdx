@@ -1,0 +1,170 @@
+import { Badge, Alert, Card, Text } from '@emberkit/ui';
+
+# Markdown y MDX
+
+<Text color="muted" className="mb-6">EmberKit incluye soporte integrado de Markdown y MDX. Escribe contenido en Markdown y renderízalo como componentes JSX.</Text>
+
+## Uso básico
+
+```tsx
+import { renderMarkdown } from '@emberkit/core';
+
+const html = renderMarkdown('# Hello\n\nThis is **bold** and *italic*.');
+```
+
+## Markdown inline en rutas
+
+El enfoque más simple — escribe Markdown como literales de plantilla:
+
+```tsx
+import type { RouteComponent } from '@emberkit/core';
+import { renderMarkdown } from '@emberkit/core';
+
+const content = `# My Page
+
+This is a paragraph with **bold** and *italic* text.
+
+## Section
+
+- Item 1
+- Item 2
+- Item 3
+`;
+
+const MyPage: RouteComponent = () => {
+  const html = renderMarkdown(content);
+  return <div dangerouslySetInnerHTML={{ __html: html }} />;
+};
+```
+
+## Archivos Markdown nativos
+
+Coloca archivos `.md` en `src/routes/` y se convierten en rutas automáticamente. El plugin de Vite los envuelve en componentes:
+
+```markdown
+---
+title: My Page
+description: A page written in Markdown
+---
+
+# Hello World
+
+This is a **Markdown** file that becomes a route.
+
+- No TSX needed
+- Auto-wrapped into a component
+- Frontmatter exports available as named exports
+```
+
+## Frontmatter
+
+Extrae metadatos del Markdown:
+
+```tsx
+import { extractFrontmatter } from '@emberkit/core';
+
+const result = extractFrontmatter(`---
+title: My Post
+date: 2025-01-15
+tags: [emberkit, tutorial]
+---
+
+# Content here
+`);
+
+console.log(result.data); // { title: 'My Post', date: '2025-01-15', tags: [...] }
+```
+
+## Funciones de Markdown
+
+<Card title="Funciones compatibles" variant="outline">
+  <table>
+    <thead>
+      <tr><th>Función</th><th>Sintaxis</th><th>Estado</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>GFM</td><td><code>~~strikethrough~~</code>, <code>==highlight==</code></td><td><Badge variant="success">Compatible</Badge></td></tr>
+      <tr><td>Tablas</td><td>Tablas con pipes</td><td><Badge variant="success">Compatible</Badge></td></tr>
+      <tr><td>Listas de tareas</td><td><code>- [x] Done</code></td><td><Badge variant="success">Compatible</Badge></td></tr>
+      <tr><td>Bloques de código</td><td>Cercados con lenguaje</td><td><Badge variant="success">Compatible</Badge></td></tr>
+      <tr><td>Código inline</td><td>Backticks</td><td><Badge variant="success">Compatible</Badge></td></tr>
+      <tr><td>Enlaces</td><td><code>{'[text](url)'}</code></td><td><Badge variant="success">Compatible</Badge></td></tr>
+      <tr><td>Imágenes</td><td><code>{'![alt](src)'}</code></td><td><Badge variant="success">Compatible</Badge></td></tr>
+      <tr><td>Citas</td><td><code>&gt; quote</code></td><td><Badge variant="success">Compatible</Badge></td></tr>
+      <tr><td>Notas al pie</td><td><code>[^1]</code></td><td><Badge variant="success">Compatible</Badge></td></tr>
+      <tr><td>Listas de definición</td><td><code>term: definition</code></td><td><Badge variant="success">Compatible</Badge></td></tr>
+    </tbody>
+  </table>
+</Card>
+
+## Compilador MDX
+
+Para casos más complejos, usa el compilador MDX. Los archivos MDX admiten todas las funciones de Markdown más JSX:
+
+```tsx
+import { compileMDX } from '@emberkit/core';
+
+const component = await compileMDX(`
+# Title
+
+Some content with **markup**.
+
+- [x] Task 1
+- [ ] Task 2
+
+| Column 1 | Column 2 |
+|----------|----------|
+| Cell 1   | Cell 2   |
+`);
+
+// component is a function that returns JSX
+const element = component({});
+```
+
+## Compilación síncrona
+
+```tsx
+import { compileSync, useMDX } from '@emberkit/core';
+
+const component = compileSync('# Hello World');
+// or
+const component = useMDX('# Hello World');
+```
+
+## Componentes personalizados
+
+Sustituye cómo se renderizan los elementos Markdown:
+
+```tsx
+import { renderMarkdown } from '@emberkit/core';
+
+const html = renderMarkdown(content, {
+  components: {
+    h1: 'h2',    // Render h1 as h2
+    table: 'div', // Wrap tables in div
+  },
+});
+```
+
+## Tiempo de lectura
+
+```tsx
+import { getReadingTime } from '@emberkit/core';
+
+const minutes = getReadingTime(content); // ~200 WPM
+```
+
+## Conteo de palabras
+
+```tsx
+import { getWordCount, getCharacterCount } from '@emberkit/core';
+
+const words = getWordCount(content);
+const chars = getCharacterCount(content, false); // excluding spaces
+```
+
+## Siguientes pasos
+
+- [Componentes](/es/docs/components) - Renderizado de componentes
+- [SEO y meta](/es/docs/meta) - Meta tags desde frontmatter
+- [Enrutamiento](/es/docs/routing) - Contenido a nivel de ruta

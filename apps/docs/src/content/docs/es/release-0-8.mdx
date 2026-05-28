@@ -1,0 +1,143 @@
+---
+title: Release 0.8.0
+---
+
+import { Badge, Alert, Card, Text } from '@emberkit/ui';
+
+# Release 0.8.0
+
+<Text color="muted" className="mb-6">
+  <Badge variant="outline" className="mr-2">@emberkit/core 0.8.0</Badge>
+  <Badge variant="outline" className="mr-2">@emberkit/cli 1.0.0</Badge>
+  <Badge variant="outline">@emberkit/icons & @emberkit/ui 6.0.0</Badge>
+</Text>
+
+Esta release añade efectos reactivos, View Transitions, routing API en dev, imports SQL raw, bindings de hidratación más robustos y correcciones para cargar <code>emberkit.config.ts</code> en el plugin de Vite.
+
+## Destacados
+
+| Área | Qué cambió |
+|------|------------|
+| [Signals](/es/docs/signals) | <code>createEffect</code> y <code>createMemo</code> rastrean dependencias y se re-ejecutan cuando cambian los signals |
+| [View Transitions](/es/docs/view-transitions) | Transiciones SPA integradas vía <code>render(..., &#123; viewTransitions: true &#125;)</code> |
+| [Dev API](/es/docs/dev-api) | <code>devApiPlugin</code> y rutas por archivo <code>src/routes/_api/*</code> en desarrollo |
+| [Hidratación](/es/docs/hydration#dynamic-lists-after-ssr) | <code>data-ek-bind</code> más rico para inputs; guía para listas async tras SSR |
+| Vite | <code>sqlRawPlugin()</code> para imports <code>*.sql?raw</code> (Workers / edge) |
+
+## Efectos reactivos y memos
+
+Antes de 0.8.0, <code>createEffect</code> se ejecutaba una sola vez en el cliente. Ahora:
+
+- Rastrea lecturas dentro del effect (y dentro de <code>createMemo</code>)
+- Se re-ejecuta cuando cambian esos signals
+- Respeta <code>untrack()</code> y agrupa notificaciones vía <code>batch()</code>
+- Omite la ejecución durante SSR (<code>window</code> es undefined)
+
+```tsx
+import { createSignal, createEffect } from '@emberkit/core';
+
+const [query, setQuery] = createSignal('');
+
+createEffect(() => {
+  document.title = `Search: ${query()}`;
+});
+```
+
+Consulta [Signals — Effects](/es/docs/signals#effects-with-createeffect).
+
+## View Transitions
+
+Habilita cambios de ruta fluidos con la View Transitions API nativa:
+
+```tsx
+import { render } from '@emberkit/core';
+import App from './routes/_layout.tsx';
+import { routes } from 'virtual:emberkit-routes';
+
+render(App, document.getElementById('app')!, {
+  routes,
+  viewTransitions: true,
+});
+```
+
+También exportados: <code>supportsViewTransitions</code>, <code>withViewTransition</code>, <code>initViewTransitions</code>, <code>navigateWithViewTransition</code> y <code>navigate(..., &#123; viewTransition: true &#125;)</code>.
+
+Guía completa: [View Transitions](/es/docs/view-transitions).
+
+## Middleware Dev API
+
+En desarrollo, reenvía <code>/api</code> y <code>/api/*</code> a un handler Node o a rutas por archivo bajo <code>src/routes/_api/</code>.
+
+**Opción A — config:**
+
+```ts
+// emberkit.config.ts
+export default defineConfig({
+  devApi: {
+    handler: './src/server/api-router.node.ts',
+    export: 'handleApiRequestNode',
+  },
+});
+```
+
+**Opción B — plugin Vite explícito** (mismo comportamiento):
+
+```ts
+import { devApiPlugin, emberkitVitePlugin } from '@emberkit/core/vite-plugin';
+
+plugins: [
+  devApiPlugin({
+    handler: './src/server/api-router.node.ts',
+    export: 'handleApiRequestNode',
+  }),
+  emberkitVitePlugin(),
+];
+```
+
+Si <code>devApi</code> no está configurado y tienes rutas <code>src/routes/_api/*</code>, el routing API por archivo se habilita automáticamente.
+
+Detalles: [Dev API](/es/docs/dev-api).
+
+## sqlRawPlugin
+
+Importa archivos SQL como strings en build time (útil para migraciones en Cloudflare Workers, donde no hay filesystem):
+
+```ts
+import migration from '../migrations/001_init.sql?raw';
+```
+
+```ts
+import { sqlRawPlugin, emberkitVitePlugin } from '@emberkit/core/vite-plugin';
+
+plugins: [sqlRawPlugin(), emberkitVitePlugin()];
+```
+
+## Mejoras de hidratación
+
+- <strong>Inputs:</strong> <code>data-ek-bind</code> en <code>&lt;input&gt;</code>, <code>&lt;textarea&gt;</code> y <code>&lt;select&gt;</code> sincroniza <code>.value</code>; los botones pueden enlazar <code>disabled</code>.
+- <strong>SSR + listas async:</strong> La hidratación no re-renderiza listas <code>.map()</code> cuando un signal se actualiza. Consulta [Listas dinámicas tras SSR](/es/docs/hydration#dynamic-lists-after-ssr).
+
+## Correcciones del plugin Vite (0.8.0)
+
+- <code>emberkit.config.ts</code> se transpila con esbuild cuando el plugin carga opciones (corrige que <code>devApi</code> no se aplicara bajo Node plano).
+- El middleware SSR en dev omite peticiones <code>/api</code> para que no se rendericen como páginas HTML.
+- El matching de prefijo API acepta <code>/api</code> y <code>/api/*</code> (no solo <code>/api/...</code> con path final).
+
+## CLI 1.0.0
+
+La versión major del CLI se alinea con core 0.8.0. Las plantillas de scaffold fijan rangos de dependencias compatibles. Sin cambios breaking en comandos CLI más allá de la alineación de versiones.
+
+## Checklist de migración
+
+1. Actualiza dependencias: <code>@emberkit/core@^0.8.0</code>, <code>@emberkit/cli@^1.0.0</code>, opcional <code>@emberkit/icons@^6.0.0</code> / <code>@emberkit/ui@^6.0.0</code>.
+2. Elimina shims locales si copiaste <code>vite.dev-api-plugin.ts</code> o <code>vite-sql-raw.ts</code> de apps antiguas.
+3. Añade <code>devApi</code> o <code>devApiPlugin</code> para rutas API locales.
+4. Habilita <code>viewTransitions: true</code> en <code>render()</code> y elimina scripts custom de view-transition si estaban duplicados.
+5. Para páginas SSR con listas obtenidas en cliente, sigue la [guía de hidratación para listas dinámicas](/es/docs/hydration#dynamic-lists-after-ssr).
+
+## Próximos pasos
+
+- [Referencia API](/es/docs/api) — exports actualizados
+- [Dev API](/es/docs/dev-api)
+- [View Transitions](/es/docs/view-transitions)
+- [Hidratación](/es/docs/hydration)

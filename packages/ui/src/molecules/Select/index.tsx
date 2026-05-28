@@ -6,6 +6,8 @@ import type { SelectHTMLAttributes } from "../../types/index.js";
 export interface SelectOption {
   value: string;
   label: string;
+  /** Optional leading marker (e.g. flag emoji) shown before the label. */
+  leading?: string;
   disabled?: boolean;
 }
 
@@ -165,7 +167,14 @@ const Select: FC<SelectProps> = ({
                 data-ek-active-class={opt.disabled ? undefined : activeCls}
                 data-ek-inactive-class={opt.disabled ? undefined : inactiveCls}
               >
-                <span>{opt.label}</span>
+                <span class="flex min-w-0 items-center gap-2">
+                  {opt.leading ? (
+                    <span aria-hidden="true" class="shrink-0 text-base leading-none">
+                      {opt.leading}
+                    </span>
+                  ) : null}
+                  <span>{opt.label}</span>
+                </span>
                 {!opt.disabled && (
                   <Icon
                     name="check"

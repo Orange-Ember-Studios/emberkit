@@ -1,0 +1,111 @@
+import { Badge, Alert, Card, Text } from '@emberkit/ui';
+
+# Optimización de imágenes
+
+<Text color="muted" className="mb-6">EmberKit ofrece optimización de imágenes integrada con conversión automática de formato, tamaños responsivos y carga diferida.</Text>
+
+## Plugin de imágenes
+
+Activa el plugin de imágenes en tu configuración de Vite:
+
+```typescript
+import { defineConfig } from 'vite';
+import { createImageVitePlugin } from '@emberkit/core';
+
+export default defineConfig({
+  plugins: [
+    createImageVitePlugin({
+      quality: 80,
+      formats: ['webp', 'jpeg'],
+      sizes: [320, 640, 1024, 1920],
+      lazy: true,
+      placeholder: 'blur',
+    }),
+  ],
+});
+```
+
+## Configuración
+
+<Card title="Opciones del plugin" variant="outline">
+  <table>
+    <thead>
+      <tr><th>Opción</th><th>Por defecto</th><th>Descripción</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>quality</code></td><td><code>80</code></td><td>Calidad de imagen (1-100)</td></tr>
+      <tr><td><code>formats</code></td><td><code>['webp', 'jpeg']</code></td><td>Formatos de salida</td></tr>
+      <tr><td><code>sizes</code></td><td><code>[320, 640, 1024, 1920]</code></td><td>Puntos de corte responsivos</td></tr>
+      <tr><td><code>lazy</code></td><td><code>true</code></td><td>Activar carga diferida</td></tr>
+      <tr><td><code>placeholder</code></td><td><code>'blur'</code></td><td>Tipo de marcador de posición</td></tr>
+    </tbody>
+  </table>
+</Card>
+
+## Carga diferida
+
+Las imágenes se cargan de forma diferida por defecto:
+
+```tsx
+function Gallery() {
+  return (
+    <img
+      src="/images/photo.jpg"
+      alt="A beautiful scene"
+      loading="lazy"
+      decoding="async"
+    />
+  );
+}
+```
+
+## Marcadores de posición con desenfoque
+
+Muestra un marcador desenfocado mientras carga la imagen:
+
+```tsx
+// El procesador de imágenes genera marcadores de desenfoque automáticamente
+<img
+  src="/images/hero.jpg"
+  alt="Hero image"
+  style={{
+    backgroundImage: 'url(data:image/jpeg;base64,...)',
+    backgroundSize: 'cover',
+  }}
+/>
+```
+
+## Imágenes responsivas
+
+Genera varios tamaños para distintos viewports:
+
+```html
+<picture>
+  <source
+    srcset="/images/photo-320.webp 320w, /images/photo-640.webp 640w, /images/photo-1024.webp 1024w"
+    type="image/webp"
+  />
+  <source
+    srcset="/images/photo-320.jpg 320w, /images/photo-640.jpg 640w, /images/photo-1024.jpg 1024w"
+    type="image/jpeg"
+  />
+  <img src="/images/photo-640.jpg" alt="Photo" loading="lazy" />
+</picture>
+```
+
+## Proveedores personalizados
+
+Configura proveedores de imágenes externos:
+
+```typescript
+createImageVitePlugin({
+  provider: 'cloudinary',
+  baseUrl: 'https://res.cloudinary.com/mycloud',
+});
+```
+
+## Siguientes pasos
+
+- [Despliegue en el edge](/es/docs/edge) - Optimizar para entrega en el edge
+- [Componentes](/es/docs/components) - Patrones de componentes de imagen
+- [SSR](/es/docs/ssr) - Imágenes renderizadas en el servidor

@@ -1,0 +1,592 @@
+import { Badge, Alert, Card, Text } from '@emberkit/ui';
+
+# Referencia de API
+
+<Text color="muted" className="mb-8">Referencia completa de API para <code class="text-primary-400">@emberkit/core</code>.</Text>
+
+## Runtime
+
+### render
+
+```typescript
+render(
+  element: JSXElement | string | null | ((props: Record<string, unknown>) => JSXNode),
+  container: Element | string,
+  options?: {
+    hydrate?: boolean;
+    viewTransitions?: boolean | { rootId?: string };
+    routes?: Array<{
+      path: string;
+      component: () => Promise<{ default: (props: Record<string, unknown>) => JSXNode }>;
+    }>;
+  }
+): void
+```
+
+Renderiza un elemento JSX en un contenedor DOM. Pasa <code>routes</code> desde <code>virtual:emberkit-routes</code> para enrutamiento cliente basado en archivos.
+
+```tsx
+import { render } from '@emberkit/core';
+import { routes } from 'virtual:emberkit-routes';
+import App from './routes/_layout.tsx';
+
+render(App, document.getElementById('app')!, {
+  routes,
+  viewTransitions: true,
+});
+```
+
+Consulta [View Transitions](/es/docs/view-transitions).
+
+### hydrate
+
+```typescript
+hydrate(
+  element: JSXElement | string | null,
+  container: Element | string
+): void
+```
+
+Hidrata HTML renderizado en el servidor con interactividad en el cliente.
+
+### createElement
+
+```typescript
+createElement(
+  type: string | ((props) => JSXNode),
+  props?: Record<string, unknown> | null,
+  ...children: unknown[]
+): DOMElement
+```
+
+Crea un elemento JSX. Lo usa la transformación JSX.
+
+## Señales
+
+### createSignal
+
+```typescript
+createSignal<T>(
+  initialValue: T,
+  options?: { equals?: (prev: T, next: T) => boolean }
+): [() => T, (newValue: T) => void] & Signal<T>
+```
+
+Crea una señal reactiva.
+
+```tsx
+const [count, setCount] = createSignal(0);
+console.log(count()); // 0
+setCount(1);
+```
+
+### createMemo
+
+```typescript
+createMemo<T>(
+  computation: () => T,
+  options?: SignalOptions<T>
+): Signal<T>
+```
+
+Crea un valor derivado que se actualiza cuando cambian las dependencias.
+
+```tsx
+const doubled = createMemo(() => count() * 2);
+console.log(doubled.value); // reactive
+```
+
+### createEffect
+
+```typescript
+createEffect(
+  callback: () => void | (() => void)
+): () => void
+```
+
+Ejecuta un efecto secundario cuando cambian las dependencias. Devuelve una función de limpieza.
+
+```tsx
+const dispose = createEffect(() => {
+  document.title = `Count: ${count()}`;
+  return () => { /* cleanup */ };
+});
+```
+
+### batch
+
+```typescript
+batch<T>(fn: () => T): T
+```
+
+Agrupa varias actualizaciones de señal en una sola notificación.
+
+### untrack
+
+```typescript
+untrack<T>(fn: () => T): T
+```
+
+Lee señales sin registrarlas como dependencias.
+
+## Contexto
+
+### createContext
+
+```typescript
+createContext<T>(defaultValue?: T): ContextBridge<T>
+```
+
+Crea un contexto con métodos Provider y use.
+
+```tsx
+const ThemeContext = createContext<'light' | 'dark'>('light');
+```
+
+### useContext
+
+```typescript
+useContext<T>(context: Context<T>): T
+```
+
+Lee el valor de contexto más cercano por encima del componente actual.
+
+## Viewport (lazy en vista)
+
+Diferir renderizado e hidratación de secciones pesadas hasta que estén cerca del viewport. Consulta [Hidratación — Carga diferida en viewport](/es/docs/hydration#viewport-lazy-loading-lazyinview) para conceptos y pruebas.
+
+### LazyInView
+
+```typescript
+function LazyInView(props: LazyInViewProps): JSXNode
+```
+
+```typescript
+interface LazyInViewProps {
+  children: JSXNode | (() => JSXNode);
+  fallback?: JSXNode;
+  rootMargin?: string;      // default '200px'
+  minHeight?: string | number;
+  once?: boolean;             // default true
+  ssr?: 'lazy' | 'eager';     // default 'lazy'
+  as?: string;                // default 'div'
+  className?: string;
+  style?: Record<string, unknown>;
+}
+```
+
+```tsx
+import { LazyInView } from '@emberkit/core';
+
+<LazyInView minHeight="20rem" fallback={<div className="min-h-80 animate-pulse" />}>
+  <ExpensiveSection />
+</LazyInView>
+```
+
+Se invoca automáticamente tras `render()` en el cliente — rara vez llamarás los helpers siguientes salvo un flujo de montaje personalizado.
+
+### hydrateLazyInView
+
+```typescript
+hydrateLazyInView(container: Element): void
+```
+
+Busca `[data-ek-lazy-in-view]:not([data-ek-lazy-loaded])` bajo `container`, observa cada host, monta hijos registrados al ser visibles y ejecuta hidratación del subárbol (handlers + señales).
+
+### clearLazyRegistry
+
+```typescript
+clearLazyRegistry(): void
+```
+
+Limpia cargadores de contenido en memoria. Útil en tests o desmontaje completo de la app.
+
+## Navegación
+
+### navigate
+
+```typescript
+navigate(
+  to: string,
+  options?: {
+    replace?: boolean;
+    state?: Record<string, unknown>;
+    viewTransition?: boolean;
+  }
+): Promise<void>
+```
+
+Navegación programática.
+
+```tsx
+navigate('/about');
+navigate('/new', { replace: true });
+await navigate('/docs', { viewTransition: true });
+```
+
+### Helpers de view transition
+
+```typescript
+supportsViewTransitions(): boolean
+withViewTransition(callback: () => void | Promise<void>): Promise<void>
+waitForAppUpdate(href: string, options?: { replace?: boolean; rootId?: string }): Promise<void>
+initViewTransitions(options?: { rootId?: string }): void
+navigateWithViewTransition(href: string, options?: { replace?: boolean; rootId?: string }): Promise<void>
+```
+
+Consulta [View Transitions](/es/docs/view-transitions).
+
+### getCached / setCache
+
+```typescript
+getCached<T>(key: string): T | null
+setCache<T>(key: string, data: T, ttl?: number): void
+```
+
+Caché en memoria para compartir datos en el cliente (p. ej. precarga antes de <code>render()</code>). Combínalo con la [guía de hidratación para listas dinámicas](/es/docs/hydration#dynamic-lists-after-ssr) al usar SSR + <code>.map()</code>.
+
+### preload
+
+```typescript
+preload(path: string): void
+```
+
+Precarga una página añadiendo un enlace prefetch al `<head>` del documento.
+
+### redirect
+
+```typescript
+redirect(to: string, status?: number): never
+```
+
+Redirección en el servidor. Lanza una `Response`.
+
+## Markdown
+
+### renderMarkdown
+
+```typescript
+renderMarkdown(
+  content: string,
+  options?: MarkdownOptions
+): string
+```
+
+Renderiza Markdown a HTML.
+
+### extractFrontmatter
+
+```typescript
+extractFrontmatter(
+  content: string
+): { data: Record<string, unknown>; content: string } | null
+```
+
+Extrae frontmatter YAML del Markdown.
+
+### getReadingTime
+
+```typescript
+getReadingTime(text: string, wpm?: number): number
+```
+
+Estima el tiempo de lectura en minutos.
+
+## Formularios
+
+### handleFormSubmit
+
+```typescript
+handleFormSubmit(
+  event: SubmitEvent,
+  config: FormConfig
+): Promise<boolean>
+```
+
+Gestiona el envío de formulario con validación.
+
+### createFormValidator
+
+```typescript
+createFormValidator(schema: ValidationSchema): FormValidator
+```
+
+Crea un validador de formulario desde un esquema.
+
+### parseFormData
+
+```typescript
+parseFormData(form: HTMLFormElement): Record<string, unknown>
+```
+
+Extrae los datos del formulario como objeto plano.
+
+## Internacionalización
+
+Consulta la guía completa: [Internacionalización (i18n)](/es/docs/i18n).
+
+### createI18n
+
+```typescript
+createI18n(config, options?: { strict?: boolean }): I18nInstance
+```
+
+Crea una instancia i18n desde catálogos en memoria (TypeScript u objetos JSON parseados).
+
+```ts
+const i18n = createI18n({
+  locales: ['en', 'es'] as const,
+  defaultLocale: 'en',
+  messages: { en, es },
+});
+```
+
+### createI18nFromJson
+
+```typescript
+createI18nFromJson(
+  config: { locales; defaultLocale; fallbackLocale?; messages: Record<Locale, unknown> },
+  options?: { strict?: boolean }
+): I18nInstance
+```
+
+Crea una instancia i18n desde objetos JSON (imports estáticos o datos parseados). El JSON anidado se aplana a claves con punto.
+
+```ts
+import en from './locales/en.json';
+import es from './locales/es.json';
+
+const i18n = createI18nFromJson({
+  locales: ['en', 'es'] as const,
+  defaultLocale: 'en',
+  messages: { en, es },
+});
+```
+
+### createI18nFromGlob
+
+```typescript
+createI18nFromGlob(
+  modules: Record<string, { default?: unknown } | unknown>,
+  config: { locales; defaultLocale; fallbackLocale? },
+  options?: { strict?: boolean }
+): I18nInstance
+```
+
+Carga cada locale desde resultados de `import.meta.glob` de Vite. El código de locale se deduce del nombre de archivo (`en.json` → `en`).
+
+```ts
+const modules = import.meta.glob('./locales/*.json', { eager: true });
+const i18n = createI18nFromGlob(modules, {
+  locales: ['en', 'es'] as const,
+  defaultLocale: 'en',
+});
+```
+
+### createI18nFromUrls
+
+```typescript
+createI18nFromUrls(
+  urls: Record<Locale, string>,
+  config: { locales; defaultLocale; fallbackLocale? },
+  options?: { strict?: boolean }
+): Promise<I18nInstance>
+```
+
+Obtiene catálogos JSON por red y crea una instancia i18n. Úsalo con archivos en `public/locales/`.
+
+### fetchLocaleMessages
+
+```typescript
+fetchLocaleMessages(urls: Record<Locale, string>): Promise<Record<Locale, MessageCatalog>>
+```
+
+Obtiene y parsea JSON de locale sin crear instancia.
+
+### createI18nContext
+
+```typescript
+createI18nContext<TKeys extends string = string>(): {
+  Provider: (props: { i18n; locale?; children? }) => JSXNode;
+  useI18n: () => I18nInstance<TKeys>;
+  context: ContextBridge;
+}
+```
+
+Proporciona `t()` consciente del locale vía contexto al estilo React.
+
+### I18nInstance
+
+```typescript
+interface I18nInstance {
+  locale: string;
+  t(key, values?): string;
+  tp(key, count, values?): string;
+  setLocale(locale): void;
+  getLocale(): string;
+  hasKey(key, locale?): boolean;
+  formatDate(value, options?): string;
+  formatNumber(value, options?): string;
+  formatRelativeTime(value, unit, options?): string;
+}
+```
+
+### resolveLocaleFromRequest
+
+```typescript
+resolveLocaleFromRequest(request: Request, options: {
+  locales: readonly string[];
+  defaultLocale: string;
+  strategy?: 'path-prefix' | 'header' | 'cookie' | 'query' | Array<...>;
+  cookieName?: string;
+  queryParam?: string;
+}): string
+```
+
+Resuelve el locale activo desde una `Request` entrante (loaders SSR, handlers edge).
+
+### Helpers de ruta
+
+```typescript
+extractLocaleFromPath(pathname, supported): { locale; pathnameWithoutLocale }
+stripLocalePrefix(pathname, supported): string
+addLocalePrefix(pathname, locale): string
+localizePath(pathname, locale, supported): string
+```
+
+Utilidades para prefijos de URL `[locale]`.
+
+### Helpers de catálogo
+
+```typescript
+defineMessages(catalog): typeof catalog
+parseMessageCatalog(input: unknown): MessageCatalog
+parseMessageCatalogJson(json: string): MessageCatalog
+mergeMessageCatalogs(...catalogs): MessageCatalog
+localeFromJsonPath(path): string
+```
+
+### Solo Node (`@emberkit/core/i18n/node`)
+
+```typescript
+readLocaleCatalog(filePath: string): MessageCatalog
+loadLocalesFromDirectory(directory: string): Record<Locale, MessageCatalog>
+createI18nFromDirectory(directory, config, options?): I18nInstance
+```
+
+Cargadores de sistema de archivos para SSR Node y scripts. No disponibles en runtimes edge.
+
+## Meta
+
+### generateMeta
+
+```typescript
+generateMeta(data: MetaData, baseUrl?: string): string
+```
+
+Genera meta tags HTML desde metadatos.
+
+### generateArticleSchema
+
+```typescript
+generateArticleSchema(data: ArticleData): string
+```
+
+Genera esquema JSON-LD Article.
+
+### generateProductSchema
+
+```typescript
+generateProductSchema(data: ProductData): string
+```
+
+Genera esquema JSON-LD Product.
+
+### generateBreadcrumbs
+
+```typescript
+generateBreadcrumbs(items: Array<{ name: string; url: string }>): string
+```
+
+Genera esquema JSON-LD BreadcrumbList.
+
+## SSR y head
+
+### renderToHTMLString
+
+```typescript
+renderToHTMLString(element: JSXNode | null): string
+```
+
+Convierte un árbol de elementos JSX en fragmento HTML. Texto y atributos string se escapan en HTML.
+
+### drainHeadContent
+
+```typescript
+drainHeadContent(): string
+```
+
+Devuelve y limpia las etiquetas registradas por `<Head>` durante el pase de render actual. Úsalo en handlers `entry-server` personalizados.
+
+### RouteParams
+
+```typescript
+interface RouteParams<T extends Record<string, string> = Record<string, string>> {
+  params: T;
+  query: Record<string, string | string[]>;
+  request: Request;
+}
+```
+
+Forma de props para componentes de ruta dinámica (SSR y cliente).
+
+### LoaderFunction
+
+```typescript
+type LoaderFunction<T = unknown> = (
+  context: LoaderContext
+) => Promise<LoaderResult<T>> | LoaderResult<T>;
+```
+
+`LoaderContext` incluye `params`, `query` y `request`. Úsalo con `createLoaderData()` para resultados exitosos.
+
+## Config
+
+### defineConfig
+
+```typescript
+defineConfig(config: Record<string, unknown>): Record<string, unknown>
+```
+
+Se usa en `emberkit.config.ts` para `mode`, `server`, `build`, opciones `vite` anidadas y `devApi` opcional. Consulta [SSR y SSG](/es/docs/ssr) y [Dev API](/es/docs/dev-api).
+
+```ts
+export default defineConfig({
+  mode: 'ssr',
+  devApi: {
+    handler: './src/server/api.node.ts',
+    export: 'handleRequest',
+  },
+});
+```
+
+## Plugin Vite (`@emberkit/core/vite-plugin`)
+
+| Export | Descripción |
+|--------|-------------|
+| `emberkitVitePlugin(options?)` | Rutas, middleware SSR, MDX, manifiesto |
+| `devApiPlugin(options)` | Solo dev `/api` → handler Node |
+| `sqlRawPlugin()` | Empaqueta `*.sql?raw` como literales string |
+| `registerDevApiMiddleware(server, options)` | Adjuntar middleware API personalizado |
+| `registerFileBasedDevApiMiddleware(server)` | Adjuntar enrutamiento `src/routes/_api/*` |
+| `isApiRequest(url)` | Verdadero para `/api` y `/api/*` |
+
+## Siguientes pasos
+
+- [Release 0.8.0](/es/docs/release-0-8) - Últimas funciones
+- [Dev API](/es/docs/dev-api) - Middleware API local
+- [View Transitions](/es/docs/view-transitions) - Transiciones SPA
+- [Internacionalización](/es/docs/i18n) - Traducciones JSON y rutas por locale
+- [Componentes](/es/docs/components) - Patrones de componentes
+- [Señales](/es/docs/signals) - Estado reactivo
+- [Enrutamiento](/es/docs/routing) - Enrutamiento basado en archivos

@@ -1,0 +1,315 @@
+import { Alert, Text } from '@emberkit/ui';
+
+# Internacionalización (i18n)
+
+<Text color="muted" className="mb-6">
+  EmberKit incluye un núcleo i18n ligero y tree-shakeable — sin runtime de terceros.
+  Usa catálogos TypeScript o archivos JSON de traducción.
+</Text>
+
+## Resumen
+
+El i18n de EmberKit se basa en cuatro ideas:
+
+- **Catálogos de mensajes** — mapas clave/valor planos o anidados por locale
+- **Interpolación `{placeholder}`** — `t('greeting', { name: 'Ada' })`
+- **Sintaxis plural con pipe** — `one {count} item | other {count} items`
+- **Formateadores `Intl`** — fechas, números y tiempo relativo sin coste extra de bundle
+
+El locale fluye por **contexto** (`createI18nContext`) y puede resolverse por petición en el servidor.
+
+## Estructura del proyecto (JSON — recomendado)
+
+```
+src/
+├── lib/
+│   └── i18n.ts              # createI18nFromGlob + export del provider
+├── locales/
+│   ├── en.json
+│   └── es.json
+└── routes/
+    ├── [locale]/
+    │   ├── _layout.tsx      # I18nProvider + locale desde loader
+    │   └── index.tsx
+    └── index.tsx            # redirección opcional al locale por defecto
+public/
+└── locales/                 # solo al cargar en diferido vía fetch
+    ├── en.json
+    └── es.json
+```
+
+### `src/locales/en.json`
+
+```json
+{
+  "greeting": "Hello {name}",
+  "nav": {
+    "home": "Home",
+    "about": "About"
+  },
+  "items": "one {count} item | other {count} items"
+}
+```
+
+Los objetos anidados se aplanan a claves con punto — `nav.home` en código.
+
+### `src/lib/i18n.ts`
+
+```ts
+import { createI18nFromGlob, createI18nContext, resolveLocaleFromRequest } from '@emberkit/core';
+
+const modules = import.meta.glob('../locales/*.json', { eager: true });
+
+export const i18n = createI18nFromGlob(modules, {
+  locales: ['en', 'es'] as const,
+  defaultLocale: 'en',
+  fallbackLocale: 'en',
+});
+
+export const { Provider: I18nProvider, useI18n } = createI18nContext();
+
+export function resolveRequestLocale(request: Request): string {
+  return resolveLocaleFromRequest(request, {
+    locales: i18n.locales,
+    defaultLocale: i18n.defaultLocale,
+    strategy: ['path-prefix', 'header', 'cookie'],
+  });
+}
+```
+
+Los nombres de archivo son códigos de locale: `en.json` → `en`, `es-MX.json` → `es-MX`.
+
+## Carga de archivos de traducción
+
+| Método | API | Cuándo usarlo |
+|--------|-----|-------------|
+| **Vite glob** | `createI18nFromGlob` | Por defecto — empaqueta todos los locales en build |
+| **Import estático** | `createI18nFromJson` | Un solo locale o imports explícitos |
+| **Fetch en runtime** | `createI18nFromUrls` | Carga diferida desde `public/locales/` |
+| **Sistema de archivos Node** | `createI18nFromDirectory` | Scripts SSR, CLI, herramientas solo Node |
+
+### Import estático
+
+```ts
+import en from './locales/en.json';
+import es from './locales/es.json';
+import { createI18nFromJson } from '@emberkit/core';
+
+export const i18n = createI18nFromJson({
+  locales: ['en', 'es'] as const,
+  defaultLocale: 'en',
+  messages: { en, es },
+});
+```
+
+Vite y TypeScript resuelven imports JSON cuando `resolveJsonModule` está activo en `tsconfig.json`.
+
+### Carga diferida en runtime (fetch)
+
+```ts
+import { createI18nFromUrls } from '@emberkit/core';
+
+export const i18n = await createI18nFromUrls(
+  {
+    en: '/locales/en.json',
+    es: '/locales/es.json',
+  },
+  { locales: ['en', 'es'] as const, defaultLocale: 'en' },
+);
+```
+
+Coloca JSON bajo `public/locales/` para que el servidor de desarrollo y producción los sirvan como estáticos.
+
+### Node / SSR (sistema de archivos)
+
+```ts
+import { createI18nFromDirectory } from '@emberkit/core/i18n/node';
+
+export const i18n = createI18nFromDirectory('./src/locales', {
+  locales: ['en', 'es'] as const,
+  defaultLocale: 'en',
+});
+```
+
+También disponible desde `@emberkit/core/i18n/node`:
+
+- `readLocaleCatalog(filePath)` — leer y parsear un archivo JSON
+- `loadLocalesFromDirectory(dir)` — cargar todos los `*.json` de una carpeta
+
+<Alert variant="info" title="Edge y Workers">
+  Prefiere <code>createI18nFromGlob</code> o imports JSON estáticos para empaquetar catálogos en build.
+  Los helpers de sistema de archivos requieren Node.js y no están disponibles en Cloudflare Workers.
+</Alert>
+
+## Catálogos TypeScript
+
+Usa `defineMessages` cuando quieras catálogos colocados en TypeScript con inferencia completa de claves:
+
+```ts
+import { createI18n, defineMessages } from '@emberkit/core';
+
+const en = defineMessages({
+  'nav.home': 'Home',
+  greeting: 'Hello {name}',
+  items: 'one {count} item | other {count} items',
+});
+
+const es = defineMessages({
+  'nav.home': 'Inicio',
+  greeting: 'Hola {name}',
+  items: 'one {count} artículo | other {count} artículos',
+});
+
+export const i18n = createI18n({
+  locales: ['en', 'es'] as const,
+  defaultLocale: 'en',
+  fallbackLocale: 'en',
+  messages: { en, es },
+});
+```
+
+## Traducir
+
+```ts
+i18n.t('greeting', { name: 'World' }); // Hello World
+i18n.setLocale('es');
+i18n.t('greeting', { name: 'Mundo' }); // Hola Mundo
+
+// Plural pipe syntax
+i18n.tp('items', 1, { count: 1 });
+i18n.tp('items', 5, { count: 5 });
+
+// Intl helpers (respect current locale)
+i18n.formatDate(new Date(), { dateStyle: 'medium' });
+i18n.formatNumber(1234.5);
+i18n.formatRelativeTime(-1, 'day'); // "1 day ago"
+```
+
+Pasa `{ strict: true }` como segundo argumento a `createI18n` / `createI18nFromJson` para lanzar `MissingTranslationError` en claves faltantes (útil en CI).
+
+## Provider y hooks
+
+```tsx
+import { I18nProvider, useI18n, i18n } from '../lib/i18n';
+
+function App({ locale, children }: { locale: string; children?: unknown }) {
+  return (
+    <I18nProvider i18n={i18n} locale={locale}>
+      {children}
+    </I18nProvider>
+  );
+}
+
+function Header() {
+  const { t, setLocale, formatDate } = useI18n();
+  return (
+    <header>
+      <span>{t('nav.home')}</span>
+      <button type="button" onClick={() => setLocale('es')}>ES</button>
+      <time>{formatDate(new Date(), { dateStyle: 'medium' })}</time>
+    </header>
+  );
+}
+```
+
+## Rutas con prefijo de locale
+
+Combina i18n con un segmento dinámico `[locale]`:
+
+```
+src/routes/[locale]/index.tsx   →  /en, /es
+src/routes/[locale]/about.tsx   →  /en/about, /es/about
+```
+
+```tsx
+// src/routes/[locale]/_layout.tsx
+import type { RouteComponent } from '@emberkit/core';
+import { I18nProvider, i18n, resolveRequestLocale } from '../../lib/i18n';
+
+export async function loader({ request }: { request: Request }) {
+  const locale = resolveRequestLocale(request);
+  return { data: { locale } };
+}
+
+const LocaleLayout: RouteComponent<{ locale: string }> = ({ locale, children }) => (
+  <I18nProvider i18n={i18n} locale={locale}>
+    {children}
+  </I18nProvider>
+);
+
+export default LocaleLayout;
+```
+
+Helpers de ruta para enlaces y redirecciones:
+
+```ts
+import { extractLocaleFromPath, localizePath } from '@emberkit/core';
+
+const { locale, pathnameWithoutLocale } = extractLocaleFromPath('/es/blog/post', ['en', 'es']);
+// locale: 'es', pathnameWithoutLocale: '/blog/post'
+
+localizePath('/en/about', 'es', ['en', 'es']); // '/es/about'
+```
+
+En Cloudflare Workers, usa `beforeAssets` en `createCloudflareWorker` para redirigir visitantes a su prefijo de locale preferido. Consulta [Despliegue en el edge](/es/docs/edge).
+
+## Detección de locale en SSR
+
+`resolveLocaleFromRequest` comprueba estrategias en orden y recurre a `defaultLocale`:
+
+| Estrategia | Origen |
+|----------|--------|
+| `path-prefix` | Primer segmento de URL (`/es/about` → `es`) |
+| `header` | `Accept-Language` |
+| `cookie` | Cookie `locale` (nombre configurable) |
+| `query` | `?lang=es` (parámetro configurable) |
+
+```ts
+import { resolveLocaleFromRequest } from '@emberkit/core';
+
+export async function loader({ request }: RouteParams) {
+  const locale = resolveLocaleFromRequest(request, {
+    locales: ['en', 'es'],
+    defaultLocale: 'en',
+    strategy: ['path-prefix', 'header', 'cookie'],
+    cookieName: 'locale',
+    queryParam: 'lang',
+  });
+  i18n.setLocale(locale);
+  return { data: { locale } };
+}
+```
+
+## Parseo y validación
+
+Helpers de bajo nivel para pipelines personalizados:
+
+```ts
+import { parseMessageCatalog, parseMessageCatalogJson } from '@emberkit/core';
+
+const catalog = parseMessageCatalog({ nav: { home: 'Home' } });
+// { 'nav.home': 'Home' }
+
+const fromFile = parseMessageCatalogJson('{"hello":"world"}');
+```
+
+Catálogos inválidos lanzan `InvalidMessageCatalogError` (valores hoja no string, JSON mal formado).
+
+## Scaffold CLI
+
+```bash
+emberkit generate i18n app --path src/lib/i18n.ts
+```
+
+El archivo generado usa `createI18nFromGlob` y espera JSON en una carpeta `locales/` junto a él.
+
+## Referencia de API
+
+Consulta [Referencia de API — Internacionalización](/es/docs/api#internationalization) para la lista completa de funciones.
+
+## Relacionado
+
+- [Contexto](/es/docs/context) — mecanismo de provider subyacente
+- [Enrutamiento](/es/docs/routing) — segmentos dinámicos y loaders
+- [SSR](/es/docs/ssr) — renderizado en servidor y `request` en loaders
+- [Despliegue en el edge](/es/docs/edge) — Workers y redirecciones de locale

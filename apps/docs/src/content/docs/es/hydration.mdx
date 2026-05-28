@@ -1,0 +1,315 @@
+import { Badge, Alert, Card, Text } from '@emberkit/ui';
+
+# Hidratación
+
+<Text color="muted" className="mb-6">La hidratación es el proceso de hacer interactivo el HTML renderizado en servidor. La hidratación de EmberKit es ligera y dirigida — en lugar de re-renderizar todo el árbol de componentes, conecta signals a elementos DOM concretos mediante atributos declarativos <code className="text-primary-400">data-ek-bind</code>.</Text>
+
+## Cómo funciona
+
+1. **SSR renderiza el HTML completo** — Todos los componentes se renderizan a HTML en el servidor. No se necesita JavaScript para ver la página.
+
+2. **El navegador muestra el HTML de inmediato** — First Contentful Paint rápido. La página es totalmente visible y usable.
+
+3. **La hidratación escanea bindings** — Un script mínimo (`~1KB`) se ejecuta tras cargar la página. Encuentra elementos con atributos `data-ek-bind` y conecta signals a nodos DOM vía `signal.subscribe()`.
+
+4. **Actualizaciones dirigidas** — Cuando cambia un signal, solo se actualiza el elemento DOM enlazado. Sin virtual DOM, sin diffing, sin re-render.
+
+```tsx
+// Static: pure HTML, zero JS
+function Footer() {
+  return <footer>&copy; 2025 EmberKit</footer>;
+}
+
+// Interactive: signal-driven DOM binding
+function Counter() {
+  const [count, setCount] = createSignal(0);
+  return (
+    <div>
+      <button onClick={() => setCount(c => c + 1)}>+</button>
+      <span data-ek-bind={count}>{count()}</span>
+      <button onClick={() => setCount(c => c - 1)}>-</button>
+    </div>
+  );
+}
+```
+
+## Referencia de data-ek-bind
+
+<Alert variant="info" title="data-ek-bind">
+  Conecta un getter de signal directamente a un elemento DOM. El framework serializa la identidad del signal durante SSR y la reconecta durante la hidratación.
+</Alert>
+
+| Patrón | Comportamiento |
+|---------|----------|
+| `<span data-ek-bind={count}>{count()}</span>` | Actualiza `textContent` cuando cambia el signal |
+| `<div data-ek-bind={open} data-ek-show="opacity-100" data-ek-hide="opacity-0">` | Añade/quita clases CSS según verdad |
+| `<div data-ek-bind={tab} data-ek-show-when="preview">` | Alterna la clase `hidden` cuando el signal coincide con una cadena concreta |
+
+### Enlace textContent (por defecto)
+
+No hacen falta atributos extra — el texto del elemento permanece sincronizado:
+
+```tsx
+const [name, setName] = createSignal('Alice');
+return <p data-ek-bind={name}>{name()}</p>;
+// When setName('Bob'), the <p> textContent updates.
+```
+
+### Enlace con alternancia de clases
+
+Usa `data-ek-show` / `data-ek-hide` para alternar conjuntos de clases CSS según un signal booleano:
+
+```tsx
+const [open, setOpen] = createSignal(false);
+return (
+  <div data-ek-bind={open} data-ek-show="opacity-100" data-ek-hide="opacity-0 pointer-events-none" class="opacity-0 pointer-events-none">
+    Panel content
+  </div>
+);
+```
+
+### Enlace por coincidencia de cadena
+
+Usa `data-ek-show-when` para cambios tipo pestaña:
+
+```tsx
+const [tab, setTab] = createSignal('preview');
+return (
+  <>
+    <div data-ek-bind={tab} data-ek-show-when="preview" class="p-4">Preview panel</div>
+    <div data-ek-bind={tab} data-ek-show-when="code" class="p-4 hidden">Code panel</div>
+  </>
+);
+```
+
+Personaliza la clase de ocultación con `data-ek-hide-class` (por defecto `"hidden"`).
+
+## Componentes que aceptan signals
+
+Los componentes interactivos detectan cuando una prop es un signal (tiene `__idx` / `subscribe`) y aplican bindings automáticamente. Esto mantiene el código del consumidor limpio:
+
+```tsx
+const [open, setOpen] = createSignal(false);
+
+// Pass the signal — Modal handles data-ek-bind internally
+<Modal open={open} onClose={() => setOpen(false)} />
+
+// Or pass a plain boolean — SSR only, no hydration
+<Modal open={true} />
+```
+
+## Qué se hidrata
+
+Solo los elementos con `data-ek-bind` o event handlers reciben JavaScript. Los click handlers se serializan como atributos `data-ekclick` y se cablean al cargar. Todo lo demás permanece como HTML puro.
+
+```tsx
+function App() {
+  return (
+    <div>
+      {/* Zero JS — pure HTML */}
+      <header>
+        <h1>My App</h1>
+        <nav>
+          <a href="/about">About</a>
+          <a href="/contact">Contact</a>
+        </nav>
+      </header>
+
+      {/* Gets hydration — signal binding on value */}
+      <span data-ek-bind={count}>{count()}</span>
+
+      {/* Zero JS — pure content */}
+      <article>
+        <p>This content never needs JavaScript.</p>
+      </article>
+    </div>
+  );
+}
+```
+
+## Carga diferida por viewport (`LazyInView`)
+
+Diferir el render de UI pesada hasta que esté cerca del viewport. El sitio de docs usa esto para secciones de la home bajo el hero, la cuadrícula de iconos y demos UI grandes.
+
+<Alert variant="info" title="Distinto del lazy loading de imágenes">
+  <code>LazyInView</code> retrasa el <strong>HTML de componentes y trabajo en cliente</strong> de una sección. <code>loading="lazy"</code> en imágenes solo difiere peticiones de imagen — consulta [Optimización de imágenes](/es/docs/images).
+</Alert>
+
+### Cómo funciona
+
+1. **SSR (por defecto `ssr="lazy"`)** — El servidor envía un elemento host ligero con tu <code>fallback</code> (placeholder), no los children completos.
+2. **Navegación cliente / hidratación** — Tras cada <code>render()</code>, EmberKit ejecuta <code>hydrateLazyInView()</code> en la raíz de la app.
+3. **IntersectionObserver** — Cuando el host entra en el viewport (más <code>rootMargin</code>), los children se renderizan en el host y <code>hydrateSubtree()</code> cablea click handlers y <code>data-ek-bind</code> dentro de esa sección.
+
+**Flujo:** carga de página → fallback visible → el usuario se acerca a la sección → `LazyInView` monta children → `hydrateSubtree` cablea ese host.
+
+### Uso básico
+
+```tsx
+import { LazyInView } from '@emberkit/core';
+
+function HomePage() {
+  return (
+    <div>
+      <Hero />
+      <LazyInView
+        minHeight="24rem"
+        rootMargin="200px"
+        fallback={
+          <div aria-hidden="true" className="min-h-96 animate-pulse rounded-2xl border border-white/5 bg-white/[0.02]" />
+        }
+      >
+        <FeaturesSection />
+      </LazyInView>
+    </div>
+  );
+}
+```
+
+Usa <code>minHeight</code> (o fallback con altura fija) para que el layout no salte cuando aparece el contenido.
+
+### Props
+
+| Prop | Tipo | Default | Descripción |
+|------|------|---------|-------------|
+| `children` | `JSXNode` o `() => JSXNode` | — | Contenido a renderizar cuando sea visible |
+| `fallback` | `JSXNode` | `null` | Placeholder mostrado antes de cargar |
+| `rootMargin` | `string` | `'200px'` | Pasado a `IntersectionObserver` (precarga antes de visible) |
+| `minHeight` | `string` \| `number` | — | Espacio reservado en el elemento host |
+| `once` | `boolean` | `true` | Desregistrar loader tras el primer montaje |
+| `ssr` | `'lazy'` \| `'eager'` | `'lazy'` | `eager` = renderizar children también en servidor |
+| `as` | `string` | `'div'` | Nombre de tag del host |
+| `className` | `string` | — | Clases en el host |
+
+### Modos SSR
+
+| Modo | Primer HTML | Ideal para |
+|------|------------|----------|
+| `lazy` (default) | Solo fallback | Páginas largas, demos, secciones marketing bajo el fold |
+| `eager` | Children completos | Copy crítico para SEO que debe estar en view source |
+
+### Render prop lazy
+
+Pasa una función cuando los children importan módulos grandes:
+
+```tsx
+<LazyInView fallback={<SectionSkeleton />}>
+  {() => {
+    // Evaluated only when the section enters the viewport
+    return <HeavyChart data={data} />;
+  }}
+</LazyInView>
+```
+
+### Atributos del host (depuración)
+
+Inspecciona el DOM mientras pruebas:
+
+| Atributo | Significado |
+|-----------|---------|
+| `data-ek-lazy-in-view` | Id de registro para este host |
+| `data-ek-lazy-root-margin` | Margen del observer |
+| `data-ek-lazy-loaded="true"` | Los children ya se montaron |
+| `aria-busy="true"` | Aún esperando (se quita tras cargar) |
+
+### Pruebas locales
+
+1. Inicia la app de docs: <code>pnpm dev</code> desde la raíz del repo (o <code>pnpm dev</code> en <code>apps/docs</code>).
+2. Abre <code>/</code>, <code>/docs/icons</code> o <code>/docs/ui</code>.
+3. Confirma placeholders con pulse above the fold donde las secciones son lazy.
+4. Desplázate — el contenido debe reemplazar placeholders; los hosts ganan <code>data-ek-lazy-loaded</code>.
+5. Opcional: DevTools → Network → limitar a **Fast 3G**, hard refresh, y comparar first paint vs tras scroll.
+
+Tests del framework:
+
+```bash
+pnpm --filter @emberkit/core test -- src/viewport src/hydration
+```
+
+### `data-hydrate="lazy"` (islas interactivas)
+
+Para elementos que necesitan hidratación pero no de inmediato, márcalos lazy para que el analizador de hidratación los trate como baja prioridad:
+
+```tsx
+<div data-hydrate="lazy" onClick={handleClick}>
+  Below-the-fold control
+</div>
+```
+
+Complementa <code>LazyInView</code>: lazy in view difiere el <strong>render</strong>; <code>data-hydrate="lazy"</code> difiere el <strong>cableado de event handlers</strong> para HTML ya renderizado.
+
+## Listas dinámicas tras SSR
+
+<Alert variant="warning" title="Hidratación vs listas .map()">
+  Tras SSR, EmberKit <strong>hidrata</strong> HTML existente. <strong>No</strong> re-ejecuta JSX <code>.map()</code> cuando un signal se actualiza — solo los nodos con <code>data-ek-bind</code> permanecen sincronizados.
+</Alert>
+
+### Qué falla
+
+Flujo típico en una home SSR:
+
+1. **Servidor** renderiza con lista vacía (sin API en servidor).
+2. **Cliente** precarga <code>/api/...</code> en <code>setCache()</code> antes o después de <code>render()</code>.
+3. **Hidratación** mantiene la cuadrícula vacía del servidor en el DOM.
+4. Un signal se actualiza con datos obtenidos, pero el **markup de la lista no cambia**.
+
+La API puede devolver 200 y la caché estar llena mientras la UI sigue mostrando una sección vacía.
+
+### Patrones recomendados
+
+**1. Forzar un re-render en cliente de la ruta** cuando llegan datos async y el DOM de la lista sigue vacío:
+
+```tsx
+function refreshCurrentRoute() {
+  const url =
+    window.location.pathname + window.location.search + window.location.hash;
+  history.replaceState(null, '', url);
+}
+
+createEffect(() => {
+  void (async () => {
+    const list = await fetchProjects();
+    setProjects(list);
+    const grid = document.getElementById('portfolio-grid');
+    if (list.length > 0 && (grid?.children.length ?? 0) === 0) {
+      refreshCurrentRoute();
+    }
+  })();
+});
+```
+
+El <code>history.replaceState</code> parcheado en <code>render()</code> llama de nuevo a <code>renderCurrentRoute()</code> con <code>hydrate: false</code>, reconstruyendo el HTML de la ruta desde JSX.
+
+**2. Actualizaciones DOM imperativas** (como el patrón del índice del blog en docs): renderiza tarjetas con <code>innerHTML</code> o <code>createElement</code> dentro de <code>createEffect</code> en lugar de depender de <code>.map()</code> en JSX.
+
+**3. Loaders SSR** — obtén datos de lista en un <code>loader</code> de ruta para que el HTML del servidor incluya items. Consulta [SSR y SSG](/es/docs/ssr).
+
+**4. LazyInView con `ssr="eager"`** — cuando el SEO necesita HTML completo en el first paint.
+
+### Bindings de input (0.8.0)
+
+<code>data-ek-bind</code> ahora sincroniza controles de formulario durante la hidratación:
+
+| Elemento | Propiedad enlazada |
+|---------|----------------|
+| <code>&lt;input&gt;</code>, <code>&lt;textarea&gt;</code> | <code>.value</code> |
+| <code>&lt;select&gt;</code> | <code>.value</code> |
+| <code>&lt;button&gt;</code> (signal booleano) | <code>disabled</code> |
+| Otros elementos | <code>textContent</code> (por defecto) |
+
+## Impacto en rendimiento
+
+| Enfoque | Tamaño del bundle | FCP | TTI |
+|----------|------------|-----|-----|
+| SPA tradicional | ~100KB+ | Lento | Lento |
+| Hidratación EmberKit | ~1-2KB | Rápido | Rápido |
+| Solo estático | 0KB | Instantáneo | Instantáneo |
+| + LazyInView bajo el fold | Mismo chunk de ruta; menos render/hidratación inicial | Carga percibida más rápida en páginas largas | Las secciones se hidratan al hacer scroll |
+
+## Próximos pasos
+
+- [Signals](/es/docs/signals) — API de signals y subscribe
+- [SSR](/es/docs/ssr) — Renderizado en servidor
+- [Release 0.8.0](/es/docs/release-0-8) — Dev API, view transitions, notas de hidratación
+- [Components](/es/docs/components) — Componentes estáticos vs interactivos
+- [Referencia API](/es/docs/api) — `LazyInView`, `hydrateLazyInView`, `clearLazyRegistry`

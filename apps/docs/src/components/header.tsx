@@ -3,8 +3,10 @@ import { IconGithub } from '@emberkit/icons';
 import { Icon } from '@emberkit/ui';
 import { useNavigate } from '@emberkit/core';
 import { CORE_VERSION, formatVersion } from '../lib/version.js';
+import LanguageSwitcher from './language-switcher.js';
+import type { DocsLocale } from '../lib/i18n.js';
 
-const Header: RouteComponent = () => {
+const Header: RouteComponent<{ locale?: DocsLocale }> = ({ locale = 'en' }) => {
   const navigate = useNavigate();
 
   const toggleSidebar = () => {
@@ -55,10 +57,10 @@ const Header: RouteComponent = () => {
           </svg>
         </button>
         <a
-          href="/"
+          href={`/${locale}`}
           onClick={(e) => {
             e.preventDefault();
-            navigate('/');
+            navigate(`/${locale}`);
           }}
           className="flex items-center gap-2.5 no-underline transition-opacity duration-200 hover:opacity-80 cursor-pointer"
         >
@@ -73,11 +75,13 @@ const Header: RouteComponent = () => {
       </div>
 
       <div className="flex items-center gap-2">
+        <LanguageSwitcher />
         <a
           href="https://github.com/Orange-Ember-Studios/emberkit"
           className="flex h-9 w-9 items-center justify-center rounded-lg border border-transparent text-gray-500 transition-all duration-200 hover:border-orange-500/30 hover:bg-white/5 hover:text-white hover:shadow-[0_0_18px_rgba(249,115,22,0.12)] active:scale-95"
           target="_blank"
           rel="noopener noreferrer"
+          aria-label="GitHub"
         >
           <IconGithub size={18} />
         </a>

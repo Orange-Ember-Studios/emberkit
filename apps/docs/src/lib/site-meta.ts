@@ -1,114 +1,53 @@
 import type { HeadProps, MetaData } from '@emberkit/core';
+import { extractLocaleFromPath } from '@emberkit/core';
+import en from '../locales/en.json';
+import es from '../locales/es.json';
+import fr from '../locales/fr.json';
+import {
+  DEFAULT_DOCS_LOCALE,
+  DOCS_LOCALES,
+  isDocsLocale,
+  type DocsLocale,
+} from './locales.js';
 
 export const SITE_URL = 'https://emberkit.orangeember.com';
 export const SITE_NAME = 'EmberKit';
 export const DOCS_TITLE_SUFFIX = 'EmberKit Docs';
-export const DEFAULT_DESCRIPTION =
-  'Documentation for EmberKit — a minimalist, TypeScript-first JSX framework built for speed, minimal weight, and selective hydration.';
+export const DEFAULT_DESCRIPTION = en.meta.siteDescription;
 export const OG_IMAGE_URL = `${SITE_URL}/og-image.svg`;
 
-const PAGE_COPY: Record<string, { title: string; description: string }> = {
-  '/': {
-    title: 'EmberKit',
-    description:
-      'The TypeScript-first JSX framework where speed comes first — fast SSR, pre-rendered static routes, and selective hydration.',
-  },
-  '/docs/introduction': {
-    title: 'Introduction',
-    description: 'What EmberKit is, how it prioritizes speed, and how zero-JS-by-default works.',
-  },
-  '/docs/installation': {
-    title: 'Installation',
-    description: 'Install EmberKit, create a project, and configure your first app.',
-  },
-  '/docs/quick-start': {
-    title: 'Quick Start',
-    description: 'Build your first EmberKit page with routing, components, and metadata.',
-  },
-  '/docs/built-with-emberkit': {
-    title: 'Built with EmberKit',
-    description: 'This documentation site and patterns used to build it with EmberKit.',
-  },
-  '/docs/api': {
-    title: 'API Reference',
-    description: 'Runtime, router, signals, SSR, meta, and CLI API reference.',
-  },
-  '/docs/examples': {
-    title: 'Examples',
-    description: 'Example patterns for components, routing, and interactivity.',
-  },
-  '/docs/components': {
-    title: 'Components',
-    description: 'Author components, compose UI, and return JSX from functions.',
-  },
-  '/docs/routing': {
-    title: 'Routing',
-    description: 'File-based routes, dynamic segments, layouts, and loaders.',
-  },
-  '/docs/signals': {
-    title: 'Signals',
-    description: 'Reactive state with signals, memos, and effects.',
-  },
-  '/docs/context': {
-    title: 'Context',
-    description: 'Share values across the component tree with createContext.',
-  },
-  '/docs/ssr': {
-    title: 'SSR & SSG',
-    description: 'Server rendering, static generation, hybrid mode, and route metadata.',
-  },
-  '/docs/forms': {
-    title: 'Forms & Mutations',
-    description: 'Forms, actions, and progressive enhancement patterns.',
-  },
-  '/docs/hydration': {
-    title: 'Hydration',
-    description: 'Selective hydration, data-ek-bind, and client event wiring.',
-  },
-  '/docs/meta': {
-    title: 'SEO & Meta',
-    description: 'generateMeta, Open Graph, Twitter cards, and structured data.',
-  },
-  '/docs/head': {
-    title: 'Head Component',
-    description: 'Manage document head tags from JSX with the Head component.',
-  },
-  '/docs/icons': {
-    title: 'Icons',
-    description: 'Use @emberkit/icons in your EmberKit applications.',
-  },
-  '/docs/ui': {
-    title: 'UI Components',
-    description: 'Primitives and molecules from @emberkit/ui for docs and apps.',
-  },
-  '/docs/edge': {
-    title: 'Edge Deployment',
-    description: 'Deploy static output and SSR bundles to edge and Node hosts.',
-  },
-  '/docs/images': {
-    title: 'Image Optimization',
-    description: 'Responsive images, transforms, and lazy loading helpers.',
-  },
-  '/docs/markdown': {
-    title: 'Markdown & MDX',
-    description: 'Author content in Markdown and MDX with frontmatter metadata.',
-  },
-  '/404': {
-    title: 'Page Not Found',
-    description: 'The page you requested does not exist on the EmberKit documentation site.',
-  },
-  '/500': {
-    title: 'Server Error',
-    description: 'Something went wrong while loading this EmberKit documentation page.',
-  },
+const LOCALE_PAGES: Record<DocsLocale, Record<string, { title: string; description: string }>> = {
+  en: en.pages,
+  es: es.pages,
+  fr: fr.pages,
+};
+
+const LOCALE_SITE_DESCRIPTION: Record<DocsLocale, string> = {
+  en: en.meta.siteDescription,
+  es: es.meta.siteDescription,
+  fr: fr.meta.siteDescription,
+};
+
+const OG_LOCALE: Record<DocsLocale, string> = {
+  en: 'en_US',
+  es: 'es_ES',
+  fr: 'fr_FR',
 };
 
 export function normalizeDocsPath(pathname: string): string {
-  return pathname.replace(/\/+$/, '') || '/';
+  const stripped = pathname.replace(/\/+$/, '') || '/';
+  const { pathnameWithoutLocale } = extractLocaleFromPath(stripped, DOCS_LOCALES);
+  return pathnameWithoutLocale || '/';
 }
 
-function pageCopyForPath(pathname: string): { title: string; description: string } | undefined {
-  return PAGE_COPY[normalizeDocsPath(pathname)];
+export function localeFromDocsPath(pathname: string): DocsLocale {
+  const { locale } = extractLocaleFromPath(pathname.replace(/\/+$/, '') || '/', DOCS_LOCALES);
+  return locale && isDocsLocale(locale) ? locale : DEFAULT_DOCS_LOCALE;
+}
+
+function pageCopyForPath(pathname: string, locale: DocsLocale): { title: string; description: string } | undefined {
+  const path = normalizeDocsPath(pathname);
+  return LOCALE_PAGES[locale]?.[path];
 }
 
 export function formatDocsTitle(title?: string): string {
@@ -122,22 +61,24 @@ export function formatDocsTitle(title?: string): string {
 }
 
 export function docsPageUrl(pathname: string): string {
-  const path = normalizeDocsPath(pathname);
+  const path = pathname.replace(/\/+$/, '') || '/';
   return path === '/' ? SITE_URL : `${SITE_URL}${path}`;
 }
 
 export function enrichDocsMetadata(
   pathname: string,
   frontmatter: Record<string, unknown> = {},
+  locale?: DocsLocale,
 ): MetaData {
+  const resolvedLocale = locale ?? localeFromDocsPath(pathname);
   const path = normalizeDocsPath(pathname);
-  const page = pageCopyForPath(path);
+  const page = pageCopyForPath(pathname, resolvedLocale);
   const title = typeof frontmatter.title === 'string' ? frontmatter.title : page?.title;
   const description =
     typeof frontmatter.description === 'string'
       ? frontmatter.description
-      : (page?.description ?? DEFAULT_DESCRIPTION);
-  const pageUrl = docsPageUrl(path);
+      : (page?.description ?? LOCALE_SITE_DESCRIPTION[resolvedLocale]);
+  const pageUrl = docsPageUrl(pathname.startsWith('/') ? pathname : `/${pathname}`);
   const fullTitle = formatDocsTitle(title);
 
   return {
@@ -150,7 +91,7 @@ export function enrichDocsMetadata(
     canonical: pageUrl,
     openGraph: {
       type: 'website',
-      locale: 'en_US',
+      locale: OG_LOCALE[resolvedLocale],
       siteName: SITE_NAME,
       url: pageUrl,
       title: fullTitle,

@@ -1,0 +1,118 @@
+---
+title: View Transitions
+---
+
+import { Badge, Alert, Card, Text } from '@emberkit/ui';
+
+# View Transitions
+
+<Text color="muted" className="mb-6">
+  EmberKit integra la <a href="https://developer.mozilla.org/en-US/docs/Web/API/View_Transitions_API" className="text-primary-400 underline">View Transitions API</a> para navegación SPA fluida. Las transiciones esperan hasta que el HTML de la ruta se escribe en la raíz de la app antes de que el navegador capture snapshots.
+</Text>
+
+## Inicio rápido
+
+Habilita transiciones al arrancar el router de cliente:
+
+```tsx
+// src/index.tsx
+import { render } from '@emberkit/core';
+import App from './routes/_layout.tsx';
+import { routes } from 'virtual:emberkit-routes';
+
+render(App, document.getElementById('app')!, {
+  routes,
+  viewTransitions: true,
+});
+```
+
+Los enlaces internos se interceptan en fase capture para que la navegación se ejecute una sola vez dentro de <code>startViewTransition</code>.
+
+## Navegación programática
+
+```tsx
+import { navigate, navigateWithViewTransition } from '@emberkit/core';
+
+// Per navigation
+await navigate('/docs/api', { viewTransition: true });
+
+// Dedicated helper
+await navigateWithViewTransition('/docs/api');
+```
+
+## CSS
+
+Estiliza el cross-fade por defecto en la raíz:
+
+```css
+::view-transition-old(root) {
+  animation: fade-out 0.3s ease-in-out forwards;
+}
+::view-transition-new(root) {
+  animation: fade-in 0.3s ease-in-out forwards;
+}
+```
+
+Este sitio de docs usa reglas similares en <code>src/styles/globals.css</code>.
+
+## Referencia API
+
+| Export | Descripción |
+|--------|-------------|
+| <code>supportsViewTransitions()</code> | Si existe <code>document.startViewTransition</code> |
+| <code>withViewTransition(callback)</code> | Envuelve trabajo async en una transición cuando está soportado |
+| <code>waitForAppUpdate(href, options?)</code> | Navegación SPA que resuelve tras mutar <code>#app</code> |
+| <code>initViewTransitions(options?)</code> | Interceptor de clicks en enlaces (llamado automáticamente por <code>render</code>) |
+| <code>navigateWithViewTransition(href, options?)</code> | Navegar con transición + espera de actualización DOM |
+
+Opción de <code>render()</code>:
+
+```ts
+viewTransitions?: boolean | { rootId?: string };
+```
+
+Usa <code>rootId</code> si tu elemento de montaje no es <code>id="app"</code>.
+
+## Cómo funciona el timing
+
+1. El usuario hace click en un enlace interno (o llamas a <code>navigate</code> con <code>viewTransition: true</code>).
+2. EmberKit inicia una view transition.
+3. <code>history.pushState</code> (o <code>replaceState</code>) ejecuta el router parcheado.
+4. <code>renderCurrentRoute()</code> actualiza el HTML de la raíz de la app.
+5. Un <code>MutationObserver</code> en la raíz de la app resuelve cuando cambian nodos hijos.
+6. El navegador anima del snapshot antiguo al nuevo.
+
+Esto evita flashes de contenido vacío entre rutas.
+
+## Opt-out por enlace
+
+Añade <code>data-no-transition</code> en un anchor, o usa teclas modificadoras (Ctrl/Cmd click). Enlaces externos, <code>target="_blank"</code> y enlaces solo hash en la misma página se omiten automáticamente.
+
+## Compatibilidad de navegadores
+
+| Navegador | Soporte |
+|---------|---------|
+| Chrome / Edge 111+ | API completa |
+| Safari / Firefox | Fallback a navegación instantánea (sin errores) |
+
+Los usuarios con <code>prefers-reduced-motion</code> deben obtener movimiento reducido del navegador.
+
+## Patrón del sitio de docs
+
+Esta app usa un wrapper fino para que cada llamada a <code>useNavigate()</code> habilite transiciones por defecto:
+
+```tsx
+// apps/docs/src/hooks/useNavigate.ts
+import { navigate as coreNavigate } from '@emberkit/core';
+
+export function useNavigate() {
+  return (path: string, options = {}) =>
+    coreNavigate(path, { ...options, viewTransition: options.skipTransition ? false : true });
+}
+```
+
+## Relacionado
+
+- [Release 0.8.0](/es/docs/release-0-8)
+- [Referencia API — Navigation](/es/docs/api#navigation)
+- [Routing](/es/docs/routing)
