@@ -1,5 +1,11 @@
 # @emberkit/core
 
+## 0.10.1
+
+### Patch Changes
+
+- Declare esbuild as a direct dependency so load-emberkit-config transpilation resolves in CI and published installs.
+
 ## 0.10.0
 
 ### Minor Changes
