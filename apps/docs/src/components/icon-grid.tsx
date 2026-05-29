@@ -251,14 +251,18 @@ function IconShowcase() {
           </div>
           <div className="flex gap-2">
             <button
+              type="button"
               onClick={() => handleCopy(selectedIcon.name)}
-              className="rounded-lg bg-orange-500/20 px-4 py-2 text-sm font-medium text-orange-400 transition-all hover:bg-orange-500/30 active:scale-95"
+              className="rounded-lg bg-orange-500/20 px-4 py-2 text-sm font-medium text-orange-300 transition-all hover:bg-orange-500/30 active:scale-95"
+              aria-label={`Copy import for ${selectedIcon.name}`}
             >
               {copied() ? 'Copied!' : 'Copy Import'}
             </button>
             <button
+              type="button"
               onClick={() => setSelected(null)}
-              className="rounded-lg bg-white/5 px-4 py-2 text-sm font-medium text-gray-400 transition-all hover:bg-white/10 hover:text-white active:scale-95"
+              className="rounded-lg bg-white/5 px-4 py-2 text-sm font-medium text-gray-300 transition-all hover:bg-white/10 hover:text-white active:scale-95"
+              aria-label="Close icon details"
             >
               Close
             </button>
@@ -273,13 +277,15 @@ function IconShowcase() {
           return (
             <button
               key={icon.name}
+              type="button"
               onClick={() => setSelected(isActive ? null : icon.name)}
               className={`group relative flex flex-col items-center justify-center rounded-xl border p-3 transition-all duration-200 cursor-pointer ${
                 isActive
-                  ? 'border-orange-400/60 bg-orange-500/10 text-orange-400 scale-105'
-                  : 'border-white/5 bg-white/[0.02] text-gray-400 hover:border-white/10 hover:bg-white/[0.05] hover:text-white hover:scale-105'
+                  ? 'border-orange-400/60 bg-orange-500/10 text-orange-300 scale-105'
+                  : 'border-white/5 bg-white/[0.02] text-gray-300 hover:border-white/10 hover:bg-white/[0.05] hover:text-white hover:scale-105'
               }`}
-              title={icon.name}
+              aria-label={icon.name}
+              aria-pressed={isActive}
             >
               <IconComp size={20} />
               <span className="mt-1.5 truncate text-[9px] leading-tight opacity-75 group-hover:opacity-100 transition-opacity">

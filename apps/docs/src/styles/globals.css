@@ -231,7 +231,7 @@
   /* Lead paragraph — first <p> right after h1 */
   .md-content h1 + p {
     font-size: 1.0625rem;
-    color: #9ca3af;
+    color: #d1d5db;
     line-height: 1.8;
     margin-bottom: 2.5rem;
   }

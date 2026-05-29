@@ -19,7 +19,7 @@ const NotFoundContent: RouteComponent = () => {
       <div className="max-w-lg">
         <div className="mb-5 text-7xl font-bold text-orange-400">404</div>
         <h1 className="mb-3 text-3xl font-bold text-white">{t('notFound.title')}</h1>
-        <p className="mb-8 text-lg text-gray-400">{t('notFound.body')}</p>
+        <p className="mb-8 text-lg text-gray-300">{t('notFound.body')}</p>
 
         <button
           type="button"
@@ -39,7 +39,7 @@ const NotFoundContent: RouteComponent = () => {
             className="rounded-xl border border-white/10 p-5 no-underline text-inherit hover:border-orange-500/30"
           >
             <div className="font-semibold text-white">{t('notFound.docsTitle')}</div>
-            <div className="text-sm text-gray-400">{t('notFound.docsDesc')}</div>
+            <div className="text-sm text-gray-300">{t('notFound.docsDesc')}</div>
           </a>
           <a
             href={docsNavPath('quick-start', locale)}
@@ -50,7 +50,7 @@ const NotFoundContent: RouteComponent = () => {
             className="rounded-xl border border-white/10 p-5 no-underline text-inherit hover:border-orange-500/30"
           >
             <div className="font-semibold text-white">{t('notFound.quickStartTitle')}</div>
-            <div className="text-sm text-gray-400">{t('notFound.quickStartDesc')}</div>
+            <div className="text-sm text-gray-300">{t('notFound.quickStartDesc')}</div>
           </a>
         </div>
       </div>

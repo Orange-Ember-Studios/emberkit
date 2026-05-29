@@ -36,6 +36,7 @@ const Sidebar: RouteComponent<{ pathname?: string; locale?: DocsLocale }> = ({
 
   return (
     <aside
+      id="docs-sidebar"
       data-sidebar
       className="fixed top-16 left-0 z-[110] h-[calc(100dvh-4rem)] w-[260px] max-lg:pointer-events-none overflow-y-auto border-r border-white/5 bg-[#0b0f19]/95 px-4 py-4 shadow-[4px_0_40px_rgba(0,0,0,0.2)] backdrop-blur-xl transition-transform duration-300 -translate-x-full lg:static lg:sticky lg:top-16 lg:z-40 lg:translate-x-0 lg:pointer-events-auto lg:self-start lg:py-6"
     >
@@ -63,7 +64,7 @@ const Sidebar: RouteComponent<{ pathname?: string; locale?: DocsLocale }> = ({
                       'group flex items-center gap-2 rounded-xl border border-transparent px-3 py-2 text-sm no-underline transition-all duration-200 cursor-pointer',
                       isActive
                         ? 'bg-orange-500/10 font-semibold text-orange-300 ring-1 ring-orange-500/30 shadow-[0_0_24px_rgba(249,115,22,0.08)]'
-                        : 'font-medium text-gray-400 hover:border-orange-500/25 hover:bg-white/[0.04] hover:text-gray-100 hover:shadow-[0_0_20px_rgba(249,115,22,0.06)]',
+                        : 'font-medium text-gray-300 hover:border-orange-500/25 hover:bg-white/[0.04] hover:text-gray-100 hover:shadow-[0_0_20px_rgba(249,115,22,0.06)]',
                     ].join(' ')}
                   >
                     <span

@@ -1,14 +1,11 @@
 import { Head, type RouteComponent } from '@emberkit/core';
-import { docsAlternateLinks, getDocsHeadProps, normalizeDocsPath } from '../lib/site-meta.js';
+import { docsAlternateLinks, getDocsHeadProps } from '../lib/site-meta.js';
+import { DEFAULT_DOCS_LOCALE } from '../lib/locales.js';
 
 function resolvePathname(pathname?: string): string {
-  if (pathname) {
-    return normalizeDocsPath(pathname);
-  }
-  if (typeof window !== 'undefined') {
-    return normalizeDocsPath(window.location.pathname);
-  }
-  return '/';
+  const raw =
+    pathname ?? (typeof window !== 'undefined' ? window.location.pathname : `/${DEFAULT_DOCS_LOCALE}`);
+  return raw.replace(/\/+$/, '') || '/';
 }
 
 /** Updates document head (including Open Graph) on each client render / navigation. */

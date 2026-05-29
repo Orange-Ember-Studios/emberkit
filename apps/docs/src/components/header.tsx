@@ -4,10 +4,11 @@ import { Icon } from '@emberkit/ui';
 import { useNavigate } from '@emberkit/core';
 import { CORE_VERSION, formatVersion } from '../lib/version.js';
 import LanguageSwitcher from './language-switcher.js';
-import type { DocsLocale } from '../lib/i18n.js';
+import { useI18n, type DocsLocale } from '../lib/i18n.js';
 
 const Header: RouteComponent<{ locale?: DocsLocale }> = ({ locale = 'en' }) => {
   const navigate = useNavigate();
+  const { t } = useI18n();
 
   const toggleSidebar = () => {
     const sidebar = document.querySelector('[data-sidebar]');
@@ -47,8 +48,12 @@ const Header: RouteComponent<{ locale?: DocsLocale }> = ({ locale = 'en' }) => {
     <header className="fixed top-0 left-0 right-0 z-50 flex h-16 items-center justify-between border-b border-white/5 bg-[#0b0f19]/80 px-6 shadow-[0_8px_32px_rgba(249,115,22,0.04)] backdrop-blur-xl">
       <div className="flex items-center gap-3">
         <button
+          type="button"
           onClick={() => toggleSidebar()}
-          className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-400 transition-all duration-200 hover:bg-white/5 hover:text-white active:scale-95 lg:hidden"
+          className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-300 transition-all duration-200 hover:bg-white/5 hover:text-white active:scale-95 lg:hidden"
+          aria-label={t('header.openMenu')}
+          aria-expanded="false"
+          aria-controls="docs-sidebar"
         >
           <svg data-menu-icon xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M3 12h18"/>
@@ -78,10 +83,10 @@ const Header: RouteComponent<{ locale?: DocsLocale }> = ({ locale = 'en' }) => {
         <LanguageSwitcher />
         <a
           href="https://github.com/Orange-Ember-Studios/emberkit"
-          className="flex h-9 w-9 items-center justify-center rounded-lg border border-transparent text-gray-500 transition-all duration-200 hover:border-orange-500/30 hover:bg-white/5 hover:text-white hover:shadow-[0_0_18px_rgba(249,115,22,0.12)] active:scale-95"
+          className="flex h-9 w-9 items-center justify-center rounded-lg border border-transparent text-gray-300 transition-all duration-200 hover:border-orange-500/30 hover:bg-white/5 hover:text-white hover:shadow-[0_0_18px_rgba(249,115,22,0.12)] active:scale-95"
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="GitHub"
+          aria-label={t('header.github')}
         >
           <IconGithub size={18} />
         </a>

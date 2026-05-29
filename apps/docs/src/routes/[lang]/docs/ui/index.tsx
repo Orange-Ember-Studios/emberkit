@@ -148,7 +148,8 @@ const UIContent: RouteComponent = () => {
                 pnpm add @emberkit/ui
               </code>
               <button
-                class="shrink-0 text-surface-500 hover:text-surface-200 transition-colors p-1"
+                type="button"
+                class="shrink-0 text-gray-300 hover:text-white transition-colors p-1"
                 onClick={(e: MouseEvent) => {
                   navigator.clipboard.writeText("pnpm add @emberkit/ui");
                   const el = e.target as HTMLElement;
@@ -197,12 +198,13 @@ const UIContent: RouteComponent = () => {
           {UI_PAGE_SECTIONS.map((s) => (
             <button
               key={s.id}
+              type="button"
               onClick={() =>
                 document
                   .getElementById(s.id)
                   ?.scrollIntoView({ behavior: "smooth" })
               }
-              class="whitespace-nowrap text-sm font-medium text-surface-500 hover:text-surface-900 transition-colors"
+              class="whitespace-nowrap text-sm font-medium text-gray-300 hover:text-white transition-colors"
             >
               {s.label}
             </button>
@@ -697,12 +699,12 @@ import type { ButtonProps } from "@emberkit/ui/atoms";`}
               <code class="font-mono text-primary-400">InputSize</code> prop).
             </Text>
             <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <Input placeholder="Default input" />
-              <Input placeholder="With error" error="This field is required" />
-              <Input placeholder="Disabled" disabled />
-              <Input placeholder="Search..." type="search" />
-              <Input placeholder="Small" size="sm" />
-              <Input placeholder="Large" size="lg" />
+              <Input placeholder="Default input" aria-label="Default input example" />
+              <Input placeholder="With error" error="This field is required" aria-label="Input with error example" />
+              <Input placeholder="Disabled" disabled aria-label="Disabled input example" />
+              <Input placeholder="Search..." type="search" aria-label="Search input example" />
+              <Input placeholder="Small" size="sm" aria-label="Small input example" />
+              <Input placeholder="Large" size="lg" aria-label="Large input example" />
             </div>
             <DocSubheading>Example</DocSubheading>
             <CodeBlock
@@ -1306,6 +1308,7 @@ const [open, setOpen] = createSignal(false);
             </Text>
             <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
               <Select
+                aria-label="Framework select example"
                 placeholder="Choose a framework..."
                 value={""}
                 options={[
@@ -1316,6 +1319,7 @@ const [open, setOpen] = createSignal(false);
                 ]}
               />
               <Select
+                aria-label="Select with error example"
                 placeholder="With error"
                 error="Selection is required"
                 options={[{ value: "", label: "Option" }]}

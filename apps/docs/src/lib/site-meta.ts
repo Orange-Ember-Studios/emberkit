@@ -62,7 +62,10 @@ export function formatDocsTitle(title?: string): string {
 
 export function docsPageUrl(pathname: string): string {
   const path = pathname.replace(/\/+$/, '') || '/';
-  return path === '/' ? SITE_URL : `${SITE_URL}${path}`;
+  if (path === '/') {
+    return `${SITE_URL}/${DEFAULT_DOCS_LOCALE}`;
+  }
+  return `${SITE_URL}${path}`;
 }
 
 const HREFLANG: Record<DocsLocale, string> = {
@@ -97,6 +100,7 @@ export function enrichDocsMetadata(
 ): MetaData {
   const resolvedLocale = locale ?? localeFromDocsPath(pathname);
   const path = normalizeDocsPath(pathname);
+  const strippedPath = pathname.replace(/\/+$/, '') || '/';
   const page = pageCopyForPath(pathname, resolvedLocale);
   const title = typeof frontmatter.title === 'string' ? frontmatter.title : page?.title;
   const description =
@@ -105,6 +109,13 @@ export function enrichDocsMetadata(
       : (page?.description ?? LOCALE_SITE_DESCRIPTION[resolvedLocale]);
   const pageUrl = docsPageUrl(pathname.startsWith('/') ? pathname : `/${pathname}`);
   const fullTitle = formatDocsTitle(title);
+  const isRootRedirect = strippedPath === '/';
+  const robots =
+    typeof frontmatter.robots === 'string'
+      ? frontmatter.robots
+      : path.includes('404') || isRootRedirect
+        ? 'noindex, follow'
+        : 'index, follow';
 
   return {
     title,
@@ -112,7 +123,7 @@ export function enrichDocsMetadata(
     keywords: Array.isArray(frontmatter.keywords)
       ? frontmatter.keywords.filter((k): k is string => typeof k === 'string')
       : ['emberkit', 'jsx', 'typescript', 'ssr', 'framework'],
-    robots: path.includes('404') ? 'noindex, follow' : 'index, follow',
+    robots,
     canonical: pageUrl,
     openGraph: {
       type: 'website',

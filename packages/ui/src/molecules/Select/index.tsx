@@ -17,6 +17,8 @@ export interface SelectProps extends Omit<SelectHTMLAttributes, "onChange"> {
   placeholder?: string;
   error?: string;
   onChange?: (value: string) => void;
+  "aria-label"?: string;
+  "aria-labelledby"?: string;
 }
 
 const Select: FC<SelectProps> = ({
@@ -29,6 +31,8 @@ const Select: FC<SelectProps> = ({
   error,
   className = "",
   onChange,
+  "aria-label": ariaLabel,
+  "aria-labelledby": ariaLabelledBy,
 }) => {
   const [open, setOpen] = createSignal(false);
   const [selectedValue, setSelectedValue] = createSignal(initialValue);
@@ -101,6 +105,9 @@ const Select: FC<SelectProps> = ({
           role="combobox"
           aria-expanded="false"
           aria-haspopup="listbox"
+          aria-controls={dropdownId}
+          aria-label={ariaLabel}
+          aria-labelledby={ariaLabelledBy}
           data-ek-bind={open}
           data-ek-active-class="border-primary-500 ring-2 ring-primary-300/30 rounded-b-none bg-surface-200/70"
         >
@@ -132,7 +139,7 @@ const Select: FC<SelectProps> = ({
         data-ek-bind={open}
         data-ek-hide="hidden"
       >
-        <ul role="listbox" class="py-1 max-h-60 overflow-y-auto">
+        <ul id={dropdownId} role="listbox" class="py-1 max-h-60 overflow-y-auto">
           {placeholder && (
             <li
               role="option"

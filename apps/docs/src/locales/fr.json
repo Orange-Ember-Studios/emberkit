@@ -5,7 +5,8 @@
     "homeDescription": "Le framework JSX TypeScript-first où la vitesse passe avant tout — SSR rapide, routes statiques pré-rendues et hydratation sélective."
   },
   "header": {
-    "github": "GitHub"
+    "github": "GitHub",
+    "openMenu": "Ouvrir le menu de navigation"
   },
   "nav": {
     "sectionGettingStarted": "Premiers pas",

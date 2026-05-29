@@ -33,6 +33,7 @@ const LanguageSwitcher: RouteComponent = () => {
         key={locale}
         name="docs-language"
         value={locale}
+        aria-label={t('language.switch')}
         options={languageOptions}
         onChange={(next) => {
           if (next === locale) return;

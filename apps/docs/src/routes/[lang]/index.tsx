@@ -67,7 +67,7 @@ const HomePage: RouteComponent<{ params?: Record<string, string> }> = ({ params 
           <span className="bg-gradient-to-br from-orange-300 via-orange-500 to-fuchsia-500 bg-clip-text text-transparent">EmberKit</span>
         </h1>
 
-        <p className="mb-10 max-w-2xl min-h-[4.5rem] text-lg leading-relaxed text-gray-300 md:min-h-[5.5rem] md:text-2xl">
+        <p className="mb-10 max-w-2xl min-h-[4.5rem] text-lg leading-relaxed text-gray-200 md:min-h-[5.5rem] md:text-2xl">
           {renderRichText(t('home.hero'))}
         </p>
 
@@ -93,7 +93,7 @@ const HomePage: RouteComponent<{ params?: Record<string, string> }> = ({ params 
           <h2 className="mb-4 text-4xl font-bold tracking-tight md:text-5xl">
             {renderRichText(t('home.whyTitle'))}
           </h2>
-          <p className="max-w-2xl text-lg text-gray-400">{t('home.whySubtitle')}</p>
+          <p className="max-w-2xl text-lg text-gray-300">{t('home.whySubtitle')}</p>
 
           <div className="mt-16 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
             {features.map((f) => (
@@ -105,7 +105,7 @@ const HomePage: RouteComponent<{ params?: Record<string, string> }> = ({ params 
                   {f.icon}
                 </div>
                 <h3 className="mb-2 text-lg font-bold text-white group-hover:text-orange-300">{f.title}</h3>
-                <p className="text-sm leading-relaxed text-gray-400 group-hover:text-gray-300">{f.desc}</p>
+                <p className="text-sm leading-relaxed text-gray-300 group-hover:text-gray-200">{f.desc}</p>
               </div>
             ))}
           </div>
@@ -125,7 +125,7 @@ const HomePage: RouteComponent<{ params?: Record<string, string> }> = ({ params 
                 className="rounded-xl border border-white/5 bg-white/[0.02] p-6 text-center hover:border-orange-500/30"
               >
                 <div className={`text-3xl font-bold ${s.color}`}>{s.value}</div>
-                <div className="mt-1 text-sm text-gray-400">{s.label}</div>
+                <div className="mt-1 text-sm text-gray-300">{s.label}</div>
               </div>
             ))}
           </div>
@@ -135,7 +135,7 @@ const HomePage: RouteComponent<{ params?: Record<string, string> }> = ({ params 
       <section className="relative z-10 py-24 text-center">
         <div className="mx-auto max-w-2xl px-6">
           <h2 className="mb-4 text-4xl font-bold tracking-tight md:text-5xl">{t('home.ctaTitle')}</h2>
-          <p className="mb-8 text-lg text-gray-400">{t('home.ctaSubtitle')}</p>
+          <p className="mb-8 text-lg text-gray-300">{t('home.ctaSubtitle')}</p>
           <button
             className="min-h-[3.5rem] rounded-full bg-gradient-to-r from-orange-500 to-orange-700 px-8 py-4 text-xl font-bold text-white shadow-lg transition-transform duration-300 hover:scale-[1.03] active:scale-95"
             onClick={() => navigate(docsNavPath('quick-start', locale))}

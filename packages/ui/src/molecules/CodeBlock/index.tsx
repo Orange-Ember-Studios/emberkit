@@ -231,7 +231,8 @@ const CodeBlock: FC<CodeBlockProps> = ({ code, language = "tsx", className }) =>
       </pre>
       <button
         type="button"
-        class="absolute top-2 right-2 rounded-lg border border-white/10 bg-surface-200/40 px-2.5 py-1 text-xs font-medium text-surface-600 transition-colors hover:text-surface-900"
+        aria-label="Copy code to clipboard"
+        class="absolute top-2 right-2 rounded-lg border border-white/10 bg-surface-200/40 px-2.5 py-1 text-xs font-medium text-gray-300 transition-colors hover:text-white"
         onClick={(e: MouseEvent) => {
           void navigator.clipboard.writeText(code);
           const t = e.currentTarget as HTMLButtonElement;
