@@ -1,5 +1,11 @@
 # @emberkit/ui
 
+## 9.0.1
+
+### Patch Changes
+
+- 615b77d: Improve mobile language switcher in docs; show Select option leading in trigger.
+
 ## 9.0.0
 
 ### Patch Changes
