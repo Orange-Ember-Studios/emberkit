@@ -28,8 +28,9 @@ const HomeCodeDemo: RouteComponent = () => {
   if (!Block) {
     return (
       <div
-        className="min-h-[12rem] animate-pulse rounded-xl bg-white/[0.03] motion-reduce:animate-none"
+        className="min-h-[20rem] w-full bg-white/[0.03]"
         aria-hidden="true"
+        role="presentation"
       />
     );
   }

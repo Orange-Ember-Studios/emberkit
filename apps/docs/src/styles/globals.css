@@ -19,6 +19,25 @@
   100% { background-position: 200% center; }
 }
 
+/* Metric-matched fallback while Inter loads (reduces font-swap CLS). */
+@font-face {
+  font-family: "Inter Fallback";
+  src: local("Arial");
+  ascent-override: 90.2%;
+  descent-override: 22.48%;
+  line-gap-override: 0%;
+  size-adjust: 107.4%;
+}
+
+@font-face {
+  font-family: "JetBrains Mono Fallback";
+  src: local("Menlo"), local("Consolas"), local("monospace");
+  ascent-override: 73.8%;
+  descent-override: 20.3%;
+  line-gap-override: 0%;
+  size-adjust: 100%;
+}
+
 @layer base {
   @media (prefers-reduced-motion: reduce) {
     *,
@@ -47,6 +66,13 @@
     background: #0b0f19;
     color: #f3f4f6;
     overflow-x: hidden;
+    font-family: "Inter", "Inter Fallback", ui-sans-serif, system-ui, sans-serif;
+  }
+
+  code,
+  pre,
+  .font-mono {
+    font-family: "JetBrains Mono", "JetBrains Mono Fallback", ui-monospace, monospace;
   }
 
 

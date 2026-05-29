@@ -49,7 +49,7 @@ const Layout: RouteComponent<{ pathname?: string; children?: unknown }> = ({
 
         <div className="relative" data-app-shell>
           <Header locale={locale as DocsLocale} />
-          <div className="pt-16 lg:grid lg:grid-cols-[260px_minmax(0,1fr)]">
+          <div className="pt-16 lg:grid lg:grid-cols-[260px_minmax(0,1fr)] lg:items-start">
             <Sidebar pathname={pathname} locale={locale as DocsLocale} />
             <main className="md-content relative min-w-0 px-4 py-8 sm:px-6 sm:py-10 lg:px-16 lg:py-14">
               {children}
