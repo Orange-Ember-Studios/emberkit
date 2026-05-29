@@ -171,6 +171,8 @@ Placez-les dans `src/routes/` (pas imbriquées sous un segment) :
 | `404.tsx` | Aucune route ne correspond |
 | `500.tsx` | Erreur non capturée lors du rendu d'une route |
 
+Sans ces fichiers, EmberKit affiche des pages d'erreur intégrées (identiques à la navigation client). Les pages personnalisées reçoivent `pathname` pour le 404 et `error` pour le 500.
+
 ```tsx
 // src/routes/404.tsx
 export default function NotFound() {

@@ -15,6 +15,10 @@ import { compile } from '@mdx-js/mdx';
 import remarkGfm from 'remark-gfm';
 import { loadEmberKitConfig } from './load-emberkit-config.js';
 import { sqlRawPlugin } from './sql-raw.js';
+import {
+  DEFAULT_NOT_FOUND_ROUTE_IMPORT,
+  DEFAULT_SERVER_ERROR_ROUTE_IMPORT,
+} from '../errors/index.js';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const VIRTUAL_EMBERKIT_CONFIG = 'virtual:emberkit-config';
@@ -1499,11 +1503,15 @@ export async function render(url, server) {
       status = rendered.status;
       loaderState = rendered.loaderState;
       const drained = drainHeadContent();
-      if (mod.metadata) {
-        headContent =
-          buildRouteHeadFromMetadata(mod.metadata, pathname, siteHeadOptions ?? undefined) + '\\n';
-      } else if (drained) {
+      const routeMetadata =
+        typeof mod.getMetadata === 'function'
+          ? mod.getMetadata({ pathname, params: match.params })
+          : mod.metadata;
+      if (drained && drained.trim()) {
         headContent = drained + '\\n';
+      } else if (routeMetadata) {
+        headContent =
+          buildRouteHeadFromMetadata(routeMetadata, pathname, siteHeadOptions ?? undefined) + '\\n';
       }
     } catch (e) {
       console.error('[SSR] Failed to render route:', pathname, e);
@@ -1558,8 +1566,21 @@ export async function render(url, server) {
   const fs = await import('node:fs');
   const path = await import('node:path');
   const indexPath = path.join(server.config.root, 'index.html');
+  const outDir = server.config.build?.outDir ?? 'dist';
+  const builtIndexPath = path.join(server.config.root, outDir, 'index.html');
   let template = fs.readFileSync(indexPath, 'utf-8');
-  template = await server.transformIndexHtml(url, template);
+  if (fs.existsSync(builtIndexPath)) {
+    const built = fs.readFileSync(builtIndexPath, 'utf-8');
+    const assetTags = [
+      ...(built.match(/<link rel="stylesheet"[^>]*>/g) ?? []),
+      ...(built.match(/<script type="module"[^>]*><\\/script>/g) ?? []),
+    ];
+    if (assetTags.length > 0) {
+      template = template.replace('</head>', assetTags.join('\\n') + '\\n</head>');
+    }
+  } else {
+    template = await server.transformIndexHtml(url, template);
+  }
 
   template = injectSSRIntoTemplate(template, { appHtml, headContent, loaderState });
 
@@ -1689,6 +1710,13 @@ function generateRoutesCode(files: string[], routeDir: string): string {
   // Sort static routes before dynamic routes so the emitted array already has
   // the correct priority order (defense-in-depth alongside runtime scoring).
   routeEntries.sort((a, b) => scoreRoutePath(b.path) - scoreRoutePath(a.path));
+
+  if (notFoundRoute === 'null') {
+    notFoundRoute = `() => import(${JSON.stringify(DEFAULT_NOT_FOUND_ROUTE_IMPORT)})`;
+  }
+  if (errorRoute === 'null') {
+    errorRoute = `() => import(${JSON.stringify(DEFAULT_SERVER_ERROR_ROUTE_IMPORT)})`;
+  }
 
   return `export const routes = [\n${routeEntries.map((r) => r.entry).join(',\n')}\n];
 export const rootLayout = ${rootLayout};

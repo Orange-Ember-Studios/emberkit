@@ -323,6 +323,25 @@ describe('Meta', () => {
       expect(content).toContain('content="Test Author"');
     });
 
+    it('should merge shorthand props with children', () => {
+      clearHeadContent();
+      Head({
+        title: 'Docs Page',
+        robots: 'index, follow',
+        children: createElement('link', {
+          rel: 'alternate',
+          hreflang: 'en',
+          href: 'https://example.com/en',
+        }),
+      });
+
+      const content = drainHeadContent();
+
+      expect(content).toContain('Docs Page</title>');
+      expect(content).toContain('name="robots" content="index, follow"');
+      expect(content).toContain('hreflang="en"');
+    });
+
     it('should register multiple children', () => {
       const children = [
         createElement('title', {}, 'My Page'),

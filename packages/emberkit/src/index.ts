@@ -111,6 +111,15 @@ export {
 export type { MetaData, OpenGraphData, TwitterCardData, SiteHeadOptions } from './meta/index.js';
 
 export type { FC, RouteComponent, RouteChildren, RouteParams } from './runtime/types.js';
+export {
+  DefaultNotFoundPage,
+  DefaultServerErrorPage,
+  DEFAULT_NOT_FOUND_ROUTE_IMPORT,
+  DEFAULT_SERVER_ERROR_ROUTE_IMPORT,
+  type DefaultNotFoundPageProps,
+  type DefaultServerErrorInfo,
+  type DefaultServerErrorPageProps,
+} from './errors/index.js';
 export type { LazyInViewProps } from './viewport/index.js';
 
 export type { Logger, LoggerOptions, LogLevel, RequestLog, ResponseLog } from './logger/types.js';

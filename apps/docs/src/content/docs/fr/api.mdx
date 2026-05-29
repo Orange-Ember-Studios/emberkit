@@ -19,19 +19,23 @@ render(
       path: string;
       component: () => Promise<{ default: (props: Record<string, unknown>) => JSXNode }>;
     }>;
+    notFoundRoute?: () => Promise<{ default: (props: Record<string, unknown>) => JSXNode }>;
+    errorRoute?: () => Promise<{ default: (props: Record<string, unknown>) => JSXNode }>;
   }
 ): void
 ```
 
-Rend un élément JSX dans un conteneur DOM. Passez <code>routes</code> depuis <code>virtual:emberkit-routes</code> pour le routage client basé sur les fichiers.
+Rend un élément JSX dans un conteneur DOM. Passez <code>routes</code>, <code>notFoundRoute</code> et <code>errorRoute</code> depuis <code>virtual:emberkit-routes</code> pour le routage client et les pages 404/500 intégrées.
 
 ```tsx
 import { render } from '@emberkit/core';
-import { routes } from 'virtual:emberkit-routes';
+import { routes, notFoundRoute, errorRoute } from 'virtual:emberkit-routes';
 import App from './routes/_layout.tsx';
 
 render(App, document.getElementById('app')!, {
   routes,
+  notFoundRoute,
+  errorRoute,
   viewTransitions: true,
 });
 ```

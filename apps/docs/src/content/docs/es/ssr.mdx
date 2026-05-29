@@ -171,6 +171,8 @@ Colócalas en `src/routes/` (no anidadas bajo un segmento):
 | `404.tsx` | Ninguna ruta coincide |
 | `500.tsx` | Error no capturado al renderizar una ruta |
 
+Si no existen esos archivos, EmberKit renderiza páginas de error integradas (las mismas que en la navegación del cliente). Las páginas personalizadas reciben `pathname` en 404 y `error` en 500.
+
 ```tsx
 // src/routes/404.tsx
 export default function NotFound() {

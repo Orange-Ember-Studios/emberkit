@@ -171,6 +171,8 @@ Place these in `src/routes/` (not nested under a segment):
 | `404.tsx` | No route matches |
 | `500.tsx` | Uncaught error while rendering a route |
 
+If neither file exists, EmberKit renders built-in default pages (same components used for client navigation). Custom pages receive `pathname` on 404 and `error` on 500.
+
 ```tsx
 // src/routes/404.tsx
 export default function NotFound() {

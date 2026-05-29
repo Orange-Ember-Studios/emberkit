@@ -188,7 +188,7 @@ import {
   createWrapWithRootLayout,
   renderToHTMLString,
 } from '@emberkit/core';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -336,11 +336,15 @@ export async function render(url) {
       status = rendered.status;
       loaderState = rendered.loaderState;
       const drained = drainHeadContent();
-      if (mod.metadata) {
-        headContent =
-          buildRouteHeadFromMetadata(mod.metadata, pathname, siteHeadOptions ?? undefined) + '\\n';
-      } else if (drained) {
+      const routeMetadata =
+        typeof mod.getMetadata === 'function'
+          ? mod.getMetadata({ pathname, params: match.params })
+          : mod.metadata;
+      if (drained && drained.trim()) {
         headContent = drained + '\\n';
+      } else if (routeMetadata) {
+        headContent =
+          buildRouteHeadFromMetadata(routeMetadata, pathname, siteHeadOptions ?? undefined) + '\\n';
       }
     } catch (e) {
       console.error('[SSR] Failed to render route:', pathname, e);
@@ -373,7 +377,7 @@ export async function render(url) {
         const Route = mod.default || mod;
         clearHeadContent();
         const Page = await wrapWithRootLayout(Route);
-        const element = createElement(Page, {});
+        const element = createElement(Page, { pathname });
         appHtml = renderToString(element);
         const drained = drainHeadContent();
         if (drained) {
@@ -391,8 +395,19 @@ export async function render(url) {
     }
   }
 
-  const templatePath = join(__dirname, '..', 'index.html');
-  let template = readFileSync(templatePath, 'utf-8');
+  const distIndexPath = join(__dirname, '..', 'index.html');
+  const sourceIndexPath = join(__dirname, '..', '..', 'index.html');
+  let template = readFileSync(sourceIndexPath, 'utf-8');
+  if (existsSync(distIndexPath)) {
+    const built = readFileSync(distIndexPath, 'utf-8');
+    const assetTags = [
+      ...(built.match(/<link rel="stylesheet"[^>]*>/g) ?? []),
+      ...(built.match(/<script type="module"[^>]*crossorigin[^>]*><\\/script>/g) ?? []),
+    ];
+    if (assetTags.length > 0) {
+      template = template.replace('</head>', assetTags.join('\\n') + '\\n</head>');
+    }
+  }
 
   template = injectSSRIntoTemplate(template, { appHtml, headContent, loaderState });
 

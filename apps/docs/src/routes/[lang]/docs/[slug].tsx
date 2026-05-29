@@ -89,8 +89,13 @@ const DocPage: RouteComponent<{
 
 export default DocPage;
 
-export function getMetadata(props: { pathname?: string }) {
-  const pathname = props.pathname ?? '/en/docs/introduction';
+export function getMetadata(props: {
+  pathname?: string;
+  params?: Record<string, string>;
+}) {
+  const lang = props.params?.lang ?? 'en';
+  const slug = props.params?.slug ?? 'introduction';
+  const pathname = props.pathname ?? `/${lang}/docs/${slug}`;
   const locale = localeFromDocsPath(pathname);
   return enrichDocsMetadata(pathname, {}, locale);
 }

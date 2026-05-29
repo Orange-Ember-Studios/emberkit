@@ -60,6 +60,14 @@
     "./i18n/node": {
       "types": "./dist/i18n/node.d.ts",
       "import": "./dist/i18n/node.js"
+    },
+    "./errors/default-not-found": {
+      "import": "./dist/errors/default-not-found.js",
+      "types": "./dist/errors/default-not-found.d.ts"
+    },
+    "./errors/default-server-error": {
+      "import": "./dist/errors/default-server-error.js",
+      "types": "./dist/errors/default-server-error.d.ts"
     }
   },
   "scripts": {

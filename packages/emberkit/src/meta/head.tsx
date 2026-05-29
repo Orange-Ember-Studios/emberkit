@@ -124,18 +124,18 @@ function updateClientHead(html: string): void {
 }
 
 export function Head(props: HeadProps): JSXNode {
-  let html = '';
+  const shorthand = buildShorthandTags(props);
+  let html = shorthand;
 
   if (props.children) {
     const children = Array.isArray(props.children) ? props.children : [props.children];
-    html = children
+    const childHtml = children
       .map((child) => {
         if (child == null || child === false) return '';
         return renderToString(child as Parameters<typeof renderToString>[0]);
       })
       .join('\n');
-  } else {
-    html = buildShorthandTags(props);
+    html = [shorthand, childHtml].filter(Boolean).join('\n');
   }
 
   registerHeadContent(html);

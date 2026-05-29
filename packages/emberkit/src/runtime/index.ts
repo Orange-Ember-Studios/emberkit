@@ -54,6 +54,12 @@ interface RouteProps {
   params: Record<string, string>;
   query: Record<string, string | string[]>;
   request: Request;
+  pathname?: string;
+  error?: {
+    status?: number;
+    message?: string;
+    error?: unknown;
+  };
 }
 
 function parseQueryString(searchString: string): Record<string, string | string[]> {
@@ -227,6 +233,10 @@ export function hydrateSubtree(container: Element): void {
   hydrateSignalBindings(container);
 }
 
+type RouteModuleLoader = () => Promise<{
+  default: (props: Record<string, unknown>) => JSXNode;
+}>;
+
 export function render(
   element: JSXElement | string | null | ((props: Record<string, unknown>) => JSXNode),
   container: Element | string,
@@ -235,8 +245,10 @@ export function render(
     viewTransitions?: boolean | { rootId?: string };
     routes?: Array<{
       path: string;
-      component: () => Promise<{ default: (props: Record<string, unknown>) => JSXNode }>;
+      component: RouteModuleLoader;
     }>;
+    notFoundRoute?: RouteModuleLoader;
+    errorRoute?: RouteModuleLoader;
   },
 ): void {
   if (!element) return;
@@ -257,6 +269,8 @@ export function render(
   }
 
   const routes = options?.routes;
+  const notFoundRoute = options?.notFoundRoute;
+  const errorRoute = options?.errorRoute;
 
   if (!routes || routes.length === 0) {
     renderToTarget(layout, target);
@@ -298,22 +312,65 @@ export function render(
   }
 
   async function renderCurrentRoute() {
-    const matched = matchRoute(routes, window.location.pathname);
+    const pathname = window.location.pathname;
     const hydrate = isInitialNavigation;
     isInitialNavigation = false;
 
-    if (matched) {
-      const mod = await matched.component();
-      const routeProps = await resolveRouteProps(mod, matched.path, hydrate);
+    const baseRouteProps: RouteProps = {
+      params: {},
+      query: parseQueryString(window.location.search),
+      request: new Request(window.location.href),
+    };
+
+    try {
+      const matched = matchRoute(routes, pathname);
+
+      if (matched) {
+        const mod = await matched.component();
+        const routeProps = await resolveRouteProps(mod, matched.path, hydrate);
+        renderToTarget(
+          layout,
+          target,
+          mod.default as (props: Record<string, unknown>) => JSXNode,
+          routeProps,
+          { hydrate },
+        );
+        return;
+      }
+
+      if (notFoundRoute) {
+        const mod = await notFoundRoute();
+        renderToTarget(
+          layout,
+          target,
+          mod.default as (props: Record<string, unknown>) => JSXNode,
+          { ...baseRouteProps, pathname },
+          { hydrate },
+        );
+        return;
+      }
+
+      renderToTarget(layout, target, undefined, undefined, { hydrate });
+    } catch (e) {
+      if (!errorRoute) {
+        throw e;
+      }
+      const mod = await errorRoute();
       renderToTarget(
         layout,
         target,
         mod.default as (props: Record<string, unknown>) => JSXNode,
-        routeProps,
-        { hydrate },
+        {
+          ...baseRouteProps,
+          pathname,
+          error: {
+            status: 500,
+            message: e instanceof Error ? e.message : 'Internal Server Error',
+            error: e,
+          },
+        },
+        { hydrate: false },
       );
-    } else {
-      renderToTarget(layout, target, undefined, undefined, { hydrate });
     }
   }
 

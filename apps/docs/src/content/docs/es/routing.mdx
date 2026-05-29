@@ -88,6 +88,8 @@ Archivos especiales (no son segmentos de URL): `_layout.tsx`, `_error.tsx`, `_lo
 | `src/routes/500.tsx` | Se muestra cuando el renderizado lanza un error (500) |
 | `src/routes/_error.tsx` | Error boundary a nivel de ruta (planificado / errores de layout) |
 
+Si omites `404.tsx` o `500.tsx`, EmberKit usa páginas de error integradas en SSR y en la navegación del cliente. El plugin de Vite las expone como `notFoundRoute` y `errorRoute` en `virtual:emberkit-routes`; pásalas a `render()` junto con `routes`. Un `404.tsx` personalizado recibe `pathname`; un `500.tsx` personalizado recibe `error: { status, message, error }`. Añade los archivos de la tabla para personalizarlas, o importa `DefaultNotFoundPage` / `DefaultServerErrorPage` desde `@emberkit/core`.
+
 ```tsx
 // src/routes/404.tsx
 export default function NotFound() {

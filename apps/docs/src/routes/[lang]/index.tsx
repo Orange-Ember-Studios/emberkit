@@ -5,7 +5,8 @@ import { Icon } from '@emberkit/ui';
 import HomeCodeDemo from '../../components/home-code-demo.js';
 import { renderRichText } from '../../lib/rich-text.js';
 import { docsNavPath } from '../../lib/i18n.js';
-import { useI18n, type DocsLocale } from '../../lib/i18n.js';
+import { enrichDocsMetadata } from '../../lib/site-meta.js';
+import { isDocsLocale, useI18n, type DocsLocale } from '../../lib/i18n.js';
 
 const HomePage: RouteComponent<{ params?: Record<string, string> }> = ({ params }) => {
   const navigate = useNavigate();
@@ -147,5 +148,15 @@ const HomePage: RouteComponent<{ params?: Record<string, string> }> = ({ params 
     </div>
   );
 };
+
+export function getMetadata(props: {
+  pathname?: string;
+  params?: Record<string, string>;
+}) {
+  const lang = props.params?.lang ?? 'en';
+  const pathname = props.pathname ?? `/${lang}`;
+  const locale = isDocsLocale(lang) ? lang : 'en';
+  return enrichDocsMetadata(pathname, {}, locale);
+}
 
 export default HomePage;
