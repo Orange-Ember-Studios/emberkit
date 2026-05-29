@@ -1,5 +1,11 @@
 # @emberkit/core
 
+## 0.11.0
+
+### Minor Changes
+
+- de16a37: Add built-in default 404/500 pages when projects omit custom routes. Merge Head shorthand with children; fix SSR head priority and prerender template pollution. Wire notFoundRoute and errorRoute through virtual routes, client render, and CLI templates.
+
 ## 0.10.1
 
 ### Patch Changes
