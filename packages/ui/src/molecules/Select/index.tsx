@@ -112,10 +112,17 @@ const Select: FC<SelectProps> = ({
           data-ek-active-class="border-primary-500 ring-2 ring-primary-300/30 rounded-b-none bg-surface-200/70"
         >
           <span
-            class={selectedOption ? "text-surface-900" : "text-surface-700"}
+            class={`flex min-w-0 items-center gap-2 ${selectedOption ? "text-surface-900" : "text-surface-700"}`}
             data-ek-bind={displayLabel}
           >
-            {selectedOption ? selectedOption.label : placeholder || "Select..."}
+            {selectedOption?.leading ? (
+              <span aria-hidden="true" class="shrink-0 text-base leading-none">
+                {selectedOption.leading}
+              </span>
+            ) : null}
+            <span class="truncate">
+              {selectedOption ? selectedOption.label : placeholder || "Select..."}
+            </span>
           </span>
           <Icon
             name="chevron-down"

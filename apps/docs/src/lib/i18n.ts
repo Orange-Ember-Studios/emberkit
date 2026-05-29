@@ -11,6 +11,7 @@ import {
   isDocsLocale,
   LOCALE_FLAGS,
   LOCALE_LABELS,
+  LOCALE_SHORT,
   type DocsLocale,
 } from './locales.js';
 
@@ -20,6 +21,7 @@ export {
   isDocsLocale,
   LOCALE_FLAGS,
   LOCALE_LABELS,
+  LOCALE_SHORT,
   type DocsLocale,
 };
 

@@ -17,3 +17,10 @@ export const LOCALE_FLAGS: Record<DocsLocale, string> = {
   es: '🇪🇸',
   fr: '🇫🇷',
 };
+
+/** Short codes for compact mobile controls */
+export const LOCALE_SHORT: Record<DocsLocale, string> = {
+  en: 'EN',
+  es: 'ES',
+  fr: 'FR',
+};

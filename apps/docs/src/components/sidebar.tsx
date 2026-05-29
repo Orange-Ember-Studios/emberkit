@@ -3,6 +3,7 @@ import { useNavigate } from '@emberkit/core';
 import { DOCS_NAV, navItemPath } from '../lib/docs-nav.js';
 import { CORE_VERSION, DOCS_VERSION, formatVersion } from '../lib/version.js';
 import { useI18n, type DocsLocale } from '../lib/i18n.js';
+import LanguageSwitcher from './language-switcher.js';
 
 function normalizePath(path: string): string {
   return path.replace(/\/+$/, '') || '/';
@@ -38,8 +39,9 @@ const Sidebar: RouteComponent<{ pathname?: string; locale?: DocsLocale }> = ({
     <aside
       id="docs-sidebar"
       data-sidebar
-      className="fixed top-16 left-0 z-[110] h-[calc(100dvh-4rem)] w-[260px] max-lg:pointer-events-none overflow-y-auto border-r border-white/5 bg-[#0b0f19]/95 px-4 py-4 shadow-[4px_0_40px_rgba(0,0,0,0.2)] backdrop-blur-xl transition-transform duration-300 -translate-x-full lg:static lg:sticky lg:top-16 lg:z-40 lg:translate-x-0 lg:pointer-events-auto lg:self-start lg:py-6"
+      className="fixed top-16 left-0 z-[110] h-[calc(100dvh-4rem)] w-[min(100vw-2rem,280px)] max-lg:pointer-events-none overflow-y-auto border-r border-white/5 bg-[#0b0f19]/95 px-4 py-4 shadow-[4px_0_40px_rgba(0,0,0,0.2)] backdrop-blur-xl transition-transform duration-300 -translate-x-full lg:static lg:sticky lg:top-16 lg:z-40 lg:w-[260px] lg:translate-x-0 lg:pointer-events-auto lg:self-start lg:py-6"
     >
+      <LanguageSwitcher placement="sidebar" onLocaleChange={closeSidebar} />
       {DOCS_NAV.map((section) => (
         <div key={section.titleKey} className="mb-7">
           <h3 className="mb-2 px-3 text-[0.6875rem] font-semibold uppercase tracking-[0.12em] text-transparent bg-clip-text bg-gradient-to-r from-orange-400/85 via-fuchsia-400/75 to-cyan-400/70">
