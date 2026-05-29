@@ -9,7 +9,11 @@ import {
   isDocsLocale,
   type DocsLocale,
 } from '../../../lib/i18n.js';
-import { normalizeDocSlug, resolveDocModule } from '../../../lib/load-doc.js';
+import {
+  getResolvedDocModule,
+  normalizeDocSlug,
+  resolveDocModule,
+} from '../../../lib/load-doc.js';
 
 export async function loader({
   params,
@@ -24,7 +28,7 @@ export async function loader({
     return { data: { notFound: true as const } };
   }
 
-  const resolved = resolveDocModule(langParam, slug);
+  const resolved = await resolveDocModule(langParam, slug);
   if (!resolved) {
     return { data: { notFound: true as const } };
   }
@@ -59,7 +63,7 @@ const DocPage: RouteComponent<{
     ? ((params.lang ?? props.lang ?? props.data?.locale) as DocsLocale)
     : 'en';
   const slug = normalizeDocSlug(params.slug ?? props.slug ?? props.data?.slug);
-  const resolved = resolveDocModule(locale, slug);
+  const resolved = getResolvedDocModule(locale, slug);
 
   if (!resolved || props.data?.notFound) {
     return (

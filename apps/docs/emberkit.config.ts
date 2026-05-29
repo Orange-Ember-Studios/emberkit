@@ -6,6 +6,10 @@ import { DEFAULT_DESCRIPTION, DOCS_TITLE_SUFFIX, OG_IMAGE_URL, SITE_NAME, SITE_U
 
 export default defineConfig({
   mode: 'ssr',
+  compression: {
+    gzip: true,
+    brotli: true,
+  },
   site: {
     url: SITE_URL,
     name: SITE_NAME,

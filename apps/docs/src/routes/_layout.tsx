@@ -1,5 +1,6 @@
 import type { RouteComponent } from '@emberkit/core';
 import DocsPageHead from '../components/docs-page-head';
+import SetDocumentLang from '../components/set-document-lang';
 import Sidebar from '../components/sidebar';
 import Header from '../components/header';
 import { I18nProvider, i18n, localeFromPathname, type DocsLocale } from '../lib/i18n.js';
@@ -33,13 +34,17 @@ const Layout: RouteComponent<{ pathname?: string; children?: unknown }> = ({
 
   return (
     <I18nProvider i18n={i18n} locale={locale}>
+      <SetDocumentLang locale={locale} />
       <div className="relative min-h-dvh overflow-x-hidden bg-[#0b0f19] text-gray-100">
         <DocsPageHead pathname={pathname} />
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute top-[20%] left-1/2 h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-orange-500/18 blur-[130px] animate-pulse" />
-          <div className="absolute top-[25%] left-1/2 h-[260px] w-[260px] -translate-x-1/2 rounded-full bg-amber-500/12 blur-[100px] animate-pulse [animation-delay:700ms]" />
-          <div className="absolute top-[15%] right-[8%] h-[240px] w-[240px] rounded-full bg-fuchsia-500/10 blur-[90px] animate-pulse [animation-delay:400ms]" />
-          <div className="absolute bottom-[10%] left-[6%] h-[200px] w-[200px] rounded-full bg-cyan-500/10 blur-[80px] animate-pulse [animation-delay:1100ms]" />
+        <div
+          className="pointer-events-none absolute inset-0 overflow-hidden motion-reduce:hidden"
+          aria-hidden="true"
+        >
+          <div className="absolute top-[20%] left-1/2 h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-orange-500/18 blur-[130px] animate-pulse motion-reduce:animate-none" />
+          <div className="absolute top-[25%] left-1/2 h-[260px] w-[260px] -translate-x-1/2 rounded-full bg-amber-500/12 blur-[100px] animate-pulse motion-reduce:animate-none [animation-delay:700ms]" />
+          <div className="absolute top-[15%] right-[8%] h-[240px] w-[240px] rounded-full bg-fuchsia-500/10 blur-[90px] animate-pulse motion-reduce:animate-none [animation-delay:400ms]" />
+          <div className="absolute bottom-[10%] left-[6%] h-[200px] w-[200px] rounded-full bg-cyan-500/10 blur-[80px] animate-pulse motion-reduce:animate-none [animation-delay:1100ms]" />
         </div>
 
         <div className="relative" data-app-shell>

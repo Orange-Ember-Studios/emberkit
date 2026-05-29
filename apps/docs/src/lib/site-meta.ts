@@ -1,5 +1,5 @@
 import type { HeadProps, MetaData } from '@emberkit/core';
-import { extractLocaleFromPath } from '@emberkit/core';
+import { extractLocaleFromPath, localizePath } from '@emberkit/core';
 import en from '../locales/en.json';
 import es from '../locales/es.json';
 import fr from '../locales/fr.json';
@@ -63,6 +63,31 @@ export function formatDocsTitle(title?: string): string {
 export function docsPageUrl(pathname: string): string {
   const path = pathname.replace(/\/+$/, '') || '/';
   return path === '/' ? SITE_URL : `${SITE_URL}${path}`;
+}
+
+const HREFLANG: Record<DocsLocale, string> = {
+  en: 'en',
+  es: 'es',
+  fr: 'fr',
+};
+
+/** Alternate URLs for the same page in each docs locale (hreflang). */
+export function docsAlternateLinks(pathname: string): Array<{ hreflang: string; href: string }> {
+  const stripped = pathname.replace(/\/+$/, '') || '/';
+  const { pathnameWithoutLocale } = extractLocaleFromPath(stripped, DOCS_LOCALES);
+  const pathWithoutLocale = pathnameWithoutLocale || '/';
+
+  const links = DOCS_LOCALES.map((locale) => ({
+    hreflang: HREFLANG[locale],
+    href: docsPageUrl(localizePath(pathWithoutLocale, locale, DOCS_LOCALES)),
+  }));
+
+  links.push({
+    hreflang: 'x-default',
+    href: docsPageUrl(localizePath(pathWithoutLocale, DEFAULT_DOCS_LOCALE, DOCS_LOCALES)),
+  });
+
+  return links;
 }
 
 export function enrichDocsMetadata(

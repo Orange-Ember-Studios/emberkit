@@ -2,7 +2,7 @@ import type { RouteComponent } from '@emberkit/core';
 import { LazyInView, useNavigate } from '@emberkit/core';
 import { IconZap, IconPackage, IconTarget, IconType, IconArrowRight } from '@emberkit/icons';
 import { Icon } from '@emberkit/ui';
-import { CodeBlock } from '@emberkit/ui/molecules';
+import HomeCodeDemo from '../../components/home-code-demo.js';
 import { renderRichText } from '../../lib/rich-text.js';
 import { docsNavPath } from '../../lib/i18n.js';
 import { useI18n, type DocsLocale } from '../../lib/i18n.js';
@@ -50,11 +50,20 @@ const HomePage: RouteComponent<{ params?: Record<string, string> }> = ({ params 
 
   return (
     <div className="relative -mx-4 max-lg:-mt-6 sm:-mx-6 lg:-mx-16 lg:-mt-12 min-h-0 overflow-x-hidden text-gray-100">
-      <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[500px] w-[500px] rounded-full bg-orange-500/20 blur-[150px] animate-pulse" />
-      <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[300px] w-[300px] rounded-full bg-amber-500/15 blur-[120px] animate-pulse [animation-delay:700ms]" />
+      <div
+        className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[500px] w-[500px] rounded-full bg-orange-500/20 blur-[150px] animate-pulse motion-reduce:hidden max-md:blur-[80px]"
+        aria-hidden="true"
+      />
+      <div
+        className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[300px] w-[300px] rounded-full bg-amber-500/15 blur-[120px] animate-pulse motion-reduce:hidden max-md:blur-[60px] [animation-delay:700ms]"
+        aria-hidden="true"
+      />
 
       <section className="relative z-10 flex min-h-[85vh] flex-col items-center justify-center px-6 text-center">
-        <div className="relative mb-10 h-28 w-28 animate-bounce md:h-32 md:w-32" style={{ animationDuration: '3s' }}>
+        <div
+          className="relative mb-10 h-28 w-28 animate-bounce motion-reduce:animate-none md:h-32 md:w-32"
+          style={{ animationDuration: '3s' }}
+        >
           <span className="relative z-10 flex h-full w-full items-center justify-center rounded-2xl bg-gradient-to-br from-orange-500/30 via-fuchsia-500/20 to-cyan-500/15 ring-2 ring-orange-400/35 shadow-[0_0_40px_rgba(249,115,22,0.35)]">
             <Icon name="emberkit" size={76} className="text-orange-100 drop-shadow-[0_0_24px_rgba(251,113,133,0.65)]" />
           </span>
@@ -89,7 +98,7 @@ const HomePage: RouteComponent<{ params?: Record<string, string> }> = ({ params 
         </div>
       </section>
 
-      <LazyInView className="relative z-10" minHeight="24rem" ssr="eager" fallback={sectionFallback('min-h-96')}>
+      <LazyInView className="relative z-10" minHeight="24rem" fallback={sectionFallback('min-h-96')}>
         <section className="relative z-10 py-24">
           <div className="mx-auto max-w-6xl px-6">
             <h2 className="mb-4 text-4xl font-bold tracking-tight md:text-5xl">
@@ -119,20 +128,7 @@ const HomePage: RouteComponent<{ params?: Record<string, string> }> = ({ params 
         <section className="relative z-10 py-24">
           <div className="mx-auto max-w-4xl px-6">
             <div className="overflow-hidden rounded-2xl border border-white/5 bg-[#0d1117] shadow-2xl">
-              <CodeBlock
-                code={`import { createSignal } from '@emberkit/core';
-
-function Counter() {
-  const [count, setCount] = createSignal(0);
-  return (
-    <div>
-      <span data-ek-bind={count}>{count()}</span>
-      <button type="button" onClick={() => setCount((n) => n + 1)}>+</button>
-    </div>
-  );
-}`}
-                language="tsx"
-              />
+              <HomeCodeDemo />
             </div>
 
             <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3">
