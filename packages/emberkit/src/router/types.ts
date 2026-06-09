@@ -1,3 +1,9 @@
+export interface RouteMetadata {
+  prerender?: boolean;
+  ssr?: boolean;
+  ssrOnly?: boolean;
+}
+
 export interface Route {
   path: string;
   pattern: RegExp;
@@ -8,6 +14,7 @@ export interface Route {
   isError: boolean;
   isLoading: boolean;
   isApi: boolean;
+  metadata?: RouteMetadata;
 }
 
 export interface RouteMatch {

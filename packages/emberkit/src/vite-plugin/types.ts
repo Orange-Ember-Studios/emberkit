@@ -21,6 +21,15 @@ export interface PrerenderOptions {
   discover?: () => Promise<string[]>;
 }
 
+export interface SitemapOptions {
+  /** Custom paths to include in sitemap (in addition to prerender paths). */
+  additionalPaths?: string[];
+  /** Change frequency for sitemap entries. */
+  changefreq?: 'always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'never';
+  /** Override priority calculation per path pattern. */
+  priorityOverrides?: Record<string, number>;
+}
+
 export interface EmberKitPluginOptions {
   mode?: EmberKitMode;
   routeDir?: string;
@@ -36,6 +45,8 @@ export interface EmberKitPluginOptions {
     gzip?: boolean;
     brotli?: boolean;
   };
+  /** Generate sitemap.xml during build */
+  sitemap?: SitemapOptions | boolean;
 }
 
 export interface DevApiPluginOptions {
@@ -74,6 +85,7 @@ export const DEFAULT_CONFIG = {
     gzip: true,
     brotli: true,
   },
+  sitemap: false,
 } as const;
 
 export type ResolvedConfig = typeof DEFAULT_CONFIG & EmberKitPluginOptions;

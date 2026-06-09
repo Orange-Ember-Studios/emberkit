@@ -22,6 +22,10 @@ export interface SSRRenderResult {
   headers: Headers;
 }
 
+export interface SSRStreamResult extends SSRRenderResult {
+  stream: ReadableStream<Uint8Array>;
+}
+
 export interface StreamChunk {
   type: 'html' | 'error' | 'status';
   content: string;

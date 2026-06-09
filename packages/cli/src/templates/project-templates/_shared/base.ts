@@ -82,32 +82,23 @@ export function buildTsConfig(hasPaths = true): string {
 export function buildViteConfig(hasTailwind = false): string {
   if (hasTailwind) {
     return `import { defineConfig } from 'vite';
-import { emberkitVitePlugin } from '@emberkit/core/vite-plugin';
 import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-  plugins: [emberkitVitePlugin(), tailwindcss()],
+  plugins: [tailwindcss()],
   server: {
     port: 3000,
     host: 'localhost',
-  },
-  esbuild: {
-    jsxImportSource: '@emberkit/core',
   },
 });`;
   }
 
   return `import { defineConfig } from 'vite';
-import { emberkitVitePlugin } from '@emberkit/core/vite-plugin';
 
 export default defineConfig({
-  plugins: [emberkitVitePlugin()],
   server: {
     port: 3000,
     host: 'localhost',
-  },
-  esbuild: {
-    jsxImportSource: '@emberkit/core',
   },
 });`;
 }

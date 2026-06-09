@@ -10,7 +10,25 @@ export interface ContextProviderState {
 }
 
 const contextRegistry = new Map<symbol, Context<unknown>>();
-const contextValues = new Map<symbol, unknown>();
+
+interface RenderScope {
+  values: Map<symbol, unknown>;
+  parent?: RenderScope;
+}
+
+const renderScopeStack: RenderScope[] = [];
+
+function getCurrentScope(): RenderScope {
+  return renderScopeStack[renderScopeStack.length - 1] ?? createRootScope();
+}
+
+function createRootScope(): RenderScope {
+  const scope: RenderScope = {
+    values: new Map(),
+  };
+  renderScopeStack.push(scope);
+  return scope;
+}
 
 export interface ContextBridge<T> {
   id: symbol;
@@ -24,7 +42,7 @@ export interface ContextBridge<T> {
 
 export function createContext<T>(defaultValue?: T): ContextBridge<T> {
   const context: Context<T> = {
-    id: Symbol('emberkit.context'),
+    id: Symbol(),
     defaultValue,
   };
 
@@ -40,14 +58,33 @@ export function createContext<T>(defaultValue?: T): ContextBridge<T> {
   };
 }
 
+export function pushRenderScope(): RenderScope {
+  const parent = getCurrentScope();
+  const scope: RenderScope = {
+    values: new Map(),
+    parent,
+  };
+  renderScopeStack.push(scope);
+  return scope;
+}
+
+export function popRenderScope(): void {
+  renderScopeStack.pop();
+}
+
 export function setContextValue<T>(context: Context<T>, value: T): void {
-  contextValues.set(context.id, value);
+  const scope = getCurrentScope();
+  scope.values.set(context.id, value);
 }
 
 export function getContextValue<T>(context: Context<T>): T | undefined {
-  const value = contextValues.get(context.id) as T | undefined;
-  if (value === undefined) return context.defaultValue as T | undefined;
-  return value;
+  let scope: RenderScope | undefined = getCurrentScope();
+  while (scope) {
+    const value = scope.values.get(context.id);
+    if (value !== undefined) return value as T;
+    scope = scope.parent;
+  }
+  return context.defaultValue as T | undefined;
 }
 
 export function hasContext<T>(context: Context<T>): boolean {
@@ -56,18 +93,25 @@ export function hasContext<T>(context: Context<T>): boolean {
 
 export function clearAllContexts(): void {
   contextRegistry.clear();
-  contextValues.clear();
+  renderScopeStack.length = 0;
+}
+
+export function clearRenderScope(): void {
+  const scope = getCurrentScope();
+  scope.values.clear();
 }
 
 export function useContext<T>(context: Context<T>): T {
-  const value = contextValues.get(context.id);
-  if (value === undefined) {
-    if (context.defaultValue === undefined) {
-      throw new Error(`Context ${String(context.id)} has no value`);
-    }
+  let scope: RenderScope | undefined = getCurrentScope();
+  while (scope) {
+    const value = scope.values.get(context.id);
+    if (value !== undefined) return value as T;
+    scope = scope.parent;
+  }
+  if (context.defaultValue !== undefined) {
     return context.defaultValue as T;
   }
-  return value as T;
+  return undefined as unknown as T;
 }
 
 export function createContextProvider<T>(context: Context<T>) {
@@ -81,4 +125,13 @@ export function createContextProvider<T>(context: Context<T>) {
       props: { children: props.children },
     };
   };
+}
+
+export function runWithRenderScope<T>(fn: () => T): T {
+  pushRenderScope();
+  try {
+    return fn();
+  } finally {
+    popRenderScope();
+  }
 }

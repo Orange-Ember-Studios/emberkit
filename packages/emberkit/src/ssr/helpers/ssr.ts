@@ -2,7 +2,7 @@ import type { JSXNode } from '../../runtime/types.js';
 import type { LoaderResult } from '../../loader/types.js';
 import { renderToHTMLString, createHtmlDocument } from './render-html.js';
 import { drainHeadContent } from '../../meta/head-registry.js';
-import type { SSRRenderOptions, SSRRenderResult } from '../types.js';
+import type { SSRRenderOptions, SSRRenderResult, SSRStreamResult } from '../types.js';
 import { getStatusText } from '../types.js';
 
 export function renderSSR(
@@ -122,4 +122,71 @@ export function injectScripts(html: string, scripts: string[]): string {
   }
 
   return html.slice(0, insertPoint) + scriptTags + html.slice(insertPoint);
+}
+
+export interface StreamingRenderer {
+  write(html: string): void;
+  writeChunk(type: 'html' | 'status' | 'error', content: string): void;
+  end(): string;
+  reset(): void;
+  flush(): Promise<void>;
+}
+
+export async function renderToStream(
+  element: JSXNode | null,
+  options: SSRRenderOptions = {},
+): Promise<SSRStreamResult> {
+  const encoder = new TextEncoder();
+  const chunks: Uint8Array[] = [];
+  let flushed = Promise.resolve();
+
+  const write = (html: string) => {
+    chunks.push(encoder.encode(html));
+  };
+
+  const flush = async () => {
+    await flushed;
+  };
+
+  const renderer: StreamingRenderer = {
+    write,
+    writeChunk(type: 'html' | 'status' | 'error', content: string) {
+      if (type === 'status') {
+        write(`<!--status:${content}-->`);
+      } else if (type === 'error') {
+        write(`<!--error:${content}-->`);
+      } else {
+        write(content);
+      }
+    },
+    end: () => chunks.map((c) => new TextDecoder().decode(c)).join(''),
+    reset: () => chunks.length = 0,
+    flush,
+  };
+
+  write(createHtmlDocument(renderToHTMLString(element), {
+    doctype: options.doctype,
+    lang: options.lang ?? 'en',
+  }));
+
+  const stream = new ReadableStream({
+    start(controller) {
+      for (const chunk of chunks) {
+        flushed = flushed.then(() => {
+          controller.enqueue(chunk);
+        });
+      }
+      flushed = flushed.then(() => controller.close());
+    },
+    cancel() {
+      chunks.length = 0;
+    },
+  });
+
+  return {
+    html: '',
+    status: 200,
+    headers: new Headers({ 'Content-Type': 'text/html; charset=utf-8' }),
+    stream,
+  };
 }

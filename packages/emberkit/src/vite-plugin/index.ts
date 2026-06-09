@@ -41,6 +41,7 @@ export function emberkitVitePlugin(userOptions: EmberKitPluginOptions = {}): Plu
   let apiRouteCount = 0;
   let projectRoot = process.cwd();
 
+
   return {
     name: 'emberkit:vite-plugin',
     enforce: 'pre',
@@ -211,7 +212,83 @@ export function emberkitVitePlugin(userOptions: EmberKitPluginOptions = {}): Plu
 
       return code;
     },
+
+    async writeBundle(bundleOptions) {
+      if (!options.sitemap) {
+        return;
+      }
+
+      const sitemapOptions = options.sitemap === true ? {} : options.sitemap;
+      const siteUrl = options.site?.url;
+      if (!siteUrl) {
+        console.warn('[emberkit] sitemap requires site.url to be set');
+        return;
+      }
+
+      const { writeFileSync, mkdirSync, copyFileSync, existsSync } = await import('node:fs');
+      const { join } = await import('node:path');
+
+      const outDir = bundleOptions.dir ?? 'dist';
+      mkdirSync(outDir, { recursive: true });
+
+      const sitemapPaths = await resolveSitemapPaths(options);
+      const urls = sitemapPaths.map((path) => {
+        const depth = path.split('/').filter(Boolean).length;
+        let priority = '0.8';
+        if (depth <= 1) priority = '1.0';
+        else if (path.endsWith('/docs/ui')) priority = '0.6';
+        if (sitemapOptions.priorityOverrides?.[path]) {
+          priority = String(sitemapOptions.priorityOverrides[path]);
+        }
+        const changefreq = sitemapOptions.changefreq ?? 'weekly';
+        return `  <url><loc>${siteUrl}${path}</loc><changefreq>${changefreq}</changefreq><priority>${priority}</priority></url>`;
+      });
+
+      const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join('\n')}\n</urlset>\n`;
+      writeFileSync(join(outDir, 'sitemap.xml'), sitemap, 'utf-8');
+
+      const publicDir = join(projectRoot, 'public');
+      if (existsSync(join(publicDir, 'robots.txt'))) {
+        copyFileSync(join(publicDir, 'robots.txt'), join(outDir, 'robots.txt'));
+      }
+
+      console.log(`  [emberkit] sitemap generated with ${sitemapPaths.length} URLs`);
+    },
+
+    generateBundle() {
+      if (!options?.sitemap) return;
+
+      // This hook is called for both client and SSR builds
+      // We only want to generate sitemap once, so check if we're in the right build
+    },
   };
+}
+
+async function resolveSitemapPaths(options: ReturnType<typeof resolveConfig>): Promise<string[]> {
+  const paths: string[] = [];
+
+  if (options.prerender?.discover) {
+    const discovered = await options.prerender.discover();
+    paths.push(...discovered);
+  }
+
+  if (options.prerender?.paths) {
+    paths.push(...options.prerender.paths);
+  }
+
+  if (options.sitemap && typeof options.sitemap === 'object' && options.sitemap.additionalPaths) {
+    paths.push(...options.sitemap.additionalPaths);
+  }
+
+  if (options.prerender?.exclude) {
+    for (const excluded of options.prerender.exclude) {
+      const idx = paths.indexOf(excluded);
+      if (idx !== -1) paths.splice(idx, 1);
+    }
+  }
+
+  const unique = [...new Set(paths)];
+  return unique.sort();
 }
 
 function transformMarkdownToJSX(
@@ -1700,9 +1777,14 @@ function generateRoutesCode(files: string[], routeDir: string): string {
       routePath = '/' + routePath;
     }
 
+    // Generate route entry with prerender/ssr metadata
+    const metadataImport = isMarkdown
+      ? `, metadata: () => import(${JSON.stringify(importPath)}).then(m => ({ prerender: m.prerender, ssr: m.ssr, ssrOnly: m.ssrOnly }))`
+      : `, metadata: () => import(${JSON.stringify(importPath)}).then(m => ({ prerender: m.prerender, ssr: m.ssr, ssrOnly: m.ssrOnly }))`;
+
     const entry = isMarkdown
-      ? `  { path: ${JSON.stringify(routePath)}, component: () => import(${JSON.stringify(importPath)}), isMarkdown: true }`
-      : `  { path: ${JSON.stringify(routePath)}, component: () => import(${JSON.stringify(importPath)}) }`;
+      ? `  { path: ${JSON.stringify(routePath)}, component: () => import(${JSON.stringify(importPath)}), isMarkdown: true${metadataImport} }`
+      : `  { path: ${JSON.stringify(routePath)}, component: () => import(${JSON.stringify(importPath)})${metadataImport} }`;
 
     routeEntries.push({ path: routePath, entry });
   }

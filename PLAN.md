@@ -1,7 +1,7 @@
 # EmberKit — Development Plan
 
-**Version:** 0.1.0  
-**Last Updated:** 2026-05-11
+**Version:** 0.2.0
+**Last Updated:** 2026-06-09
 
 ---
 
@@ -54,6 +54,14 @@
 - [x] **6.5** — Docs & CLI `generate i18n` template
 - [x] **6.6** — JSON translation files (import, glob, fetch, Node directory loader)
 
+### Phase 7: Advanced SSR & Deployment (v0.7.0)
+
+- [x] **7.1** — Per-route prerender/SSR export support
+- [x] **7.2** — Formal adapter interface system
+- [x] **7.3** — Middleware system
+- [x] **7.4** — Streaming SSR support
+- [x] **7.5** — Render scope isolation for SSR
+
 ---
 
 ## Completed
@@ -85,3 +93,89 @@
 | 5.5 Cache + prefetch | 2026-05-11 |
 | MD/MDX support | 2026-05-11 |
 | 6.1–6.5 i18n core + docs | 2026-05-28 |
+| 7.1 Per-route prerender/SSR exports | 2026-06-09 |
+| 7.2 Adapter interface system | 2026-06-09 |
+| 7.3 Middleware system | 2026-06-09 |
+| 7.4 Streaming SSR | 2026-06-09 |
+| 7.5 Render scope isolation | 2026-06-09 |
+
+---
+
+## New Features in v0.2.0
+
+### Per-route Rendering Control
+
+Routes can now export `prerender`, `ssr`, and `ssrOnly` to control rendering behavior:
+
+```typescript
+// src/routes/blog/[slug].tsx
+export const prerender = true;  // Pre-render at build time
+export const ssr = true;         // Enable SSR (default)
+export const ssrOnly = false;    // Disable client-side hydration
+```
+
+### Adapter System
+
+Formal adapter interface for deployment targets:
+
+```typescript
+import { createAdapter } from '@emberkit/core';
+
+export default createAdapter('my-app', 'cloudflare', async (context) => {
+  return {
+    status: 200,
+    headers: { 'Content-Type': 'text/html' },
+    body: await renderToHTML(context.request.url),
+  };
+});
+```
+
+### Middleware System
+
+Request middleware for auth, logging, etc.:
+
+```typescript
+import { addMiddleware } from '@emberkit/core';
+
+addMiddleware(async ({ request, locals }) => {
+  const user = await authenticate(request);
+  if (!user) {
+    return new Response(null, { status: 401 });
+  }
+  locals.user = user;
+});
+```
+
+### Streaming SSR
+
+Progressive HTML delivery for faster TTFB:
+
+```typescript
+import { renderToStream } from '@emberkit/core';
+
+export default async function handler(request: Request) {
+  const stream = await renderToStream(<App />, {
+    streaming: true,
+  });
+  
+  return new Response(stream, {
+    headers: { 'Content-Type': 'text/html; charset=utf-8' },
+  });
+}
+```
+
+### Render Scope Isolation
+
+Context values are now scoped per render, preventing leakage between SSR renders.
+
+---
+
+## Open Questions (Resolved)
+
+| Question | Status |
+|----------|--------|
+| Per-route rendering control | ✅ Implemented via `export const prerender/ssr/ssrOnly` |
+| Adapter system | ✅ Formal `Adapter` interface with `createAdapter()` |
+| Middleware | ✅ `addMiddleware()` and `runMiddleware()` |
+| Streaming SSR | ✅ `renderToStream()` function |
+| Context isolation | ✅ `runWithRenderScope()` for SSR renders |

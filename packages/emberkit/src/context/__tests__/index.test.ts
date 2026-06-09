@@ -62,9 +62,9 @@ describe('useContext', () => {
     expect(useContext(context)).toBe('default');
   });
 
-  it('should throw for missing context without default', () => {
+  it('should return undefined for missing context without default', () => {
     const context = createContext();
     clearAllContexts();
-    expect(() => useContext(context)).toThrow();
+    expect(useContext(context)).toBeUndefined();
   });
 });

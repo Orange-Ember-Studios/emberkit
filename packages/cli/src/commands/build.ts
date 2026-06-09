@@ -3,9 +3,10 @@ import { join } from "path";
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from "fs";
 import { pathToFileURL } from "url";
 import { cliBrand } from "../brand.js";
-import { mergeEmberkitViteConfig } from "../utils/merge-emberkit-vite.js";
+import { mergeEmberkitViteConfig, injectEmberkitPlugin } from "../utils/merge-emberkit-vite.js";
 import { loadEmberKitConfig, loadViteConfig } from "../utils/load-config.js";
-import { resolvePrerenderPaths } from "@emberkit/core";
+import { resolvePrerenderPaths, runWithRenderScope, clearRenderScope } from "@emberkit/core";
+import { emberkitVitePlugin } from "@emberkit/core/vite-plugin";
 import { normalizeSSRRenderResult } from "../utils/ssr-render-result.js";
 
 const COLORS = {
@@ -43,11 +44,15 @@ export async function build(_args: string[]): Promise<void> {
   const root = process.cwd();
   
   console.log(`\n${cliBrand.logo()} ${COLORS.orange}EmberKit Build${COLORS.reset}\n`);
-  
+
   const emberkitConfig = await loadEmberKitConfig(root);
   const viteFileConfig = await loadViteConfig(root);
-  const viteConfig = mergeEmberkitViteConfig(emberkitConfig, viteFileConfig);
-  
+  const mergedConfig = mergeEmberkitViteConfig(emberkitConfig, viteFileConfig);
+  const viteConfig = {
+    ...mergedConfig,
+    plugins: injectEmberkitPlugin(mergedConfig.plugins ?? [], emberkitVitePlugin()),
+  };
+
   const mode = (emberkitConfig as any)?.mode || "hybrid";
   const outDir = (emberkitConfig as any)?.build?.outDir || "dist";
   
@@ -187,6 +192,7 @@ import {
   injectSSRIntoTemplate,
   createWrapWithRootLayout,
   renderToHTMLString,
+  runWithRenderScope,
 } from '@emberkit/core';
 import { existsSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
@@ -312,88 +318,89 @@ const renderToString = (element) => {
 };
 
 export async function render(url) {
-  const pathname = url.split('?')[0];
+  return runWithRenderScope(async () => {
+    const pathname = url.split('?')[0];
 
-  const match = matchRoute(routes, pathname);
+    const match = matchRoute(routes, pathname);
 
-  let appHtml = '';
-  let headContent = '';
-  let status = 200;
-  let loaderState = null;
+    let appHtml = '';
+    let headContent = '';
+    let status = 200;
+    let loaderState = null;
 
-  if (match) {
-    try {
-      const mod = await match.route.component();
-      clearHeadContent();
-      const rendered = await renderMatchedRouteModule({
-        url,
-        pathname,
-        params: match.params,
-        routeModule: mod,
-        wrapWithRootLayout,
-      });
-      appHtml = rendered.appHtml;
-      status = rendered.status;
-      loaderState = rendered.loaderState;
-      const drained = drainHeadContent();
-      const routeMetadata =
-        typeof mod.getMetadata === 'function'
-          ? mod.getMetadata({ pathname, params: match.params })
-          : mod.metadata;
-      if (drained && drained.trim()) {
-        headContent = drained + '\\n';
-      } else if (routeMetadata) {
-        headContent =
-          buildRouteHeadFromMetadata(routeMetadata, pathname, siteHeadOptions ?? undefined) + '\\n';
-      }
-    } catch (e) {
-      console.error('[SSR] Failed to render route:', pathname, e);
-      if (errorRoute) {
-        try {
-          status = 500;
-          const mod = await errorRoute();
-          const Component = mod.default || mod;
-          const errorInfo = {
-            status: 500,
-            message: e instanceof Error ? e.message : 'Internal Server Error',
-            error: e,
-          };
-          const element = createElement(Component, { error: errorInfo });
-          appHtml = renderToString(element);
-        } catch (fallbackError) {
-          console.error('[SSR] Failed to render 500 page:', fallbackError);
-          appHtml = '<div style="color: red; padding: 20px;">Internal Server Error</div>';
-        }
-      } else {
-        appHtml = '<div style="color: red; padding: 20px;">SSR Error: ' + escapeHtml(String(e)) + '</div>';
-        status = 500;
-      }
-    }
-  } else {
-    status = 404;
-    if (notFoundRoute) {
+    if (match) {
       try {
-        const mod = await notFoundRoute();
-        const Route = mod.default || mod;
+        const mod = await match.route.component();
         clearHeadContent();
-        const Page = await wrapWithRootLayout(Route);
-        const element = createElement(Page, { pathname });
-        appHtml = renderToString(element);
+        const rendered = await renderMatchedRouteModule({
+          url,
+          pathname,
+          params: match.params,
+          routeModule: mod,
+          wrapWithRootLayout,
+        });
+        appHtml = rendered.appHtml;
+        status = rendered.status;
+        loaderState = rendered.loaderState;
         const drained = drainHeadContent();
-        if (drained) {
+        const routeMetadata =
+          typeof mod.getMetadata === 'function'
+            ? mod.getMetadata({ pathname, params: match.params })
+            : mod.metadata;
+        if (drained && drained.trim()) {
           headContent = drained + '\\n';
-        } else if (mod.metadata) {
+        } else if (routeMetadata) {
           headContent =
-            buildRouteHeadFromMetadata(mod.metadata, pathname, siteHeadOptions ?? undefined) + '\\n';
+            buildRouteHeadFromMetadata(routeMetadata, pathname, siteHeadOptions ?? undefined) + '\\n';
         }
       } catch (e) {
-        console.error('[SSR] Failed to render 404 page:', e);
-        appHtml = '<div style="padding: 20px;">404 - Page not found</div>';
+        console.error('[SSR] Failed to render route:', pathname, e);
+        if (errorRoute) {
+          try {
+            status = 500;
+            const mod = await errorRoute();
+            const Component = mod.default || mod;
+            const errorInfo = {
+              status: 500,
+              message: e instanceof Error ? e.message : 'Internal Server Error',
+              error: e,
+            };
+            const element = createElement(Component, { error: errorInfo });
+            appHtml = renderToString(element);
+          } catch (fallbackError) {
+            console.error('[SSR] Failed to render 500 page:', fallbackError);
+            appHtml = '<div style="color: red; padding: 20px;">Internal Server Error</div>';
+          }
+        } else {
+          appHtml = '<div style="color: red; padding: 20px;">SSR Error: ' + escapeHtml(String(e)) + '</div>';
+          status = 500;
+        }
       }
     } else {
-      appHtml = '<div style="padding: 20px;">404 - Page not found</div>';
+      status = 404;
+      if (notFoundRoute) {
+        try {
+          const mod = await notFoundRoute();
+          const Route = mod.default || mod;
+          clearHeadContent();
+          const Page = await wrapWithRootLayout(Route);
+          const element = createElement(Page, { pathname });
+          appHtml = renderToString(element);
+          const drained = drainHeadContent();
+          if (drained) {
+            headContent = drained + '\\n';
+          } else if (mod.metadata) {
+            headContent =
+              buildRouteHeadFromMetadata(mod.metadata, pathname, siteHeadOptions ?? undefined) + '\\n';
+          }
+        } catch (e) {
+          console.error('[SSR] Failed to render 404 page:', e);
+          appHtml = '<div style="padding: 20px;">404 - Page not found</div>';
+        }
+      } else {
+        appHtml = '<div style="padding: 20px;">404 - Page not found</div>';
+      }
     }
-  }
 
   const distIndexPath = join(__dirname, '..', 'index.html');
   const sourceIndexPath = join(__dirname, '..', '..', 'index.html');
@@ -411,7 +418,8 @@ export async function render(url) {
 
   template = injectSSRIntoTemplate(template, { appHtml, headContent, loaderState });
 
-  return { html: template, status };
+    return { html: template, status };
+  });
 }
 `;
 }
@@ -621,7 +629,14 @@ async function prerenderStaticRoutes(
       let html: string;
 
       if (serverModule.render) {
-        html = normalizeSSRRenderResult(await serverModule.render(routePath)).html;
+        html = await runWithRenderScope(async () => {
+          try {
+            const result = await serverModule.render(routePath);
+            return normalizeSSRRenderResult(result).html;
+          } finally {
+            clearRenderScope();
+          }
+        });
       } else if (serverModule.default && typeof serverModule.default === "function") {
         html = "<!DOCTYPE html><html><head></head><body></body></html>";
       } else {

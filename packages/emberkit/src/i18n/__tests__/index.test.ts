@@ -219,9 +219,9 @@ describe('createI18nContext', () => {
     expect(context).toBeDefined();
   });
 
-  it('throws outside provider', () => {
+  it('returns undefined outside provider', () => {
     clearAllContexts();
     const { useI18n } = createI18nContext();
-    expect(() => useI18n()).toThrow();
+    expect(useI18n()).toBeUndefined();
   });
 });

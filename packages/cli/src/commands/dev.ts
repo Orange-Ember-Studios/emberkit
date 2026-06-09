@@ -1,6 +1,7 @@
 import { createServer, type UserConfig, type LogLevel } from "vite";
-import { mergeEmberkitViteConfig } from "../utils/merge-emberkit-vite.js";
+import { mergeEmberkitViteConfig, injectEmberkitPlugin } from "../utils/merge-emberkit-vite.js";
 import { loadEmberKitConfig, loadViteConfig } from "../utils/load-config.js";
+import { emberkitVitePlugin } from "@emberkit/core/vite-plugin";
 
 const COLORS = {
   reset: "\x1b[0m",
@@ -63,7 +64,11 @@ export async function dev(_args: string[]): Promise<void> {
   
   const emberkitConfig = await loadEmberKitConfig(root);
   const viteFileConfig = await loadViteConfig(root, "serve");
-  const viteConfig = mergeEmberkitViteConfig(emberkitConfig, viteFileConfig);
+  const mergedConfig = mergeEmberkitViteConfig(emberkitConfig, viteFileConfig);
+  const viteConfig = {
+    ...mergedConfig,
+    plugins: injectEmberkitPlugin(mergedConfig.plugins ?? [], emberkitVitePlugin()),
+  };
   
   if (emberkitConfig) {
     log("debug", "Loaded emberkit.config", { mode: (emberkitConfig as any).mode || "hybrid" });

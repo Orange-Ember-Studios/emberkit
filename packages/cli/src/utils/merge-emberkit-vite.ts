@@ -1,8 +1,23 @@
-import type { UserConfig } from "vite";
+import type { Plugin, UserConfig } from "vite";
 
 function pluginsToArray(plugins: UserConfig["plugins"]): NonNullable<UserConfig["plugins"]> {
   if (plugins == null) return [];
   return Array.isArray(plugins) ? plugins : [plugins];
+}
+
+function hasEmberkitPlugin(plugins: NonNullable<UserConfig["plugins"]>): boolean {
+  return plugins.some((p) => {
+    if (!p) return false;
+    const name = typeof p === "object" && "name" in p ? p.name : null;
+    return name === "emberkit:vite-plugin";
+  });
+}
+
+export function injectEmberkitPlugin(plugins: NonNullable<UserConfig["plugins"]>, emberkitPlugin: Plugin): Plugin[] {
+  if (hasEmberkitPlugin(plugins)) {
+    return plugins.filter((p): p is Plugin => p != null);
+  }
+  return [emberkitPlugin, ...plugins.filter((p): p is Plugin => p != null)];
 }
 
 /**

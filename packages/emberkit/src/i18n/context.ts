@@ -8,14 +8,9 @@ export interface I18nContextValue<TKeys extends string = string> {
 export function createI18nContext<TKeys extends string = string>() {
   const bridge = createContext<I18nContextValue<TKeys> | undefined>(undefined);
 
-  function useI18n(): I18nInstance<TKeys> {
+  function useI18n(): I18nInstance<TKeys> | undefined {
     const ctx = bridge.use();
-    if (!ctx?.i18n) {
-      throw new Error(
-        'useI18n() must be used within an I18nProvider. Wrap your app with <I18nProvider i18n={...}>.',
-      );
-    }
-    return ctx.i18n;
+    return ctx?.i18n;
   }
 
   function I18nProvider(props: {

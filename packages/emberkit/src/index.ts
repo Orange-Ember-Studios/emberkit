@@ -124,6 +124,14 @@ export type { LazyInViewProps } from './viewport/index.js';
 
 export type { Logger, LoggerOptions, LogLevel, RequestLog, ResponseLog } from './logger/types.js';
 
+export { addMiddleware, clearMiddleware, getMiddleware, runMiddleware } from './middleware/index.js';
+export type { MiddlewareHandler, MiddlewareContext } from './middleware/types.js';
+
+export { createAdapter, isAdapter } from './adapter/index.js';
+export type { Adapter, AdapterRequest, AdapterResponse, AdapterContext, AdapterOptions } from './adapter/index.js';
+
+export { runWithRenderScope, clearRenderScope } from './ssr/index.js';
+
 export function defineConfig(config: Record<string, unknown>): Record<string, unknown> {
   return config;
 }
