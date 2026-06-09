@@ -1,7 +1,7 @@
 import {
   buildPackageJson,
   buildTsConfig,
-  buildViteConfig,
+  buildEmberkitConfig,
   buildIndexHtml,
   buildEntryFile,
   GITIGNORE,
@@ -10,7 +10,7 @@ import {
 export const apiTemplate: Record<string, string> = {
   "package.json": buildPackageJson(),
   "tsconfig.json": buildTsConfig(),
-  "vite.config.ts": buildViteConfig(false),
+  "emberkit.config.ts": buildEmberkitConfig('ssr'),
   "index.html": buildIndexHtml({ title: "{{name}} API" }),
   ".gitignore": GITIGNORE,
   "src/index.tsx": buildEntryFile(),

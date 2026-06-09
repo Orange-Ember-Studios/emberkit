@@ -78,6 +78,19 @@ export function emberkitVitePlugin(userOptions: EmberKitPluginOptions = {}): Plu
         }
       }
 
+      if (options.tailwind) {
+        try {
+          // @ts-expect-error - @tailwindcss/vite is an optional peer dependency
+          const tailwindcss = (await import('@tailwindcss/vite')).default;
+          plugins.push(tailwindcss() as any);
+        } catch (error) {
+          console.warn(
+            '[emberkit] @tailwindcss/vite is not installed; skipping Tailwind.',
+            error,
+          );
+        }
+      }
+
       const isWorkspace = existsSync(join(pkgRoot, 'src', 'index.ts'));
 
       return {

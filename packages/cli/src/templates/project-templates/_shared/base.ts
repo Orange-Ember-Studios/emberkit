@@ -79,26 +79,12 @@ export function buildTsConfig(hasPaths = true): string {
 }`;
 }
 
-export function buildViteConfig(hasTailwind = false): string {
-  if (hasTailwind) {
-    return `import { defineConfig } from 'vite';
-import tailwindcss from '@tailwindcss/vite';
-
-export default defineConfig({
-  plugins: [tailwindcss()],
-});`;
-  }
-
-  return `import { defineConfig } from 'vite';
-
-export default defineConfig({});`;
-}
-
-export function buildEmberkitConfig(mode: 'spa' | 'ssr' | 'hybrid' | 'static' = 'hybrid'): string {
+export function buildEmberkitConfig(mode: 'spa' | 'ssr' | 'hybrid' | 'static' = 'hybrid', hasTailwind = false): string {
+  const tailwindConfig = hasTailwind ? `,\n  tailwind: true` : '';
   return `import { defineConfig } from '@emberkit/core';
 
 export default defineConfig({
-  mode: '${mode}',
+  mode: '${mode}'${tailwindConfig}
 });`;
 }
 

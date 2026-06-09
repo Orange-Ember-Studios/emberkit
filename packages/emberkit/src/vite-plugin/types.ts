@@ -47,6 +47,8 @@ export interface EmberKitPluginOptions {
   };
   /** Generate sitemap.xml during build */
   sitemap?: SitemapOptions | boolean;
+  /** Enable Tailwind CSS */
+  tailwind?: boolean;
 }
 
 export interface DevApiPluginOptions {

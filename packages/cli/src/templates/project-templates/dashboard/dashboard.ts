@@ -1,7 +1,6 @@
 import {
   buildPackageJson,
   buildTsConfig,
-  buildViteConfig,
   buildEmberkitConfig,
   buildIndexHtml,
   buildEntryFile,
@@ -11,8 +10,8 @@ import {
 export const dashboardTemplate: Record<string, string> = {
   "package.json": buildPackageJson({ hasTailwind: true, hasUI: true }),
   "tsconfig.json": buildTsConfig(),
-  "vite.config.ts": buildViteConfig(true),
-  "emberkit.config.ts": buildEmberkitConfig('hybrid'),
+  
+  "emberkit.config.ts": buildEmberkitConfig('hybrid', true),
   "index.html": buildIndexHtml({
     fonts: [
       "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",

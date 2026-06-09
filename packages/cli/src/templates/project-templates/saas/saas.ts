@@ -1,7 +1,6 @@
 import {
   buildPackageJson,
   buildTsConfig,
-  buildViteConfig,
   buildEmberkitConfig,
   buildIndexHtml,
   buildEntryFile,
@@ -14,8 +13,8 @@ const INTER_FONT =
 export const saasTemplate: Record<string, string> = {
   "package.json": buildPackageJson({ hasTailwind: true, hasUI: true }),
   "tsconfig.json": buildTsConfig(),
-  "vite.config.ts": buildViteConfig(true),
-  "emberkit.config.ts": buildEmberkitConfig('ssr'),
+  
+  "emberkit.config.ts": buildEmberkitConfig('ssr', true),
   "index.html": buildIndexHtml({ fonts: [INTER_FONT] }),
   ".gitignore": GITIGNORE,
 
