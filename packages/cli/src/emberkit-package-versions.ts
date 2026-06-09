@@ -1,7 +1,7 @@
 // Semver ranges for @emberkit/* packages written into generated projects.
 // When releasing libraries, bump these to match packages/*/package.json "version".
 export const EMBERKIT_PACKAGE_VERSIONS = {
-  core: "^0.11.0",
+  core: "^0.11.1",
   ui: "^9.0.1",
   icons: "^9.0.0",
   cli: "^4.0.0",

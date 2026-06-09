@@ -2,6 +2,7 @@ import {
   buildPackageJson,
   buildTsConfig,
   buildViteConfig,
+  buildEmberkitConfig,
   buildIndexHtml,
   buildEntryFile,
   GITIGNORE,
@@ -14,6 +15,7 @@ export const starterFiles: Record<string, string> = {
   "package.json": buildPackageJson({ hasTailwind: true }),
   "tsconfig.json": buildTsConfig(),
   "vite.config.ts": buildViteConfig(true),
+  "emberkit.config.ts": buildEmberkitConfig('hybrid'),
   "index.html": buildIndexHtml({ fonts: [INTER_FONT] }),
   ".gitignore": GITIGNORE,
 

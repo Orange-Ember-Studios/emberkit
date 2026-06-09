@@ -1,7 +1,7 @@
 import {
   buildPackageJson,
   buildTsConfig,
-  buildViteConfig,
+  buildEmberkitConfig,
   buildIndexHtml,
   buildEntryFile,
   GITIGNORE,
@@ -10,7 +10,7 @@ import {
 export const minimalTemplate: Record<string, string> = {
   "package.json": buildPackageJson(),
   "tsconfig.json": buildTsConfig(false),
-  "vite.config.ts": buildViteConfig(false),
+  "emberkit.config.ts": buildEmberkitConfig('spa'),
   "index.html": buildIndexHtml(),
   ".gitignore": GITIGNORE,
 

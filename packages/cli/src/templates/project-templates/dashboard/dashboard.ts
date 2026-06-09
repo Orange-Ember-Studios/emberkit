@@ -2,6 +2,7 @@ import {
   buildPackageJson,
   buildTsConfig,
   buildViteConfig,
+  buildEmberkitConfig,
   buildIndexHtml,
   buildEntryFile,
   GITIGNORE,
@@ -11,6 +12,7 @@ export const dashboardTemplate: Record<string, string> = {
   "package.json": buildPackageJson({ hasTailwind: true, hasUI: true }),
   "tsconfig.json": buildTsConfig(),
   "vite.config.ts": buildViteConfig(true),
+  "emberkit.config.ts": buildEmberkitConfig('hybrid'),
   "index.html": buildIndexHtml({
     fonts: [
       "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",

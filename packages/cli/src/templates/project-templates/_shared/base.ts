@@ -86,20 +86,19 @@ import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
   plugins: [tailwindcss()],
-  server: {
-    port: 3000,
-    host: 'localhost',
-  },
 });`;
   }
 
   return `import { defineConfig } from 'vite';
 
+export default defineConfig({});`;
+}
+
+export function buildEmberkitConfig(mode: 'spa' | 'ssr' | 'hybrid' | 'static' = 'hybrid'): string {
+  return `import { defineConfig } from '@emberkit/core';
+
 export default defineConfig({
-  server: {
-    port: 3000,
-    host: 'localhost',
-  },
+  mode: '${mode}',
 });`;
 }
 
