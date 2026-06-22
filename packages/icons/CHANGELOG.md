@@ -1,5 +1,13 @@
 # @emberkit/icons
 
+## 9.0.1
+
+### Patch Changes
+
+- 344026f: fix icons return type to use framework JSXNode so they work as valid JSX components in consumer apps
+- Updated dependencies [75001e4]
+  - @emberkit/core@0.11.1
+
 ## 9.0.0
 
 ### Patch Changes

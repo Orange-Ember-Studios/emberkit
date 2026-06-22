@@ -1,5 +1,11 @@
 # @emberkit/core
 
+## 0.11.1
+
+### Patch Changes
+
+- 75001e4: fix vite plugin dev render to avoid double-hydrate wiping SSR content
+
 ## 0.11.0
 
 ### Minor Changes
