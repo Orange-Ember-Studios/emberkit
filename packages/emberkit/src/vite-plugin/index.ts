@@ -1652,25 +1652,18 @@ export async function render(url, server) {
     }
   }
 
-  // Load and transform index.html
+  // Load and transform index.html.
+  // Always use Vite's transformIndexHtml so the source module script is the
+  // only entry that runs. Copying asset tags from dist/index.html here caused
+  // the dev response to ship BOTH the source module and the hashed production
+  // bundle; the second hydrate then ran the route loader in the browser where
+  // process.env.TURSO_DATABASE_URL is undefined and wiped the SSR HTML with
+  // an empty render.
   const fs = await import('node:fs');
   const path = await import('node:path');
   const indexPath = path.join(server.config.root, 'index.html');
-  const outDir = server.config.build?.outDir ?? 'dist';
-  const builtIndexPath = path.join(server.config.root, outDir, 'index.html');
   let template = fs.readFileSync(indexPath, 'utf-8');
-  if (fs.existsSync(builtIndexPath)) {
-    const built = fs.readFileSync(builtIndexPath, 'utf-8');
-    const assetTags = [
-      ...(built.match(/<link rel="stylesheet"[^>]*>/g) ?? []),
-      ...(built.match(/<script type="module"[^>]*><\\/script>/g) ?? []),
-    ];
-    if (assetTags.length > 0) {
-      template = template.replace('</head>', assetTags.join('\\n') + '\\n</head>');
-    }
-  } else {
-    template = await server.transformIndexHtml(url, template);
-  }
+  template = await server.transformIndexHtml(url, template);
 
   template = injectSSRIntoTemplate(template, { appHtml, headContent, loaderState });
 
