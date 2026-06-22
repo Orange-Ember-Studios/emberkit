@@ -1,5 +1,11 @@
 # @emberkit/docs
 
+## 1.1.1
+
+### Patch Changes
+
+- Sync docs site with `@emberkit/core@0.11.1` and `@emberkit/icons@9.0.1` (icons now type as returning framework `JSXNode`, fixing `'cannot be used as a JSX component'` in consumer apps)
+
 ## 1.1.0
 
 ### Minor Changes
