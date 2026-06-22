@@ -45,7 +45,7 @@ import {
   IconEmberKit,
 } from '@emberkit/icons';
 
-type IconComponent = (props: { size?: number; className?: string; color?: string }) => unknown;
+type IconComponent = (props: { size?: number; className?: string; color?: string }) => import('@emberkit/core').JSXNode;
 
 interface IconEntry {
   name: string;

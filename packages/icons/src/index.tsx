@@ -1,20 +1,22 @@
+import type { JSXNode } from '@emberkit/core';
+
 export interface IconProps {
   size?: number;
   className?: string;
   color?: string;
 }
 
-type IconComponent<P = IconProps> = (props: P) => unknown;
+type IconComponent = (props: IconProps) => JSXNode;
 
 interface IconDefinition {
   viewBox: string;
   fill?: string;
   stroke?: boolean;
-  children: unknown;
+  children: JSXNode | JSXNode[];
 }
 
 function createSvgIcon(def: IconDefinition): IconComponent {
-  return (props: IconProps) => ({
+  return (props) => ({
     type: "svg",
     props: {
       viewBox: def.viewBox,
