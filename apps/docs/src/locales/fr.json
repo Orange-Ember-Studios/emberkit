@@ -17,7 +17,7 @@
     "installation": "Installation",
     "quickStart": "Démarrage rapide",
     "builtWith": "Construit avec EmberKit",
-    "release": "Version 0.8.0",
+    "release": "Version 0.11.1",
     "api": "Référence API",
     "examples": "Exemples",
     "components": "Composants",
@@ -106,6 +106,7 @@
     "/docs/images": { "title": "Optimisation d'images", "description": "Images responsives, transformations et chargement différé." },
     "/docs/markdown": { "title": "Markdown et MDX", "description": "Contenu Markdown et MDX avec frontmatter." },
     "/docs/release-0-8": { "title": "Version 0.8.0", "description": "Nouveautés d'EmberKit 0.8.0." },
+    "/docs/release-0-11": { "title": "Version 0.11.1", "description": "Nouveautés d'EmberKit 0.11.1 : i18n, helpers Cloudflare, 404/500 par défaut, fusion shorthand dans Head." },
     "/404": { "title": "Page introuvable", "description": "La page demandée n'existe pas sur le site de documentation EmberKit." },
     "/500": { "title": "Erreur serveur", "description": "Une erreur s'est produite lors du chargement de cette page." }
   }

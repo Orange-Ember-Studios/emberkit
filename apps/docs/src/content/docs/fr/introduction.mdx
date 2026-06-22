@@ -52,21 +52,21 @@ function Counter() {
 | État | Signaux + mises à jour DOM ciblées |
 | Outils | `emberkit dev`, `build`, `preview`, `serve` |
 
-## Nouveautés en 0.8.0
+## Nouveautés en 0.11.1
 
-- **Effets réactifs** — <code>createEffect</code> / <code>createMemo</code> se réexécutent quand les dépendances changent
-- **View Transitions** — <code>render(..., &#123; viewTransitions: true &#125;)</code> pour la navigation SPA
-- **Dev API** — <code>devApiPlugin</code> et <code>src/routes/_api/*</code> en développement
-- **sqlRawPlugin** — importer <code>*.sql?raw</code> pour les déploiements edge
-- **i18n** — fichiers JSON de traduction avec <code>createI18nFromGlob</code> ([guide](/fr/docs/i18n))
+- **Internationalisation** — catalogues JSON, routage par locale, pluralisation et formatage avec `Intl` ([guide](/fr/docs/i18n))
+- **Helpers Cloudflare Workers** — <code>createCloudflareWorker</code>, <code>injectPublicEnv</code>, <code>defineWranglerConfig</code> depuis <code>@emberkit/edge</code>
+- **404 / 500 par défaut** — pages intégrées si vous omettez <code>src/routes/404.tsx</code> ou <code>500.tsx</code>
+- **Head : fusion shorthand** — les props de <code>&lt;Head&gt;</code> se fusionnent avec les children ; correction de la priorité du head en SSR
+- **Hydratation des formulaires** — `submit` et `change` s'hydratent via le câblage `data-ek-*`
 
-Voir les notes complètes de [Release 0.8.0](/fr/docs/release-0-8).
+Voir les notes complètes de [Version 0.11.1](/fr/docs/release-0-11). Version précédente : [Release 0.8.0](/fr/docs/release-0-8).
 
 ## Étapes suivantes
 
 - [Installation](/fr/docs/installation) — Créer un projet
 - [Démarrage rapide](/fr/docs/quick-start) — Premières routes et signaux
-- [Release 0.8.0](/fr/docs/release-0-8) — Dernière version
+- [Version 0.11.1](/fr/docs/release-0-11) — Dernière version
 - [SSR et SSG](/fr/docs/ssr) — Comment la vitesse est livrée dans chaque mode
 - [Hydratation](/fr/docs/hydration) — Interactivité client sélective
 - [Internationalisation](/fr/docs/i18n) — Traductions JSON et routage par locale

@@ -1,0 +1,126 @@
+---
+title: Release 0.11.1
+---
+
+import { Badge, Alert, Card, Text } from '@emberkit/ui';
+
+# Release 0.11.1
+
+<Text color="muted" className="mb-6">
+  <Badge variant="outline" className="mr-2">@emberkit/core 0.11.1</Badge>
+  <Badge variant="outline" className="mr-2">@emberkit/icons 9.0.1</Badge>
+  <Badge variant="outline">@emberkit/ui 9.0.1</Badge>
+</Text>
+
+This release adds first-class internationalization, Cloudflare Workers helpers, default 404/500 pages, and Head shorthand merging — plus several Vite-plugin and hydration fixes.
+
+## Highlights
+
+| Area | What changed |
+|------|----------------|
+| [Internationalization](/en/docs/i18n) | Core i18n with JSON catalogs, locale routing, pluralization, and Intl formatting |
+| [Edge Deployment](/en/docs/edge) | <code>createCloudflareWorker</code>, <code>injectPublicEnv</code>, <code>defineWranglerConfig</code> from <code>@emberkit/edge</code> |
+| [Dev API](/en/docs/dev-api) | <code>createNodeDevApiHandler</code> for dev/prod API parity |
+| [Routing](/en/docs/routing) | Built-in default <code>404.tsx</code> / <code>500.tsx</code> when not provided |
+| [Head Component](/en/docs/head) | Merge shorthand props with children; fix SSR head priority |
+| [Hydration](/en/docs/hydration) | Form event hydration; richer signal bindings on inputs |
+
+## Internationalization
+
+A new core i18n API ships in <code>@emberkit/core</code>: JSON catalogs, locale routing, pluralization, and <code>Intl</code>-backed formatting.
+
+```tsx
+import { createI18n, defineMessages, createI18nFromGlob } from '@emberkit/core';
+
+const messages = defineMessages({
+  greeting: { en: 'Hello, {name}!', es: '¡Hola, {name}!', fr: 'Salut, {name} !' },
+  cartItems: {
+    en: '{count, plural, =0 {No items} one {# item} other {# items}}',
+    es: '{count, plural, =0 {Sin artículos} one {# artículo} other {# artículos}}',
+  },
+});
+
+const i18n = await createI18nFromGlob({
+  defaultLocale: 'en',
+  supportedLocales: ['en', 'es', 'fr'],
+  messages,
+});
+```
+
+Use the <code>t</code> function in components and routes, or wire locale prefixes to URL paths. Full guide: [Internationalization](/en/docs/i18n).
+
+## Cloudflare Workers helpers
+
+Three new exports from <code>@emberkit/edge</code> for Cloudflare deployments:
+
+```ts
+// wrangler config
+import { defineWranglerConfig } from '@emberkit/edge';
+
+export default defineWranglerConfig({
+  name: 'my-app',
+  compatibility_date: '2025-01-01',
+});
+```
+
+```ts
+// src/server.ts
+import { createCloudflareWorker } from '@emberkit/edge';
+
+export default createCloudflareWorker({
+  injectPublicEnv: true, // exposes PUBLIC_* on window.__CF_ENV__
+});
+```
+
+See [Edge Deployment](/en/docs/edge) for full setup and the <code>beforeAssets</code> hook for locale-prefix redirects.
+
+## Default 404 / 500 pages
+
+If your project does not ship <code>src/routes/404.tsx</code> or <code>src/routes/500.tsx</code>, EmberKit now renders built-in default pages for SSR and client navigation. Override by adding the files; the default pages are also exported as <code>DefaultNotFoundPage</code> and <code>DefaultServerErrorPage</code> from <code>@emberkit/core</code>.
+
+```tsx
+// src/routes/404.tsx — optional override
+export default function NotFound({ pathname }: { pathname?: string }) {
+  return <h1>404 — {pathname} not found</h1>;
+}
+```
+
+Routing guide: [Routing — error boundaries](/en/docs/routing#error-boundaries).
+
+## Head shorthand + children
+
+The <code>&lt;Head&gt;</code> component now merges shorthand props with children. When <code>children</code> are provided they take precedence and the shorthand props are ignored — useful for letting nested layouts override a parent route's title.
+
+```tsx
+<Head title="Default">
+  <title>Per-route override</title>
+  <meta name="description" content="From this route" />
+</Head>
+```
+
+Full reference: [Head Component](/en/docs/head).
+
+## Form event hydration
+
+Form submission and <code>change</code> events now hydrate through the same <code>data-ek-*</code> wiring used for clicks. Progressive-enhancement forms work without shipping a form runtime — see [Forms & Mutations](/en/docs/forms).
+
+## Bug fixes (0.11.1)
+
+- Vite plugin dev render no longer double-hydrates, which was wiping SSR content on hot reload.
+- SSR head injection no longer pollutes the prerender template when multiple routes share a layout.
+- Icons (<code>@emberkit/icons@9.0.1</code>) now type as returning framework <code>JSXNode</code>, so they work as valid JSX components in consumer apps (previously, TypeScript reported <em>'IconName' cannot be used as a JSX component</em>).
+
+## Migration checklist
+
+1. Bump dependencies: <code>@emberkit/core@^0.11.1</code>, optional <code>@emberkit/icons@^9.0.1</code>, <code>@emberkit/ui@^9.0.1</code>.
+2. If you scaffolded a default 404 / 500 page yourself, remove it to inherit the new built-in defaults — or keep it and add <code>notFoundRoute</code> / <code>errorRoute</code> wiring via <code>virtual:emberkit-routes</code>.
+3. For Cloudflare targets, switch to <code>createCloudflareWorker</code> + <code>defineWranglerConfig</code> from <code>@emberkit/edge</code> if you were hand-rolling <code>worker.ts</code>.
+4. If you copied Head children into a parent route, no change needed — shorthand props are still merged with children.
+
+## Next steps
+
+- [Internationalization](/en/docs/i18n)
+- [Edge Deployment](/en/docs/edge)
+- [Head Component](/en/docs/head)
+- [Routing](/en/docs/routing)
+- [API Reference](/en/docs/api)

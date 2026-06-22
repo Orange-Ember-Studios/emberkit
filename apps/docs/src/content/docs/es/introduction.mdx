@@ -52,21 +52,21 @@ function Counter() {
 | Estado | Señales + actualizaciones DOM dirigidas |
 | Herramientas | `emberkit dev`, `build`, `preview`, `serve` |
 
-## Novedades en 0.8.0
+## Novedades en 0.11.1
 
-- **Efectos reactivos** — <code>createEffect</code> / <code>createMemo</code> se re-ejecutan cuando cambian las dependencias
-- **View Transitions** — <code>render(..., &#123; viewTransitions: true &#125;)</code> para navegación SPA
-- **Dev API** — <code>devApiPlugin</code> y <code>src/routes/_api/*</code> en desarrollo
-- **sqlRawPlugin** — importar <code>*.sql?raw</code> para despliegues edge
-- **i18n** — archivos JSON de traducción con <code>createI18nFromGlob</code> ([guía](/es/docs/i18n))
+- **Internacionalización** — catálogos JSON, enrutado por locale, pluralización y formato con `Intl` ([guía](/es/docs/i18n))
+- **Helpers para Cloudflare Workers** — <code>createCloudflareWorker</code>, <code>injectPublicEnv</code>, <code>defineWranglerConfig</code> desde <code>@emberkit/edge</code>
+- **404 / 500 por defecto** — páginas integradas si omites <code>src/routes/404.tsx</code> o <code>500.tsx</code>
+- **Head: fusión shorthand** — las props de <code>&lt;Head&gt;</code> se fusionan con los children; corrige la prioridad del head en SSR
+- **Hidratación de formularios** — `submit` y `change` se hidratan con el cableado `data-ek-*`
 
-Consulta las notas completas de [Release 0.8.0](/es/docs/release-0-8).
+Consulta las notas completas de [Versión 0.11.1](/es/docs/release-0-11). Versión anterior: [Release 0.8.0](/es/docs/release-0-8).
 
 ## Siguientes pasos
 
 - [Instalación](/es/docs/installation) — Crear un proyecto
 - [Inicio rápido](/es/docs/quick-start) — Primeras rutas y señales
-- [Release 0.8.0](/es/docs/release-0-8) — Última versión
+- [Versión 0.11.1](/es/docs/release-0-11) — Última versión
 - [SSR y SSG](/es/docs/ssr) — Cómo se logra la velocidad en cada modo
 - [Hidratación](/es/docs/hydration) — Interactividad selectiva en el cliente
 - [Internacionalización](/es/docs/i18n) — Traducciones JSON y rutas por locale

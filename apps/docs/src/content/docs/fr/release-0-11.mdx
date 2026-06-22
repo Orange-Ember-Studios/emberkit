@@ -1,0 +1,126 @@
+---
+title: Version 0.11.1
+---
+
+import { Badge, Alert, Card, Text } from '@emberkit/ui';
+
+# Version 0.11.1
+
+<Text color="muted" className="mb-6">
+  <Badge variant="outline" className="mr-2">@emberkit/core 0.11.1</Badge>
+  <Badge variant="outline" className="mr-2">@emberkit/icons 9.0.1</Badge>
+  <Badge variant="outline">@emberkit/ui 9.0.1</Badge>
+</Text>
+
+Cette release ajoute l'internationalisation de première classe, des helpers pour Cloudflare Workers, des pages 404/500 par défaut, et la fusion shorthand + children pour <code>&lt;Head&gt;</code>, ainsi que plusieurs correctifs du plugin Vite et d'hydratation.
+
+## Points forts
+
+| Domaine | Ce qui a changé |
+|---------|-----------------|
+| [Internationalisation](/fr/docs/i18n) | i18n du core avec catalogues JSON, routage par locale, pluralisation et formatage via <code>Intl</code> |
+| [Edge Deployment](/fr/docs/edge) | <code>createCloudflareWorker</code>, <code>injectPublicEnv</code>, <code>defineWranglerConfig</code> depuis <code>@emberkit/edge</code> |
+| [API de développement](/fr/docs/dev-api) | <code>createNodeDevApiHandler</code> pour la parité dev/prod de l'API |
+| [Routage](/fr/docs/routing) | Pages par défaut <code>404.tsx</code> / <code>500.tsx</code> si non fournies |
+| [Composant Head](/fr/docs/head) | Fusion des props shorthand avec les children ; correction de la priorité du head en SSR |
+| [Hydratation](/fr/docs/hydration) | Hydratation des événements de formulaire ; liaisons signal enrichies sur les inputs |
+
+## Internationalisation
+
+Nouvelle API i18n dans <code>@emberkit/core</code> : catalogues JSON, routage par locale, pluralisation et formatage basé sur <code>Intl</code>.
+
+```tsx
+import { createI18n, defineMessages, createI18nFromGlob } from '@emberkit/core';
+
+const messages = defineMessages({
+  greeting: { en: 'Hello, {name}!', es: '¡Hola, {name}!', fr: 'Salut, {name} !' },
+  cartItems: {
+    en: '{count, plural, =0 {No items} one {# item} other {# items}}',
+    fr: '{count, plural, =0 {Aucun article} one {# article} other {# articles}}',
+  },
+});
+
+const i18n = await createI18nFromGlob({
+  defaultLocale: 'en',
+  supportedLocales: ['en', 'es', 'fr'],
+  messages,
+});
+```
+
+Utilisez la fonction <code>t</code> dans les composants et les routes, ou branchez les préfixes de locale sur les chemins d'URL. Guide complet : [Internationalisation](/fr/docs/i18n).
+
+## Helpers Cloudflare Workers
+
+Trois nouveaux exports depuis <code>@emberkit/edge</code> pour les déploiements Cloudflare :
+
+```ts
+// wrangler config
+import { defineWranglerConfig } from '@emberkit/edge';
+
+export default defineWranglerConfig({
+  name: 'my-app',
+  compatibility_date: '2025-01-01',
+});
+```
+
+```ts
+// src/server.ts
+import { createCloudflareWorker } from '@emberkit/edge';
+
+export default createCloudflareWorker({
+  injectPublicEnv: true, // expose PUBLIC_* sur window.__CF_ENV__
+});
+```
+
+Voir [Edge Deployment](/fr/docs/edge) pour la configuration complète et le hook <code>beforeAssets</code> pour les redirections par préfixe de locale.
+
+## Pages 404 / 500 par défaut
+
+Si votre projet ne fournit pas <code>src/routes/404.tsx</code> ou <code>src/routes/500.tsx</code>, EmberKit affiche désormais des pages par défaut pour le SSR et la navigation client. Remplacez-les en ajoutant les fichiers ; les pages par défaut sont aussi exportées sous <code>DefaultNotFoundPage</code> et <code>DefaultServerErrorPage</code> depuis <code>@emberkit/core</code>.
+
+```tsx
+// src/routes/404.tsx — surcharge optionnelle
+export default function NotFound({ pathname }: { pathname?: string }) {
+  return <h1>404 — {pathname} introuvable</h1>;
+}
+```
+
+Guide de routage : [Routage — limites d'erreur](/fr/docs/routing#error-boundaries).
+
+## Head : shorthand + children
+
+Le composant <code>&lt;Head&gt;</code> fusionne désormais les props shorthand avec les children. Quand des <code>children</code> sont fournis, ils prennent le pas et les props shorthand sont ignorées — utile pour laisser un layout enfant surcharger le titre d'une route parente.
+
+```tsx
+<Head title="Par défaut">
+  <title>Surcharge par route</title>
+  <meta name="description" content="Depuis cette route" />
+</Head>
+```
+
+Référence complète : [Composant Head](/fr/docs/head).
+
+## Hydratation des événements de formulaire
+
+La soumission de formulaires et les événements <code>change</code> sont maintenant hydratés via le même câblage <code>data-ek-*</code> que les clics. Les formulaires avec progressive enhancement fonctionnent sans embarquer de runtime de formulaires — voir [Formulaires et mutations](/fr/docs/forms).
+
+## Correctifs (0.11.1)
+
+- Le rendu dev du plugin Vite ne fait plus de double hydratation, ce qui effaçait le contenu SSR au hot reload.
+- L'injection de head en SSR ne pollue plus le template de prerender quand plusieurs routes partagent un layout.
+- Les icônes (<code>@emberkit/icons@9.0.1</code>) sont maintenant typées comme retournant le <code>JSXNode</code> du framework, ce qui leur permet d'être des composants JSX valides dans les apps consommatrices (auparavant TypeScript signalait <em>'IconName' cannot be used as a JSX component</em>).
+
+## Checklist de migration
+
+1. Mettez à jour les dépendances : <code>@emberkit/core@^0.11.1</code>, optionnel <code>@emberkit/icons@^9.0.1</code>, <code>@emberkit/ui@^9.0.1</code>.
+2. Si vous aviez créé votre propre page 404 / 500 par défaut, retirez-la pour hériter des nouveaux défauts — ou gardez-la et branchez <code>notFoundRoute</code> / <code>errorRoute</code> via <code>virtual:emberkit-routes</code>.
+3. Pour les cibles Cloudflare, passez à <code>createCloudflareWorker</code> + <code>defineWranglerConfig</code> depuis <code>@emberkit/edge</code> si vous écriviez <code>worker.ts</code> à la main.
+4. Si vous avez déplacé des children de <code>&lt;Head&gt;</code> dans une route parente, rien à changer — les props shorthand continuent d'être fusionnées avec les children.
+
+## Étapes suivantes
+
+- [Internationalisation](/fr/docs/i18n)
+- [Edge Deployment](/fr/docs/edge)
+- [Composant Head](/fr/docs/head)
+- [Routage](/fr/docs/routing)
+- [Référence API](/fr/docs/api)

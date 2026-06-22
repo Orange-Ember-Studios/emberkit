@@ -19,7 +19,7 @@ export const DOCS_NAV: DocsNavSection[] = [
       { key: 'nav.installation', slug: 'installation' },
       { key: 'nav.quickStart', slug: 'quick-start' },
       { key: 'nav.builtWith', slug: 'built-with-emberkit' },
-      { key: 'nav.release', slug: 'release-0-8' },
+      { key: 'nav.release', slug: 'release-0-11' },
       { key: 'nav.api', slug: 'api' },
       { key: 'nav.examples', slug: 'examples' },
     ],

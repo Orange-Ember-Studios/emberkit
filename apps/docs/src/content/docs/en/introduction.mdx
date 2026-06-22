@@ -52,21 +52,21 @@ function Counter() {
 | State | Signals + targeted DOM updates |
 | Tooling | `emberkit dev`, `build`, `preview`, `serve` |
 
-## What's new in 0.8.0
+## What's new in 0.11.1
 
-- **Reactive effects** — <code>createEffect</code> / <code>createMemo</code> re-run when dependencies change
-- **View Transitions** — <code>render(..., &#123; viewTransitions: true &#125;)</code> for SPA navigation
-- **Dev API** — <code>devApiPlugin</code> and <code>src/routes/_api/*</code> in development
-- **sqlRawPlugin** — import <code>*.sql?raw</code> for edge deployments
-- **i18n** — JSON translation files with <code>createI18nFromGlob</code> ([guide](/en/docs/i18n))
+- **Internationalization** — JSON catalogs, locale routing, pluralization, and `Intl` formatting ([guide](/en/docs/i18n))
+- **Cloudflare Workers helpers** — <code>createCloudflareWorker</code>, <code>injectPublicEnv</code>, <code>defineWranglerConfig</code> from <code>@emberkit/edge</code>
+- **Default 404 / 500** — built-in pages when you omit <code>src/routes/404.tsx</code> or <code>500.tsx</code>
+- **Head shorthand merge** — <code>&lt;Head&gt;</code> props merge with children; fix SSR head priority
+- **Form event hydration** — `<form>` submit and `change` events hydrate through `data-ek-*` wiring
 
-See the full [Release 0.8.0](/en/docs/release-0-8) notes.
+See the full [Release 0.11.1](/en/docs/release-0-11) notes. Earlier releases: [Release 0.8.0](/en/docs/release-0-8).
 
 ## Next Steps
 
 - [Installation](/en/docs/installation) — Create a project
 - [Quick Start](/en/docs/quick-start) — First routes and signals
-- [Release 0.8.0](/en/docs/release-0-8) — Latest release
+- [Release 0.11.1](/en/docs/release-0-11) — Latest release
 - [SSR & SSG](/en/docs/ssr) — How speed is delivered in each mode
 - [Hydration](/en/docs/hydration) — Selective client interactivity
 - [Internationalization](/en/docs/i18n) — JSON translations and locale routing
