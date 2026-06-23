@@ -109,6 +109,32 @@ createEffect(() => {
 });
 ```
 
+### Common pitfalls
+
+<Alert variant="warning" title="Don't write a signal you also read">
+  An effect that reads and writes the same signal will loop. Unlike React, the framework runs effects synchronously, so the recursion has no scheduler to bail out and you get a stack overflow before any "maximum update depth" guard.
+</Alert>
+
+```tsx
+// ✘ Loops forever — setCount triggers the effect again immediately
+createEffect(() => {
+  setCount(count() + 1);
+});
+
+// ✓ Derive instead, or read and write different signals
+const doubled = createMemo(() => count() * 2);
+
+createEffect(() => {
+  setOther(other() + count()); // 'other' is written, 'count' is read — no cycle
+});
+```
+
+Since 0.11.1, EmberKit throws a clear error after more than 100 synchronous re-runs of the same effect chain. The error mentions `createMemo` and points at the pattern, but the right fix is still to derive values outside the effect.
+
+<Alert variant="warning" title="Errors propagate to the setter">
+  Errors thrown inside an effect bubble up through the signal setter that triggered the re-run, so a faulty effect can turn an unrelated <code>setX(...)</code> into a thrown exception on the caller's side. Wrap risky work in <code>try/catch</code> locally.
+</Alert>
+
 ## Batch Updates
 
 `batch` groups multiple signal updates into a single notification:

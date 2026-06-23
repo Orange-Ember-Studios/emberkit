@@ -109,6 +109,32 @@ createEffect(() => {
 });
 ```
 
+### Pièges courants
+
+<Alert variant="warning" title="N'écrivez pas un signal que vous lisez aussi">
+  Un effect qui lit et écrit le même signal boucle. Contrairement à React, le framework exécute les effects de façon synchrone, donc la récursion n'a pas de scheduler pour s'arrêter et vous obtenez un stack overflow avant qu'un garde « profondeur maximale » puisse agir.
+</Alert>
+
+```tsx
+// ✘ Boucle infinie — setCount redéclenche l'effect immédiatement
+createEffect(() => {
+  setCount(count() + 1);
+});
+
+// ✓ Dérivez plutôt, ou lisez et écrivez des signals différents
+const doubled = createMemo(() => count() * 2);
+
+createEffect(() => {
+  setOther(other() + count()); // 'other' est écrit, 'count' est lu — pas de cycle
+});
+```
+
+Depuis 0.11.1, EmberKit lève une erreur claire après plus de 100 ré-exécutions synchrones de la même chaîne d'effects. L'erreur mentionne <code>createMemo</code> et pointe vers le pattern, mais la bonne solution reste de dériver la valeur hors de l'effect.
+
+<Alert variant="warning" title="Les erreurs remontent vers le setter">
+  Les erreurs lancées dans un effect remontent via le setter du signal qui a déclenché la ré-exécution, donc un effect défectueux peut transformer un <code>setX(...)</code> sans rapport en exception du côté de l'appelant. Encadrez le travail risqué dans un <code>try/catch</code> local.
+</Alert>
+
 ## Mises à jour en batch
 
 `batch` regroupe plusieurs mises à jour de signals en une seule notification :

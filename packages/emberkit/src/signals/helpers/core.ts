@@ -12,8 +12,11 @@ type DepSet = Set<EffectRunner>;
 let activeEffect: EffectRunner | null = null;
 let untrackDepth = 0;
 let batchDepth = 0;
+let effectDepth = 0;
 const batchedEffects = new Set<EffectRunner>();
 const batchedSubs = new Set<() => void>();
+
+const MAX_EFFECT_DEPTH = 100;
 
 const effectDeps = new Map<EffectRunner, Set<DepSet>>();
 
@@ -86,6 +89,7 @@ export function resetSigIndex(): void {
   activeEffect = null;
   untrackDepth = 0;
   batchDepth = 0;
+  effectDepth = 0;
   batchedEffects.clear();
   batchedSubs.clear();
 }
@@ -236,8 +240,18 @@ export function createEffect(callback: () => void | (() => void)): () => void {
     const prevEffect = activeEffect;
     activeEffect = effectRunner;
     try {
+      effectDepth++;
+      if (effectDepth > MAX_EFFECT_DEPTH) {
+        throw new Error(
+          `createEffect re-ran more than ${MAX_EFFECT_DEPTH} times in a single synchronous pass. ` +
+            `This usually means an effect is reading a signal it also writes (for example ` +
+            `\`createEffect(() => { setCount(count() + 1); })\`). Derive the value with ` +
+            `\`createMemo\` or split read and write across different signals.`,
+        );
+      }
       cleanup = callback();
     } finally {
+      effectDepth--;
       activeEffect = prevEffect;
     }
   }

@@ -147,6 +147,29 @@ describe('createEffect', () => {
     count.value = 1;
     expect(runs).toBe(1);
   });
+
+  it('should throw on infinite loops where effect writes the signal it reads', () => {
+    const count = createSignal(0);
+
+    expect(() => {
+      createEffect(() => {
+        const n = count.value;
+        if (n < 1000) count.value = n + 1;
+      });
+    }).toThrow(/re-ran more than 100 times/);
+  });
+
+  it('should not throw when an effect writes a signal it does not read', () => {
+    const a = createSignal(0);
+    const b = createSignal(0);
+
+    expect(() => {
+      createEffect(() => {
+        void a.value;
+        b.value = Math.random();
+      });
+    }).not.toThrow();
+  });
 });
 
 describe('batch', () => {
