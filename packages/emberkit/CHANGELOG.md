@@ -1,5 +1,11 @@
 # @emberkit/core
 
+## 0.11.2
+
+### Patch Changes
+
+- 8ffb312: add runtime guard in createEffect that throws after more than 100 synchronous re-runs of the same effect chain, detecting "effect reads the signal it writes" infinite loops before they cause a stack overflow
+
 ## 0.11.1
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 # @emberkit/docs
 
+## 1.1.2
+
+### Patch Changes
+
+- Sync docs site with `@emberkit/core@0.11.2` (createEffect runtime guard against synchronous infinite loops) and `@emberkit/icons@9.0.2`
+- Document `createEffect` pitfalls (read/write same signal, error propagation) in [Signals guide](/en/docs/signals#common-pitfalls)
+
 ## 1.1.1
 
 ### Patch Changes
